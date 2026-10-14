@@ -18,8 +18,8 @@ window.UnwipMaps = (function () {
   const FRAMES = { double: 'Double line', simple: 'Single line', thick: 'Thick line', ornate: 'Ornate corners', none: 'No frame' };
   const FRAME_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#3a3a3a"><rect x="3" y="5" width="18" height="14" stroke-width="2"/><rect x="6" y="8" width="12" height="8" stroke-width="1"/></svg>';
   const TOOLS = [
-    ['select', '✋', 'Move & select: drag things around, double-click a label or pin to edit it, Delete removes it. To turn a landmark or label, drag the round handle that appears when it’s selected (it turns in small steps; hold Shift to turn it freely), or press R and Shift+R. Drag a bridge’s end to turn and stretch it. Drag empty space to pan; scroll to zoom'],
-    ['land', '🟫', 'Paint land'], ['water', '🌊', 'Paint water (rub out land)'],
+    ['select', '✋', 'Move & select: drag things around, double-click a label or pin to edit it, Delete removes it. To turn a landmark or label, drag the round handle that appears when it’s selected (it turns in small steps; hold Shift to turn it freely), or press R and Shift+R. To make one bigger or smaller, drag the square corner handle, or press + and −. Drag a bridge’s end to turn and stretch it. Drag empty space to pan; scroll to zoom'],
+    ['land', '🟫', 'Paint land'], ['water', '🌊', 'Water: paint over land to make lakes, bays and rivers (the sea around the land is already water)'],
     ['forest', '🌲', 'Forest: drag to scatter trees'], ['mountain', '⛰️', 'Mountains: drag to place a range'], ['hill', '🏔️', 'Hills: drag to scatter'],
     ['town', '🏠', 'Town: click to place'], ['city', '🏰', 'City or castle: click to place'], ['tower', '🗼', 'Tower: click to place'], ['ruin', '🏚️', 'Ruins: click to place'],
     ['road', '〰️', 'Road or path: drag to draw'], ['border', BORDER_ICON, 'Border: drag to draw a dotted border between lands or kingdoms. (For rivers and lakes, paint with 🌊 water)'],
@@ -288,7 +288,7 @@ window.UnwipMaps = (function () {
   function renderItems(g, P, skip) {
     st.paths.forEach((p, i) => { if (!(skip && skip.type === 'path' && skip.i === i)) drawPath(g, p, P); });
     if (isTown()) T.renderUnder(g, P, skip);
-    st.stamps.map((s, i) => [s, i]).sort((a, b) => a[0].y - b[0].y).forEach(([s, i]) => { if (!(skip && skip.type === 'stamp' && skip.i === i)) stamp(g, s, P); });
+    st.stamps.map((s, i) => [s, i]).sort((a, b) => ((a[0].z || 0) - (b[0].z || 0)) || a[0].y - b[0].y).forEach(([s, i]) => { if (!(skip && skip.type === 'stamp' && skip.i === i)) stamp(g, s, P); });
     (st.boxes || []).forEach((b, i) => { if (!(skip && skip.type === 'box' && skip.i === i)) drawRectFrame(g, P, b.x, b.y, b.w, b.h, b.f); });
     st.labels.forEach((l, i) => { if (!(skip && skip.type === 'label' && skip.i === i)) drawLabel(g, l, P); });
     st.pins.forEach((p, i) => { if (!(skip && skip.type === 'pin' && skip.i === i)) drawPin(g, p, P); });
@@ -344,13 +344,14 @@ window.UnwipMaps = (function () {
     if (sel) {
       if (sel.type === 'path' && st.paths[sel.i]) { ctx.save(); ctx.strokeStyle = '#3d7bd9'; ctx.globalAlpha = 0.35; ctx.lineWidth = 10; ctx.lineCap = 'round'; smoothPath(ctx, st.paths[sel.i].pts); ctx.stroke(); ctx.restore(); }
       else { const b = bounds(sel), o = turnable(sel); if (b) { ctx.save(); if (o && o.rot && sel.type === 'label') { ctx.translate(o.x, o.y); ctx.rotate(o.rot); ctx.translate(-o.x, -o.y); } ctx.strokeStyle = '#3d7bd9'; ctx.setLineDash([5, 4]); ctx.lineWidth = 2; ctx.strokeRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8); ctx.restore(); } }
+      const sz = sizeHandle(); if (sz) { ctx.save(); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#3d7bd9'; ctx.lineWidth = 2 / cam.z; const hs = 11 / cam.z; ctx.fillRect(sz.x - hs / 2, sz.y - hs / 2, hs, hs); ctx.strokeRect(sz.x - hs / 2, sz.y - hs / 2, hs, hs); ctx.restore(); }
       const hd = handle(); if (hd) { const o = turnable(sel); ctx.save(); ctx.strokeStyle = '#3d7bd9'; ctx.fillStyle = '#fff'; ctx.lineWidth = 2 / cam.z; if (!isBridge(o)) { ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(hd.x, hd.y); ctx.setLineDash([3 / cam.z, 3 / cam.z]); ctx.stroke(); ctx.setLineDash([]); } ctx.beginPath(); ctx.arc(hd.x, hd.y, 7 / cam.z, 0, 7); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(hd.x, hd.y, 3.5 / cam.z, -2.4, 1.2); ctx.stroke(); ctx.restore(); }
     }
     if (sel && sel.type === 'box' && st.boxes[sel.i]) { const b = st.boxes[sel.i], hs = 12 / cam.z; ctx.save(); ctx.fillStyle = '#3d7bd9'; ctx.fillRect(b.x + b.w - hs / 2, b.y + b.h - hs / 2, hs, hs); ctx.restore(); }
     if (drawing && drawing.path) drawPath(ctx, drawing.path, P);
     if (drawing && drawing.box) { const b = norm(drawing.box); drawRectFrame(ctx, P, b.x, b.y, b.w, b.h, b.f); }
     if (isTown()) T.drawPreview(ctx, P);
-    syncFrameSelect();
+    syncFrameSelect(); renderSelBar();
     if ((BRUSHY.includes(tool) || (isTown() && T.brushy(tool))) && hover) { ctx.save(); ctx.strokeStyle = '#3d7bd9'; ctx.lineWidth = 1.5 / cam.z; ctx.beginPath(); ctx.arc(hover.x, hover.y, brush * K / 2, 0, 7); ctx.stroke(); ctx.restore(); }
   }
   let itemsSkip = null, raf = 0;
@@ -370,6 +371,17 @@ window.UnwipMaps = (function () {
     const b = bounds(sel); if (!b) return null;
     const d = (sel.type === 'label' ? b.h / 2 : Math.max(b.h, b.w) / 2) + 22 / cam.z;
     return { x: o.x + Math.sin(a) * d, y: o.y - Math.cos(a) * d };
+  }
+  // a square handle at the bottom-right corner: drag it to make a landmark, symbol or label bigger or smaller
+  function sizeHandle() {
+    const o = turnable(sel); if (!o) return null;
+    const b = bounds(sel); if (!b) return null;
+    return { x: b.x + b.w + 4, y: b.y + b.h + 4 };
+  }
+  const LABEL_SIZE = l => l.size || (l.k === 'region' ? 44 : l.k === 'sea' ? 30 : 20);
+  function scaleBy(o, k) {
+    if (sel.type === 'label') o.size = Math.round(Math.max(8, Math.min(140, LABEL_SIZE(o) * k)));
+    else o.s = Math.max(0.3, Math.min(5, +((o.s || 1) * k).toFixed(3)));
   }
   const snapAngle = (a, free) => { a = Math.atan2(Math.sin(a), Math.cos(a)); return free ? Math.round(a * 1000) / 1000 : Math.round(a / (Math.PI / 12)) * (Math.PI / 12); };
   function turnTo(p, free) {
@@ -409,6 +421,7 @@ window.UnwipMaps = (function () {
 
   // ================================================================== EDITING
   const world = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left - cam.x) / cam.z, y: (e.clientY - r.top - cam.y) / cam.z }; };
+  function landCount() { try { const d = mctx.getImageData(0, 0, MW, MH).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 127) n++; return n; } catch { return 0; } }
   function paint(x, y, on, from) {
     mctx.globalCompositeOperation = on ? 'source-over' : 'destination-out';
     mctx.fillStyle = '#000'; mctx.strokeStyle = '#000'; mctx.lineCap = 'round'; mctx.lineWidth = brush;
@@ -420,6 +433,7 @@ window.UnwipMaps = (function () {
   function pointerDown(e) {
     if (e.button !== 0 && e.button !== 1) return;
     const p = world(e);
+    if (e.button === 0 && tool === 'select' && !e.altKey) { const sz = sizeHandle(), o = turnable(sel); if (sz && o && Math.hypot(p.x - sz.x, p.y - sz.y) < 12 / cam.z) { cv.setPointerCapture(e.pointerId); push(); drawing = { size: true, d0: Math.max(4, Math.hypot(p.x - o.x, p.y - o.y)), s0: o.s || 1, l0: sel.type === 'label' ? LABEL_SIZE(o) : 0 }; return; } }
     if (e.button === 0 && tool === 'select' && !e.altKey) { const hd = handle(); if (hd && Math.hypot(p.x - hd.x, p.y - hd.y) < 12 / cam.z) { cv.setPointerCapture(e.pointerId); push(); drawing = { turn: true }; return; } }
     if (e.button === 1 || (tool === 'select' && !hit(p.x, p.y)) || e.altKey) { drawing = { pan: true, sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y }; sel = null; redraw(); return; }
     cv.setPointerCapture(e.pointerId);
@@ -428,7 +442,7 @@ window.UnwipMaps = (function () {
     if (tool === 'select') { sel = hit(p.x, p.y); push(); drawing = { move: true, last: p }; itemsDirty = true; redraw(); return; }
     push();
     if (isTown() && T.pointerDown(p, tool)) return;
-    if (tool === 'land' || tool === 'water') { drawing = { brush: true, on: tool === 'land', last: p }; paint(p.x, p.y, drawing.on); redraw(); return; }
+    if (tool === 'land' || tool === 'water') { drawing = { brush: true, on: tool === 'land', last: p, before: landCount() }; paint(p.x, p.y, drawing.on); redraw(); return; }
     if (['forest', 'mountain', 'hill'].includes(tool)) { drawing = { scatter: tool === 'forest' ? 'tree' : tool, last: p }; scatter(p); changed(); return; }
     if (['town', 'city', 'tower', 'ruin'].includes(tool)) { st.stamps.push({ k: tool, x: p.x, y: p.y, s: 1 }); sel = { type: 'stamp', i: st.stamps.length - 1 }; changed(); schedule(); return; }
     if (['road', 'border'].includes(tool)) { drawing = { path: { k: tool, pts: [[p.x, p.y]] } }; return; }
@@ -452,7 +466,7 @@ window.UnwipMaps = (function () {
   function pointerMove(e) {
     const p = world(e); hover = p;
     if (T && T.busy) { T.pointerMove(p); return; }
-    if (!drawing) { if (BRUSHY.includes(tool)) redraw(); else if (tool === 'select') { const hd = handle(); cv.style.cursor = hd && Math.hypot(p.x - hd.x, p.y - hd.y) < 12 / cam.z ? 'grab' : 'default'; } return; }
+    if (!drawing) { if (BRUSHY.includes(tool)) redraw(); else if (tool === 'select') { const hd = handle(), sz = sizeHandle(); cv.style.cursor = sz && Math.hypot(p.x - sz.x, p.y - sz.y) < 12 / cam.z ? 'nwse-resize' : hd && Math.hypot(p.x - hd.x, p.y - hd.y) < 12 / cam.z ? 'grab' : 'default'; } return; }
     if (drawing.pan) { cam.x = drawing.cx + e.clientX - drawing.sx; cam.y = drawing.cy + e.clientY - drawing.sy; redraw(); return; }
     if (drawing.move && sel) {
       const dx = p.x - drawing.last.x, dy = p.y - drawing.last.y; drawing.last = p;
@@ -463,6 +477,7 @@ window.UnwipMaps = (function () {
     }
     if (drawing.box) { drawing.box.x1 = p.x; drawing.box.y1 = p.y; redraw(); return; }
     if (drawing.turn) { turnTo(p, e.shiftKey); itemsDirty = true; redraw(); return; }
+    if (drawing.size) { const o = turnable(sel); if (o) { const k = Math.hypot(p.x - o.x, p.y - o.y) / drawing.d0; if (sel.type === 'label') o.size = Math.round(Math.max(8, Math.min(140, drawing.l0 * k))); else o.s = Math.max(0.3, Math.min(5, +(drawing.s0 * k).toFixed(3))); } itemsDirty = true; redraw(); return; }
     if (drawing.resize) { const b = drawing.resize; b.w = Math.max(30, p.x - b.x); b.h = Math.max(30, p.y - b.y); itemsDirty = true; redraw(); return; }
     if (drawing.brush) { paint(p.x, p.y, drawing.on, drawing.last); drawing.last = p; redraw(); return; }
     if (drawing.scatter) { if (Math.hypot(p.x - drawing.last.x, p.y - drawing.last.y) > (drawing.scatter === 'mountain' ? 22 : 10)) { drawing.last = p; scatter(p); changed(); } return; }
@@ -472,7 +487,12 @@ window.UnwipMaps = (function () {
     if (T && T.busy) { T.pointerUp(); return; }
     if (!drawing) return;
     const d = drawing; drawing = null;
-    if (d.brush) landDirty = true;
+    if (d.brush) {
+      landDirty = true;
+      // water painted where there was no land changes nothing you can see: say how the tool works instead of seeming broken
+      if (!d.on && Math.abs(landCount() - d.before) < 3) U.toast('That’s already water. Paint 🌊 over land to make a lake, a bay or a river.', '', 5000);
+      else if (d.on && Math.abs(landCount() - d.before) < 3) U.toast('That’s already land. Paint 🟫 over the sea to add land.', '', 5000);
+    }
     if (d.path) { if (d.path.pts.length >= 2) st.paths.push(d.path); else undo.pop(); }
     if (d.box) { const b = norm(d.box); if (b.w > 20 && b.h > 20) { st.boxes = st.boxes || []; st.boxes.push(b); sel = { type: 'box', i: st.boxes.length - 1 }; } else undo.pop(); }
     if (d.move && !sel) undo.pop();
@@ -530,10 +550,34 @@ window.UnwipMaps = (function () {
     if (h.type === 'label') { push(); addLabel(null, st.labels[h.i]); }
     if (h.type === 'pin') { const pin = st.pins[h.i]; if (pin.placeId && host.inBook && U.findNode(pin.placeId)) { close().then(() => U.openDoc(pin.placeId)); } else { push(); addPin(null, pin); } }
   }
+  // ================================================================== LAYERS: bring forward / send back
+  // Things of one kind are drawn in order (landmarks: nearer the bottom of the map in front, unless you've moved one).
+  const LIST_OF = () => ({ stamp: 'stamps', pin: 'pins', label: 'labels', path: 'paths', box: 'boxes', ...(T ? T.LISTS : {}) });
+  function reorder(how) {
+    if (!sel) return;
+    const key = LIST_OF()[sel.type], list = key && st[key]; if (!list || !list[sel.i]) return;
+    push();
+    if (sel.type === 'stamp') {
+      const o = list[sel.i], zs = list.map(x => x.z || 0);
+      if (how === 'front') o.z = Math.max(...zs) + 1; else if (how === 'back') o.z = Math.min(...zs) - 1;
+      else o.z = (o.z || 0) + (how === 'up' ? 1 : -1);
+    } else {
+      const [o] = list.splice(sel.i, 1);
+      const to = how === 'front' ? list.length : how === 'back' ? 0 : Math.max(0, Math.min(list.length, sel.i + (how === 'up' ? 1 : -1)));
+      list.splice(to, 0, o); sel = { type: sel.type, i: to };
+    }
+    itemsDirty = true; changed(); schedule(); renderSelBar();
+  }
+  // a small bar over the map while something is selected: layers and delete (also on right-click, and [ ] keys)
+  function renderSelBar() {
+    const bar = view && view.querySelector('.mp-selbar'); if (!bar) return;
+    const show = !!(sel && tool === 'select' && LIST_OF()[sel.type]);
+    bar.classList.toggle('hidden', !show);
+  }
   function removeSel() {
     if (!sel) return; push();
     const list = { stamp: 'stamps', pin: 'pins', label: 'labels', path: 'paths', box: 'boxes', ...(T ? T.LISTS : {}) }[sel.type];
-    st[list].splice(sel.i, 1); sel = null; changed(); schedule();
+    st[list].splice(sel.i, 1); sel = null; changed(); schedule(); renderSelBar();
   }
 
   // ================================================================== A PICTURE OF ANY MAP (split view)
@@ -594,6 +638,7 @@ window.UnwipMaps = (function () {
     view.innerHTML = `<div class="mp-top">
         <button class="icon-btn" id="mp-close" data-tip="Close the map">${I.back}</button><b class="mp-title">${esc(host.title(id) || 'Map')}</b><span class="mp-saved" id="mp-saved">Saved</span>
         <span class="mp-sp"></span>
+        ${host.inBook === false ? '<button class="st-proof rec-btn" type="button" title="Proof of writing: record your screen"></button>' : ''}
         <button class="btn small" id="mp-gen" data-tip="Roll a random coastline, mountains, forests, rivers and towns, like rolling dice. Made by fixed rules and random numbers on this device, no AI. You can edit everything after">🎲 Random map…</button>
         <select id="mp-style" data-tip="Map style">${Object.entries(STYLES).map(([k, v]) => `<option value="${k}" ${st.style === k ? 'selected' : ''}>${v.name}</option>`).join('')}</select>
         <button class="btn small ghost ${st.grid ? 'on' : ''}" id="mp-grid" data-tip="Hex grid">⬡ Grid</button>
@@ -607,8 +652,9 @@ window.UnwipMaps = (function () {
       <div class="mp-tabs" id="mp-tabs"></div>
       <div class="mp-body"><div class="mp-tools"><div class="mp-toollist"></div>
         <div class="mp-brush" data-tip="Brush size: how big the land, water, forest and mountain brushes paint"><span class="mp-brush-ic">🖌️</span><input type="range" id="mp-size" min="4" max="60" value="${brush}" orient="vertical"><span class="mp-brush-n" id="mp-size-n">${brush}</span></div></div>
-        <div class="mp-stage"><canvas></canvas><div class="mp-opts hidden" id="mp-opts"></div><div class="mp-hint">Scroll to zoom · drag empty space to move around · double-click a pin or label to edit it</div></div></div>`;
+        <div class="mp-stage"><canvas></canvas><div class="mp-opts hidden" id="mp-opts"></div><div class="mp-selbar hidden"><button type="button" class="btn small" data-layer="front" title="Bring to front (Shift+])">⇈ Front</button><button type="button" class="btn small" data-layer="up" title="Bring forward (])">↑ Forward</button><button type="button" class="btn small" data-layer="down" title="Send backward ([)">↓ Backward</button><button type="button" class="btn small" data-layer="back" title="Send to back (Shift+[)">⇊ Back</button><button type="button" class="btn small ghost" data-layer="del" title="Delete">🗑</button></div><div class="mp-hint">Scroll to zoom · drag empty space to move around · double-click a pin or label to edit it</div></div></div>`;
     host.mount(view);
+    if (window.UnwipProof && window.UnwipProof.renderStatus) window.UnwipProof.renderStatus();   // fill in the Record button (or the timer if a video is going)
     cv = $('canvas', view); ctx = cv.getContext('2d');
     buildTools(); resize(); fit(); setTool('select'); draw();
     // touch screens: one finger uses the tool, two fingers pinch to zoom and drag to move around (a stroke the first
@@ -646,6 +692,15 @@ window.UnwipMaps = (function () {
     window.addEventListener('pointerup', lift); window.addEventListener('pointercancel', lift);
     view.addEventListener('gesturestart', e => e.preventDefault());   // Safari's own page zoom
     cv.addEventListener('wheel', wheel, { passive: false }); cv.addEventListener('dblclick', dblclick);
+    view.querySelector('.mp-selbar').addEventListener('click', e => { const b = e.target.closest('[data-layer]'); if (!b) return; if (b.dataset.layer === 'del') removeSel(); else reorder(b.dataset.layer); });
+    cv.addEventListener('contextmenu', e => {
+      const p = world(e), h = hit(p.x, p.y); if (!h || !LIST_OF()[h.type]) return;
+      e.preventDefault(); sel = h; setTool('select'); redraw();
+      U.showMenu(e.clientX, e.clientY, [
+        { label: 'Bring to front', action: () => reorder('front') }, { label: 'Bring forward', action: () => reorder('up') },
+        { label: 'Send backward', action: () => reorder('down') }, { label: 'Send to back', action: () => reorder('back') },
+        { sep: true }, { label: 'Delete', danger: true, action: () => removeSel() }]);
+    });
     let autoFit = true; const autoFitOff = () => { autoFit = false; };
     new ResizeObserver(() => { if (!view) return; if (autoFit) fit(); resize(); }).observe($('.mp-stage', view));
     cv.addEventListener('pointerdown', () => { autoFit = false; }); cv.addEventListener('wheel', () => { autoFit = false; });
@@ -759,6 +814,8 @@ window.UnwipMaps = (function () {
     const ctrl = e.ctrlKey || e.metaKey;
     if (ctrl && e.key.toLowerCase() === 'z') { e.preventDefault(); e.stopPropagation(); $('#mp-undo', view).click(); }
     else if (ctrl && e.key.toLowerCase() === 'y') { e.preventDefault(); e.stopPropagation(); $('#mp-redo', view).click(); }
+    else if (!ctrl && !e.altKey && (e.key === ']' || e.key === '[' || e.key === '}' || e.key === '{') && sel) { e.preventDefault(); e.stopPropagation(); const fwd = e.key === ']' || e.key === '}'; reorder(e.shiftKey || e.key === '}' || e.key === '{' ? (fwd ? 'front' : 'back') : (fwd ? 'up' : 'down')); }
+    else if (!ctrl && !e.altKey && (e.key === '+' || e.key === '=' || e.key === '-' || e.key === '_') && turnable(sel)) { e.preventDefault(); e.stopPropagation(); push(); scaleBy(turnable(sel), e.key === '-' || e.key === '_' ? 1 / 1.15 : 1.15); changed(); schedule(); }
     else if (!ctrl && !e.altKey && e.key.toLowerCase() === 'r' && turnable(sel)) { e.preventDefault(); e.stopPropagation(); push(); const o = turnable(sel); o.rot = snapAngle((o.rot || 0) + (e.shiftKey ? -1 : 1) * Math.PI / 12); if (!o.rot) delete o.rot; changed(); schedule(); }
     else if ((e.key === 'Delete' || e.key === 'Backspace') && sel) { e.preventDefault(); e.stopPropagation(); removeSel(); }
     else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (sel) { sel = null; redraw(); } else close(); }
