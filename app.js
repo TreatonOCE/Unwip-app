@@ -142,7 +142,13 @@
       back.addEventListener('mousedown', e => { if (e.target === back) close(null); });
       document.body.appendChild(back);
       onOpen && onOpen(back);
-      const first = back.querySelector('input, select'); if (first) { first.focus(); first.select && first.select(); }
+      // put the cursor in the first box to type in, never a drop-down or a tick box (on an iPhone or iPad, focusing a
+      // drop-down pops its picker open straight away). On touch screens only for a dialog that is just one text box,
+      // so the keyboard doesn't jump up over every dialog.
+      const texts = [...back.querySelectorAll('input:not([type]), input[type=text], input[type=search], input[type=number], input[type=email], input[type=url]')].filter(x => !x.disabled && x.offsetParent !== null);
+      const touch = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+      const first = texts[0];
+      if (first && (!touch || texts.length === 1)) { first.focus(); first.select && first.select(); }
     });
   }
   async function promptText(title, label, value = '') {
@@ -4707,6 +4713,17 @@
   // ================================================================== START
   (async function start() {
     try { S.settings = await api.getSettings(); } catch { S.settings = {}; }
+    // a Build piece in its own window (PC/Mac, opened from inside a book): show just that piece
+    const buildWin = new URLSearchParams(location.search).get('buildwin');
+    if (buildWin) {
+      window.UNWIP_BUILDWIN = true; document.body.classList.add('buildwin');
+      $('#library').classList.add('hidden'); $('#workspace').classList.add('hidden');
+      try { await Fonts.loadImported(await api.importedFonts()); } catch {}
+      if (document.readyState === 'loading') await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
+      window.__flush = () => window.UnwipBuild ? window.UnwipBuild.flush() : true;
+      if (window.UnwipBuild) await window.UnwipBuild.open(buildWin, 'window');
+      return;
+    }
     S.view = 'write';
     let m = 'focused'; try { m = localStorage.getItem('folio-mode') || 'focused'; } catch {}
     S.mode = m; document.body.classList.toggle('detailed', m === 'detailed'); $$('#mode-switch button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
