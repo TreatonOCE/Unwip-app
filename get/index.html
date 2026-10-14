@@ -185,6 +185,7 @@ table.map td:last-child{color:var(--muted)}
 
 /* download */
 .get{background:linear-gradient(180deg,var(--bg),var(--sky))}
+.get .price{margin:22px auto 0;max-width:640px;text-align:center;font-size:17px}
 .big{background:var(--panel);border:2px solid var(--ink);border-radius:18px;padding:30px;display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start;margin-top:36px;box-shadow:var(--shadow)}
 .big img.icon{width:84px;height:84px;border-radius:19px}
 .big h3{font-size:1.6rem}
@@ -356,12 +357,12 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
     <div class="dots" id="dots" aria-hidden="true"><svg class="pd d1" viewBox="0 0 44 44" aria-hidden="true"><defs><clipPath id="pdc1"><rect class="fr" x="0" y="0" width="44" height="44"/></clipPath></defs><circle cx="22" cy="22" r="17.5" fill="none" stroke="#EE6038" stroke-width="9"/><circle cx="22" cy="22" r="22" fill="#EE6038" clip-path="url(#pdc1)"/></svg><svg class="pd d2" viewBox="0 0 44 44" aria-hidden="true"><defs><clipPath id="pdc2"><rect class="fr" x="0" y="0" width="44" height="44"/></clipPath></defs><circle cx="22" cy="22" r="17.5" fill="none" stroke="#EE6038" stroke-width="9"/><circle cx="22" cy="22" r="22" fill="#EE6038" clip-path="url(#pdc2)"/></svg><svg class="pd d3" viewBox="0 0 44 44" aria-hidden="true"><defs><clipPath id="pdc3"><rect class="fr" x="0" y="0" width="44" height="44"/></clipPath></defs><circle cx="22" cy="22" r="17.5" fill="none" stroke="#EE6038" stroke-width="9"/><circle cx="22" cy="22" r="22" fill="#EE6038" clip-path="url(#pdc3)"/></svg></div>
     <p class="slogan">Write to finish</p>
     <h1><span>Write anywhere.</span> <span>Keep it yours.</span></h1>
-    <p class="lede">Unwip is a quiet writing app for novelists. Your formatting stays put across your PC, Mac, iPhone and iPad, your files stay on your own devices, and the whole book leaves with you whenever you like.</p>
+    <p class="lede">Unwip is a quiet writing app for novelists: on Windows today, on the Mac in beta, and on iPhone and iPad from the browser. Your formatting stays put between them, your files stay on your own devices, and the whole book leaves with you whenever you like.</p>
     <div class="btn-row" id="hero-cta">
       <a class="btn" href="#download"><svg aria-hidden="true"><use href="#dl"/></svg>Download Unwip</a>
       <a class="btn ghost" href="#flow">See how it works</a>
     </div>
-    <p class="small note">No account and no AI. Your writing stays on your devices unless you choose to send it. Free while it’s in beta.</p>
+    <p class="small note">No account and no AI. Your writing stays on your devices unless you choose to send it. Free while in beta, then a one-time purchase. No subscription, ever.</p>
     <div class="stage" id="stage">
       <div class="float goal" aria-hidden="true">
         <svg class="ring" viewBox="0 0 42 42"><circle class="bg" cx="21" cy="21" r="18"/><circle class="fg" id="goalring" cx="21" cy="21" r="18"/></svg>
@@ -422,7 +423,7 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
           <ul>
             <li>Take the whole book out any time: Scrivener, Word, Markdown, PDF, EPUB or a full backup.</li>
             <li>Works offline. Nothing needs Unwip to be around tomorrow.</li>
-            <li>No subscription and no lock-in.</li>
+            <li>A one-time purchase at launch, never a subscription. Beta testers keep it free.</li>
           </ul>
         </article>
       </div>
@@ -452,7 +453,9 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
           <p>Start with only the manuscript. Your chapters and scenes live in the binder, the page is just the page, and Unwip saves every few seconds and keeps backups.</p>
           <ul class="ticks">
             <li><b>Paste that behaves.</b> From Word, Google Docs or Scrivener, with the stray blank lines tidied.</li>
-            <li><b>Goals and sprints.</b> A daily word goal, timed sprints, and Spark when you’re stuck.</li>
+            <li><b>Goals and sprints.</b> A daily word goal and timed sprints.</li>
+            <li><b>Spark, for a slow day.</b> Small tools to get you moving: a 50-word start, a messy draft with no backspace, or a chapter broken into tiny steps.</li>
+            <li><b>Build your world.</b> Paint or roll up maps, design a magic system whose rules Unwip checks every spell against, and make runes, sigils and coats of arms.</li>
             <li><b>Revise without AI.</b> Repeated words, long sentences and grammar slips, by fixed rules.</li>
             <li><b>Snapshots.</b> Save a version before a big rewrite, compare it, bring it back.</li>
           </ul>
@@ -560,7 +563,7 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
             <div><b id="st-pasted">0</b><span>words pasted</span></div>
             <div><b id="st-share">100%</b><span>of new words typed</span></div>
           </div>
-          <p class="small" style="margin-top:16px"><b>Only on your device:</b> replays are kept with the book (and in your own cloud folder if the book is there), never uploaded anywhere. A long writing day is about 1 MB. There’s a screen-video option too, with a clear warning first because videos get big, a pause button for breaks, and an optional “Not recording” reminder so you never forget to start it.</p>
+          <p class="small" style="margin-top:16px"><b>Only on your device:</b> Proof of writing is recorded on your device and only leaves it if you export or share it. Replays are kept with the book (and in your own cloud folder if the book is there), never uploaded to Unwip. A long writing day is about 1 MB. There’s a screen-video option too, with a clear warning first because videos get big, a pause button for breaks, and an optional “Not recording” reminder so you never forget to start it.</p>
         </div>
         <div class="rv d1">
           <div class="replay" aria-label="A replay of a paragraph being written, with a pasted note highlighted" role="img">
@@ -610,13 +613,13 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
             <li><strong>Dropbox between devices</strong>The PC and an iPhone in real use; two computers changing the same chapter tested in a simulation.</li>
             <li><strong>Exporting to Scrivener</strong>Opened in Scrivener on Windows. Scrivener on Mac hasn’t tried it yet.</li>
             <li><strong>Obsidian import</strong>Tested with sample vaults and one real one. More real vaults welcome.</li>
+            <li><strong>The Mac app</strong>In use by beta testers on a Mac with an Apple M1 chip: writing, importing, Build and Dropbox sync. Exporting on a Mac, and Intel Macs, haven’t been confirmed yet.</li>
             <li><strong>Proof of writing</strong>Replay, reports and timelapses on Windows and in browsers.</li>
           </ul>
         </div>
         <div class="rv d2">
           <h3><svg class="dot" aria-hidden="true"><use href="#s0"/></svg>Waiting for testers</h3>
           <ul>
-            <li><strong>The Mac app</strong>Built and checked, but not yet opened on a real Mac.</li>
             <li><strong>Scrivener on Mac</strong>Opening an Unwip export.</li>
             <li><strong>Vellum, Atticus and Ulysses</strong>Using the exported Word and Markdown files.</li>
             <li><strong>Android</strong>The browser version should work; nobody has tried it yet.</li>
@@ -632,6 +635,7 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
       <h2 class="rv">Get Unwip</h2>
       <div class="big rv" id="big"></div>
       <div class="tiles" id="tiles"></div>
+      <p class="price rv"><b>Free while in beta.</b> Beta testers keep it free. The launch price will be a one-time purchase, no subscription.</p>
       <p class="small rv" style="margin-top:22px">A beta: keep your original Scrivener project until you’re happy, and save a backup now and then (on the main screen, a book’s ⋯ menu › <b>Save a full backup file</b>).</p>
     </div>
   </section>
@@ -640,7 +644,7 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
     <div class="wrap center">
       <h2 class="rv">Questions</h2>
       <div class="faq rv d1">
-        <details><summary>Is it really free?</summary><p>Yes, while it’s in beta. Pricing, if there is any, hasn’t been decided.</p></details>
+        <details><summary>Is it free?</summary><p>Yes, while it’s in beta. When Unwip launches it will be a one-time purchase, never a subscription. If you tested it during the beta, you’ll keep it free.</p></details>
         <details><summary>Does it use AI?</summary><p>No. Nothing in Unwip writes, rewrites or suggests for you. Spelling and grammar checks follow fixed rules and run on your device.</p></details>
         <details><summary>Is my writing private?</summary><p>Yes. Unwip has no account and no server of its own, so your writing never passes through Unwip. It stays on your devices, and in your own cloud (Dropbox, OneDrive, Google Drive or iCloud Drive) if you connect it. Nothing is used to train AI, and there’s no tracking. Nothing leaves your device unless you choose to send it, such as a problem report you email or a Proof of writing report you share.</p></details>
         <details><summary>Where are my books stored?</summary><p>On your device, or in your own cloud: Dropbox works everywhere, and on a PC or Mac you can also use OneDrive, Google Drive or iCloud Drive. Unwip doesn’t ask you to sign up, and your writing isn’t uploaded to Unwip.</p></details>
@@ -659,7 +663,7 @@ dialog.mail .close{position:absolute;top:12px;right:14px;border:0;background:non
 
 <footer>
   <div class="wrap">
-    <p>Unwip. Write to finish. Made by one writer, for writers. No ads, no tracking.</p>
+    <p>Unwip. Write to finish. Made by one writer, for writers. No ads, no tracking. One-time purchase at launch. No subscription, ever.</p>
     <div class="links"><a data-link="discord" href="#download">Discord</a><a data-link="email" href="#download">Email</a><a href="fonts/OFL-Fraunces.txt">Font licence</a></div>
   </div>
 </footer>
@@ -689,11 +693,11 @@ var GATED = false;
   var P = {
     win: { title: 'Unwip for Windows', body: '<p>Unwip installs itself with shortcuts on your Desktop and in the Start menu, then keeps itself up to date. The first launch downloads about 110 MB, so you need an internet connection once.</p>',
       buttons: btn('windows', 'Download for Windows', '', 1), after: '<p class="small" style="margin-top:12px">If Windows says “Windows protected your PC”, choose <b>More info</b>, then <b>Run anyway</b>.</p>',
-      tile: '<h3>Windows</h3><p>The full app. Installs itself and keeps itself up to date.</p><div class="btn-row">' + btn('windows', 'Download', '', 1) + '</div>' },
-    mac: { title: 'Unwip for Mac <span class="beta">beta, not yet tested</span>', body: '<p>The full app, for macOS 10.15 or later. It keeps itself up to date. Not sure which to choose? Apple menu › <b>About This Mac</b>: “Chip: Apple M…” means Apple chip.</p>',
+      tile: '<h3>Windows</h3><p>The full app. Installs itself and keeps itself up to date. The first launch downloads about 110 MB. If Windows says “Windows protected your PC”, choose <b>More info</b>, then <b>Run anyway</b>.</p><div class="btn-row">' + btn('windows', 'Download', '', 1) + '</div>' },
+    mac: { title: 'Unwip for Mac <span class="beta">beta</span>', body: '<p>The full app, for macOS 10.15 or later. It keeps itself up to date. Not sure which to choose? Apple menu › <b>About This Mac</b>: “Chip: Apple M…” means Apple chip.</p>',
       buttons: btn('macArm', 'Mac with Apple chip', '', 1) + btn('macIntel', 'Mac with Intel', 'ghost', 1),
       after: '<ol><li>Unzip the download and drag <b>Unwip</b> into Applications.</li><li>Double-click it. macOS says it can’t check it: click <b>Done</b>.</li><li>Open System Settings › Privacy &amp; Security, click <b>Open Anyway</b> and enter your password. Once only.</li></ol><p class="small" style="margin-top:10px">Rather not download? Open Unwip in Safari and choose File › Add to Dock.</p>',
-      tile: '<h3>Mac <span class="beta">beta, not yet tested</span></h3><p>The full app. First open: System Settings › Privacy &amp; Security › Open Anyway.</p><div class="btn-row">' + btn('macArm', 'Apple chip', '', 1) + btn('macIntel', 'Intel', 'ghost', 1) + '</div>' },
+      tile: '<h3>Mac <span class="beta">beta</span></h3><p>The full app. First open: System Settings › Privacy &amp; Security › Open Anyway.</p><div class="btn-row">' + btn('macArm', 'Apple chip', '', 1) + btn('macIntel', 'Intel', 'ghost', 1) + '</div>' },
     ios: { title: 'Unwip for iPhone and iPad', body: '<p>No App Store needed. It opens like any other app once it’s on your Home Screen.</p>' + (ios && !safari ? '<p class="small" style="margin-top:8px">Open this page in <b>Safari</b> first: other browsers on iPhone can’t add it to the Home Screen.</p>' : ''),
       buttons: btn('web', 'Open Unwip', 'coral', 1), after: '<ol><li>Tap <b>Open Unwip</b>.</li><li>Tap <b>Share</b> (the square with an arrow).</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol><div class="warn"><b>Turn on Dropbox sync or make regular backups.</b> Your device can clear browser storage.</div>',
       tile: '<h3>iPhone and iPad</h3><p>No App Store needed. Open it in Safari, then Share › <b>Add to Home Screen</b>. Turn on Dropbox sync or make regular backups: your device can clear browser storage.</p><div class="btn-row">' + btn('web', 'Open Unwip', '', 1) + '</div>' },
