@@ -1,4 +1,4 @@
-window.UNWIP_VERSION = "0.44.32";
+window.UNWIP_VERSION = "0.44.35";
 if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 (function () {
   if (location.protocol !== 'https:') return;
@@ -10,7 +10,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') addEventList
       const m = t.match(/UNWIP_VERSION = "([^"]+)"/); const v = m && m[1];
       const U = window.__unwip; if (!v || v === window.UNWIP_VERSION || v === offered || !U || !U.toastAction) return;
       offered = v;
-      U.toastAction('A new version of Unwip is ready (' + v + ').', 'Update now', async () => { try { await U.flushSave(); if (U.saveMetaNow) await U.saveMetaNow(); } catch (e) {} location.reload(); }, 60000);
+      U.toastAction('A new version of Unwip is ready (' + v + ').', 'Update now', async () => { try { await U.flushSave(); if (U.saveMetaNow) await U.saveMetaNow(); } catch (e) {} if (U.saveFailing) { U.toast('Unwip can’t update yet: some writing isn’t saved (the bar at the top says why). It updates once saving works again.', 'warn', 9000); offered = ''; return; } location.reload(); }, 60000);
     } catch (e) {}
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
