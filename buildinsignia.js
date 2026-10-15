@@ -70,10 +70,18 @@
     glyph: ['Data glyph', 'M-36-36H-12V-12H-36Z M12-36H36V-12H12Z M-36 12H-12V36H-36Z M12 12H24V24H12Z M24 24H36V36H24Z M-12-24H12M-24-12V12M24-12V12']
   };
   const SYM_KEYS = Object.keys(SYM);
+  // the line symbols in groups, so the list is easy to scan
+  const GROUPS = [['Tech & system', ['chip', 'network', 'neural', 'hexcore', 'radar', 'power', 'cursor', 'target', 'glyph', 'antenna', 'pulse', 'atom', 'crosshair', 'lock', 'ascend']],
+    ['Combat', ['skull', 'dagger', 'swords', 'spear', 'claw', 'shield', 'bolt']],
+    ['Nature & body', ['eye', 'serpent', 'wings', 'flame', 'sun', 'moon', 'hand']],
+    ['Shapes & signs', ['star', 'triangle', 'infinity', 'stack', 'hourglass', 'cog', 'crown', 'key', 'anchor', 'rook']]];
+  const LIB = window.UnwipSymbols;
+  // a symbol from the shared library (animals and the like), drawn solid in the line colour
+  const libSym = (k, col) => LIB && LIB.get(k) ? LIB.g(k, col) : '';
   const blank = () => ({ frame: 'hex', symbol: 'eye', scheme: 'neon', name: '', desig: '', code: '', weight: 5, panel: true, ticks: true, double: true, custom: null, pattern: 'none', symScale: 1, rank: 0, glow: false, nodes: false, readout: false, readL: '', readR: '', barcode: false, glitch: false, orbit: false, scope: false });
   // a steady number from the name, so barcodes and readouts don't change every time it's drawn
   const hash = str => { let h = 2166136261; for (const c of String(str || 'unwip')) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
-  const COND = "'Bahnschrift SemiCondensed', Bahnschrift, 'DIN Condensed', 'Avenir Next Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif";
+  const COND = "Oswald, 'Arial Narrow', sans-serif";
   const colours = d => Object.assign({}, SCHEMES[d.scheme] || SCHEMES.neon, d.custom || {});
 
   // ---- the frames, around a centre of 200,200
@@ -148,9 +156,12 @@
     const fit = (n, f, sp, max) => n * (f * 0.56 + sp) > max ? ` textLength="${max}" lengthAdjust="spacingAndGlyphs"` : '';
     const text = hasText ? `<text x="200" y="${d.desig ? 450 : 462}" text-anchor="middle" font-family="${COND}" font-weight="700" font-size="${fs}" letter-spacing="${ls}"${fit(nm.length, fs, ls, 350)} fill="${C.main}">${nm}</text>
       ${dg ? `<path d="M40 482H${200 - Math.min(160, (d.desig || '').length * 6.8 + 12)}M${200 + Math.min(160, (d.desig || '').length * 6.8 + 12)} 482H360" stroke="${C.acc}" stroke-width="2"/><text x="200" y="488" text-anchor="middle" font-family="${COND}" font-size="17" letter-spacing="4"${fit((d.desig || '').length, 17, 4, 300)} fill="${C.acc}">${dg}</text>` : ''}
-      ${cd ? `<text x="372" y="512" text-anchor="end" font-family="Menlo, Consolas, monospace" font-size="12" letter-spacing="2" fill="${C.main}" opacity=".6">${cd}</text>` : ''}` : '';
+      ${cd ? `<text x="372" y="512" text-anchor="end" font-family="'IBM Plex Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2" fill="${C.main}" opacity=".6">${cd}</text>` : ''}` : '';
     const sk = k * (+d.symScale || 1), syCy = cy + (d.frame === 'triangle' ? 40 : 0) - (d.rank ? 16 : 0);
-    const symPath = (col, op, dx) => `<g transform="translate(${200 + (dx || 0)} ${syCy}) scale(${sk})"><path d="${sym[1]}" fill="none" stroke="${col}" stroke-width="${symW / (+d.symScale || 1)}" stroke-linejoin="round" stroke-linecap="round"${op ? ` opacity="${op}"` : ''}/></g>`;
+    const isLib = !SYM[d.symbol] && LIB && LIB.get(d.symbol);
+    const symPath = (col, op, dx) => isLib
+      ? `<g transform="translate(${200 + (dx || 0)} ${syCy}) scale(${sk * 0.95})"${op ? ` opacity="${op}"` : ''}>${libSym(d.symbol, col)}</g>`
+      : `<g transform="translate(${200 + (dx || 0)} ${syCy}) scale(${sk})"><path d="${sym[1]}" fill="none" stroke="${col}" stroke-width="${symW / (+d.symScale || 1)}" stroke-linejoin="round" stroke-linecap="round"${op ? ` opacity="${op}"` : ''}/></g>`;
     const hv = hash(d.name + d.code + d.desig);
     const extras = [];
     if (d.orbit) extras.push(`<circle cx="200" cy="${syCy}" r="${Math.min(118, 50 * sk + 18)}" fill="none" stroke="${C.acc}" stroke-width="1.6" stroke-dasharray="3 7"/><circle cx="${200 + Math.min(118, 50 * sk + 18) * Math.cos(-0.7)}" cy="${syCy + Math.min(118, 50 * sk + 18) * Math.sin(-0.7)}" r="5" fill="${C.acc}"/>`);
@@ -158,7 +169,7 @@
     if (d.nodes) { const cs = cornersOf(d); extras.push(`<path d="${cs.map(([x, y]) => { const q = Math.atan2(y - syCy, x - 200), r = 62 * Math.min(1.4, sk / 2.15 + 0.3); return `M${x.toFixed(1)} ${y.toFixed(1)}L${(200 + r * Math.cos(q)).toFixed(1)} ${(syCy + r * Math.sin(q)).toFixed(1)}`; }).join('')}" stroke="${C.acc}" stroke-width="1" opacity=".55" stroke-dasharray="2 4"/>${cs.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${Math.max(5, d.weight * 1.1)}" fill="${C.bg}" stroke="${C.acc}" stroke-width="${Math.max(1.6, d.weight * 0.45)}"/>`).join('')}`); }
     if (d.rank) extras.push([...Array(+d.rank)].map((_, i) => `<path d="M168 ${syCy + 92 + i * 14}L200 ${syCy + 80 + i * 14}L232 ${syCy + 92 + i * 14}" fill="none" stroke="${C.acc}" stroke-width="5" stroke-linejoin="miter"/>`).join(''));
     if (d.readout) { const L = (d.readL || ((d.code || ('SYS-' + String(hv % 97).padStart(2, '0'))) + ' // ' + (d.desig || 'UNIT').slice(0, 12))).toUpperCase().slice(0, 34), R = (d.readR || ('0x' + hv.toString(16).toUpperCase().padStart(8, '0'))).toUpperCase().slice(0, 34);
-      extras.push(`<text transform="translate(16 200) rotate(-90)" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" letter-spacing="3" fill="${C.main}" opacity=".55">${esc(L)}</text><text transform="translate(384 200) rotate(90)" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="11" letter-spacing="3" fill="${C.main}" opacity=".55">${R}</text>`); }
+      extras.push(`<text transform="translate(16 200) rotate(-90)" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="3" fill="${C.main}" opacity=".55">${esc(L)}</text><text transform="translate(384 200) rotate(90)" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="3" fill="${C.main}" opacity=".55">${R}</text>`); }
     const barH = d.barcode ? 34 : 0, H2 = H + barH;
     let barcode = '';
     if (d.barcode) { let x = 120, b = ''; for (let i = 0; i < 48 && x < 280; i++) { const w = 1 + ((hv >>> (i % 29)) ^ i * 7) % 4; if (i % 2 === 0) b += `<rect x="${x}" y="${H + 4}" width="${w}" height="22"/>`; x += w + 1; } barcode = `<g fill="${C.main}" opacity=".8">${b}</g>`; }
@@ -192,7 +203,7 @@
     const d = it.data, C = colours(d);
     box.innerHTML = `<div class="in-page">
       <div class="in-left"><div class="in-shot" id="in-shot"></div>
-        <p class="bm-help">Flat colours and plain lines, the way real logos and unit patches are made. Every symbol is a simple drawing you can swap; Copy picture and Save PNG are at the top.</p></div>
+        <p class="bm-help">Flat colours and plain lines, the way real logos and unit patches are made. Every symbol is a simple drawing you can swap; Copy picture and Save PNG are at the top (under ⋯ on a phone).</p></div>
       <div class="in-right">
         <section class="bm-card"><h2>Name</h2>
           <div class="bs-grid"><label>Name<input data-d="name" value="${esc(d.name)}" placeholder="e.g. Halvorsen Dynamics"></label><label>Designation<input data-d="desig" value="${esc(d.desig)}" placeholder="e.g. Security Division"></label><label>Code<input data-d="code" value="${esc(d.code)}" placeholder="e.g. HD-07"></label></div></section>
@@ -204,7 +215,8 @@
           <div class="bs-grid in-reads"><label>Left readout<input data-d="readL" value="${esc(d.readL || '')}" placeholder="e.g. HX-11 // NETWORK OPS" maxlength="34"></label><label>Right readout<input data-d="readR" value="${esc(d.readR || '')}" placeholder="e.g. 0x7AC4A25C" maxlength="34"></label></div>
           <p class="bm-help">The side readouts show when “Side readouts” is ticked. Leave them empty for a code made from the name.</p>
           <label class="in-w">Rank chevrons <select data-d="rank">${[0, 1, 2, 3].map(n => `<option value="${n}" ${+d.rank === n ? 'selected' : ''}>${n || 'None'}</option>`).join('')}</select></label></section>
-        <section class="bm-card"><h2>Symbol</h2><label class="in-w">Size <input type="range" data-d="symScale" min="0.5" max="1.5" step="0.05" value="${d.symScale || 1}"></label><div class="in-syms">${SYM_KEYS.map(k => `<button type="button" class="in-sym ${d.symbol === k ? 'on' : ''}" data-sym="${k}" title="${esc(SYM[k][0])}">${symIcon(k, '#2a2a2a')}</button>`).join('')}</div></section>
+        <section class="bm-card"><h2>Symbol</h2><label class="in-w">Size <input type="range" data-d="symScale" min="0.5" max="1.5" step="0.05" value="${d.symScale || 1}"></label>${GROUPS.map(([name, keys]) => `<h4 class="in-group">${name}</h4><div class="in-syms">${keys.filter(k => SYM[k]).map(k => `<button type="button" class="in-sym ${d.symbol === k ? 'on' : ''}" data-sym="${k}" title="${esc(SYM[k][0])}">${symIcon(k, '#2a2a2a')}</button>`).join('')}</div>`).join('')}
+          ${LIB ? `<h4 class="in-group">Animals, monsters and more</h4><div class="in-syms">${LIB.get(d.symbol) && !SYM[d.symbol] ? `<button type="button" class="in-sym on" data-sym="${d.symbol}" title="${esc(LIB.get(d.symbol).label)}">${LIB.icon(d.symbol, '#2a2a2a')}</button>` : ''}<button type="button" class="in-sym in-lib" id="in-lib" title="Lions, crows, dragons, skulls, numerals…">More…</button></div>` : ''}</section>
         <section class="bm-card"><h2>Colours</h2><div class="chip-row">${Object.entries(SCHEMES).map(([k, v]) => `<button type="button" class="chip in-sch ${d.scheme === k && !d.custom ? 'on' : ''}" data-sch="${k}"><i style="background:${v.bg}"></i><i style="background:${v.main}"></i><i style="background:${v.acc}"></i>${v.name}</button>`).join('')}</div>
           <div class="in-cols"><label>Background <input type="color" data-c="bg" value="${C.bg}"></label><label>Lines <input type="color" data-c="main" value="${C.main}"></label><label>Accent <input type="color" data-c="acc" value="${C.acc}"></label></div></section>
       </div></div>`;
@@ -222,6 +234,7 @@
     };
     box.onclick = e => {
       const t = e.target.closest('button'); if (!t) return; const d = it.data;
+      if (t.id === 'in-lib') { LIB.pick({ title: 'Pick a symbol', current: d.symbol }).then(k => { if (k) { d.symbol = k; save(); draw(); } }); return; }
       if (t.dataset.frame) d.frame = t.dataset.frame;
       else if (t.dataset.sym) d.symbol = t.dataset.sym;
       else if (t.dataset.sch) { d.scheme = t.dataset.sch; d.custom = null; }

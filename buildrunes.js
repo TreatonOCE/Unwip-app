@@ -33,7 +33,7 @@
     const k = Math.min(w, h) * 0.08, b = (cx, cy, dx, dy) => `M${cx + dx * k} ${cy}H${cx}V${cy + dy * k}`;
     return `<g fill="none" stroke="${col}"><rect x="${x + 3}" y="${y + 3}" width="${w - 6}" height="${h - 6}" stroke-width=".6" opacity=".35"/>
       <path d="${b(x + 3, y + 3, 1, 1)}${b(x + w - 3, y + 3, -1, 1)}${b(x + 3, y + h - 3, 1, -1)}${b(x + w - 3, y + h - 3, -1, -1)}" stroke-width="1.6"/></g>
-      <text x="${x + 10}" y="${y + 13}" font-family="Menlo, Consolas, monospace" font-size="7" letter-spacing="1.2" fill="${col}" opacity=".85">${esc(String(label || 'SYSTEM').toUpperCase())}</text>
+      <text x="${x + 10}" y="${y + 13}" font-family="'IBM Plex Mono', Menlo, Consolas, monospace" font-size="7" letter-spacing="1.2" fill="${col}" opacity=".85">${esc(String(label || 'SYSTEM').toUpperCase())}</text>
       <path d="M${x + w - 34} ${y + 9}h5M${x + w - 27} ${y + 9}h5M${x + w - 20} ${y + 9}h10" stroke="${col}" stroke-width="2" opacity=".7"/>
       <path d="M${x + 10} ${y + 17}H${x + w - 10}" stroke="${col}" stroke-width=".5" opacity=".4"/>`;
   }
@@ -98,7 +98,7 @@
       let x, y;
       if (vert) { x = li * colW; y = pos; } else { y = li * lineH; x = dir === 'rtl' ? maxLen - pos - size : pos; }
       if (t.g) parts += `<g transform="translate(${x} ${y})">${glyphG(A, t.g, col)}</g>`;
-      else parts += `<text x="${x + (vert ? gw / 2 : 5)}" y="${y + gh * 0.75}"${vert ? ' text-anchor="middle"' : ''} font-family="${A.cap === 'circuit' ? 'Menlo, Consolas, monospace' : 'Georgia, serif'}" font-size="${gh * 0.8}" fill="${col}" opacity=".35">${esc(t.ch)}</text>`;
+      else parts += `<text x="${x + (vert ? gw / 2 : 5)}" y="${y + gh * 0.75}"${vert ? ' text-anchor="middle"' : ''} font-family="${A.cap === 'circuit' ? "'IBM Plex Mono', Menlo, Consolas, monospace" : 'Bookhaven, Georgia, serif'}" font-size="${gh * 0.8}" fill="${col}" opacity=".35">${esc(t.ch)}</text>`;
     }));
     const hud = A.panel === 'system', pad = hud ? CELL * 1.6 : CELL, top = hud ? pad + 14 : pad;
     const W = Math.max((vert ? lines.length * colW - CELL * 1.4 : maxLen) + pad * 2, hud ? 120 : 0), H = (vert ? maxLen : lines.length * lineH - CELL * 1.4) + pad + top;
@@ -111,9 +111,9 @@
     const list = A.glyphs.filter(g => (g.strokes || []).length), per = opts.per || 6, cw = Math.max(glyphW(A), CELL * 2) + CELL * 2.4, ch = glyphH(A) + CELL * 3.2;
     const rows = Math.max(1, Math.ceil(list.length / per)), W = Math.min(per, Math.max(1, list.length)) * cw + CELL * 2, H = rows * ch + CELL * 2;
     const cells = list.map((g, i) => { const x = CELL + (i % per) * cw + (cw - glyphW(A)) / 2, y = CELL * 1.4 + Math.floor(i / per) * ch;
-      return `<g transform="translate(${x} ${y})">${glyphG(A, g)}</g><text x="${CELL + (i % per) * cw + cw / 2}" y="${y + glyphH(A) + CELL * 1.25}" text-anchor="middle" font-family="${A.cap === 'circuit' ? 'Menlo, Consolas, monospace' : 'Georgia, serif'}" font-size="${CELL * 0.62}" fill="${A.color}">${esc((g.key || '').toUpperCase())}${g.name ? ' · ' + esc(g.name) : ''}</text>`; }).join('');
+      return `<g transform="translate(${x} ${y})">${glyphG(A, g)}</g><text x="${CELL + (i % per) * cw + cw / 2}" y="${y + glyphH(A) + CELL * 1.25}" text-anchor="middle" font-family="${A.cap === 'circuit' ? "'IBM Plex Mono', Menlo, Consolas, monospace" : 'Bookhaven, Georgia, serif'}" font-size="${CELL * 0.62}" fill="${A.color}">${esc((g.key || '').toUpperCase())}${g.name ? ' · ' + esc(g.name) : ''}</text>`; }).join('');
     const hudTop = A.panel === 'system' ? 18 : 0;
-    return { svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 ${-hudTop} ${W} ${H + hudTop}" width="${W * (opts.scale || 1)}" height="${(H + hudTop) * (opts.scale || 1)}"><rect y="${-hudTop}" width="${W}" height="${H + hudTop}" fill="${opts.bg || panelBG(A)}"/>${hudTop ? hudFrame(0, -hudTop, W, H + hudTop, A.color, opts.title || 'System // alphabet') : ''}${cells || `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" font-family="Georgia" font-size="12" fill="#999">No runes yet</text>`}</svg>`, w: W, h: H + hudTop };
+    return { svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 ${-hudTop} ${W} ${H + hudTop}" width="${W * (opts.scale || 1)}" height="${(H + hudTop) * (opts.scale || 1)}"><rect y="${-hudTop}" width="${W}" height="${H + hudTop}" fill="${opts.bg || panelBG(A)}"/>${hudTop ? hudFrame(0, -hudTop, W, H + hudTop, A.color, opts.title || 'System // alphabet') : ''}${cells || `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" font-family="Bookhaven, Georgia, serif" font-size="12" fill="#999">No runes yet</text>`}</svg>`, w: W, h: H + hudTop };
   }
   // a random rune: a few joined strokes, not a copy of one already in the set (dice, not AI)
   function randomRune(A) {
@@ -156,7 +156,7 @@
         <h3>Write in runes</h3>
         <textarea id="br-sample" rows="3" placeholder="Type a name, a motto, an inscription…"></textarea>
         <div class="br-preview" id="br-preview"></div>
-        <p class="bm-help">Letters without a rune show faintly, so you can see what’s missing. Copy picture and Save PNG at the top use this writing (or the whole alphabet when it’s empty).</p>
+        <p class="bm-help">Letters without a rune show faintly, so you can see what’s missing. Copy picture and Save PNG at the top (under ⋯ on a phone) use this writing (or the whole alphabet when it’s empty).</p>
         <h3>Style</h3>
         <div class="field"><label>Stroke</label><input type="range" id="br-w" min="1.2" max="7" step="0.2"></div>
         <div class="field"><label>Ends</label><select id="br-cap"><option value="round">Ink (round)</option><option value="square">Carved (square)</option><option value="circuit">System (circuit traces)</option></select></div>
@@ -304,7 +304,7 @@
   };
 
   // ================================================================== SIGILS
-  const sigilBlank = () => ({ n: 6, mirror: true, rings: 2, width: 3, color: '#2b2118', bg: 'paper', strokes: [], ring: { alpha: '', text: '' }, guides: true, smooth: 5, snap: true });
+  const sigilBlank = () => ({ n: 6, mirror: true, rings: 2, width: 3, color: '#2b2118', bg: 'paper', strokes: [], ring: { alpha: '', text: '' }, guides: true, smooth: 5, snap: true, syms: [] });
   const BG = { paper: '#f4ecd8', white: '#ffffff', night: '#141a26', blood: '#140808', witch: '#1b1424', system: '#07101e', none: '' };
   // on a dark background the default brown ink becomes a colour that shows: pale on night, red on blood, candle gold for witch
   const DARK_INK = { night: '#e9dcb8', blood: '#d8402f', witch: '#d6a95b', system: '#5fd0ff' };
@@ -338,6 +338,15 @@
       g += `<g transform="rotate(${360 * k / D.n})">${paths}</g>`;
       if (D.mirror) g += `<g transform="rotate(${360 * k / D.n}) scale(-1 1)">${paths}</g>`;
     }
+    // symbols from the shared library (symbols.js): once where placed, or repeated around the circle like the strokes
+    let symsG = '';
+    const SY = window.UnwipSymbols;
+    if (SY && Array.isArray(D.syms)) for (const y of D.syms) {
+      if (!SY.get(y.k)) continue;
+      const one = `<g transform="translate(${y.x} ${y.y}) scale(${y.s})">${SY.g(y.k, c)}</g>`;
+      if (!y.rep) { symsG += one; continue; }
+      for (let k = 0; k < D.n; k++) { symsG += `<g transform="rotate(${360 * k / D.n})">${one}</g>`; if (D.mirror) symsG += `<g transform="rotate(${360 * k / D.n}) scale(-1 1)">${one}</g>`; }
+    }
     let rings = '';
     const ringText = (D.ring.text || '').trim();
     if (+D.star) rings += `<path d="${starPath(+D.star, ringText ? 77 : D.rings ? 96 - 8 * (D.rings - 1) : 88)}"/>`; // points touch the innermost ring
@@ -347,13 +356,13 @@
     if (ringText && !alpha) {
       // no rune alphabet picked: the words go round in plain letters (monospace in the System look)
       const sys = D.bg === 'system', txt = esc(ringText.toUpperCase()), fs = Math.min(11, 520 / Math.max(12, ringText.length + 4));
-      runes = `<defs><path id="sg-ring-path" d="M0 87A87 87 0 1 1 0.01 87"/></defs><text font-family="${sys ? 'Menlo, Consolas, monospace' : 'Georgia, serif'}" font-size="${fs}" letter-spacing="${sys ? 2 : 3}" fill="${c}" text-anchor="middle"><textPath href="#sg-ring-path" startOffset="50%">${sys ? '// ' + txt + ' //' : txt}</textPath></text>`;
+      runes = `<defs><path id="sg-ring-path" d="M0 87A87 87 0 1 1 0.01 87"/></defs><text font-family="${sys ? "'IBM Plex Mono', Menlo, Consolas, monospace" : 'Bookhaven, Georgia, serif'}" font-size="${fs}" letter-spacing="${sys ? 2 : 3}" fill="${c}" text-anchor="middle"><textPath href="#sg-ring-path" startOffset="50%">${sys ? '// ' + txt + ' //' : txt}</textPath></text>`;
     } else if (ringText) {
       const list = tokens(alpha, ringText).filter(t => t.g || t.space), h = 13, sc = h / Math.max(1, glyphH(alpha)), gw = glyphW(alpha) * sc;
       const step = 360 / Math.max(list.length, 12);
       list.forEach((t, i) => { if (!t.g) return; runes += `<g transform="rotate(${i * step}) translate(${-gw / 2} -93.5) scale(${sc})">${glyphG(alpha, t.g, c, (1.5 * D.width / 3) / sc / (alpha.width || 3.2))}</g>`; });
     }
-    return `<g fill="none" stroke="${c}" stroke-width="${D.width}" stroke-linecap="round" stroke-linejoin="round">${g}${rings}</g>${runes}`;
+    return `<g fill="none" stroke="${c}" stroke-width="${D.width}" stroke-linecap="round" stroke-linejoin="round">${g}${rings}</g>${symsG}${runes}`;
   }
   const GUIDE_R = [25, 50, 75];
   // snapping: onto the centre, a slice line (or the mirror line between slices) and the guide circles
@@ -407,8 +416,8 @@
       body = `<defs><filter id="sg-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
         <path d="${ticks}" stroke="${col}" stroke-width=".6" opacity=".45" fill="none"/>
         <path d="${br(-100, -100, 1, 1)}${br(100, -100, -1, 1)}${br(-100, 100, 1, -1)}${br(100, 100, -1, -1)}" stroke="${col}" stroke-width="1.2" fill="none" opacity=".8"/>
-        <text x="-97" y="99" font-family="Menlo, Consolas, monospace" font-size="5" letter-spacing=".8" fill="${col}" opacity=".75">SIGIL // ${String(D.n).padStart(2, '0')}${+D.star ? ' // STAR ' + D.star : ''}</text>
-        <text x="97" y="99" text-anchor="end" font-family="Menlo, Consolas, monospace" font-size="5" letter-spacing=".8" fill="${col}" opacity=".55">BOUND ${D.strokes.length}</text>
+        <text x="-97" y="99" font-family="'IBM Plex Mono', Menlo, Consolas, monospace" font-size="5" letter-spacing=".8" fill="${col}" opacity=".75">SIGIL // ${String(D.n).padStart(2, '0')}${+D.star ? ' // STAR ' + D.star : ''}</text>
+        <text x="97" y="99" text-anchor="end" font-family="'IBM Plex Mono', Menlo, Consolas, monospace" font-size="5" letter-spacing=".8" fill="${col}" opacity=".55">BOUND ${D.strokes.length}</text>
         <g filter="url(#sg-glow)">${g}</g>`;
     }
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-104 -104 208 208" width="${size}" height="${size}">${bg ? `<rect x="-104" y="-104" width="208" height="208" fill="${bg}"/>` : ''}${guides}${body}${opts.overlay || ''}</svg>`;
@@ -424,17 +433,17 @@
     }
     return out;
   }
-  let sg = null, sgAlpha = null, sgTool = 'pen', sgDraw = null, sgUndo = [], alphas = [];
+  let sg = null, sgAlpha = null, sgTool = 'pen', sgDraw = null, sgMove = null, sgUndo = [], alphas = [];
   async function openSigil(item, el, c) {
     it = item; ctx = c; box = el; sg = it.data = Object.assign(sigilBlank(), it.data || {}); sg.ring = Object.assign({ alpha: '', text: '' }, sg.ring || {}); sgUndo = [];
     alphas = await B.all('runes');
     sgAlpha = alphas.find(a => a.id === sg.ring.alpha) || null;
     box.innerHTML = `<div class="sg-wrap">
       <section class="sg-edit">
-        <div class="br-tools"><div class="chip-row" id="sg-tool">${[['pen', 'Pen'], ['line', 'Line'], ['circle', 'Circle'], ['dot', 'Dot'], ['rub', 'Rub out']].map(([v, l]) => `<button type="button" class="chip ${sgTool === v ? 'on' : ''}" data-v="${v}">${l}</button>`).join('')}</div>
-          <span class="mp-sp"></span><button class="btn small ghost" id="sg-undo" title="Undo">↶</button><button class="btn small ghost" id="sg-clear">Clear</button><button class="btn small" id="sg-rand" title="Roll a random sigil to start from (dice-style rules, not AI)">🎲 Random</button></div>
+        <div class="br-tools"><div class="chip-row" id="sg-tool">${[['pen', 'Pen'], ['line', 'Line'], ['circle', 'Circle'], ['dot', 'Dot'], ['move', 'Move'], ['rub', 'Rub out']].map(([v, l]) => `<button type="button" class="chip ${sgTool === v ? 'on' : ''}" data-v="${v}">${l}</button>`).join('')}</div>
+          <span class="mp-sp"></span><button class="btn small ghost" id="sg-undo" title="Undo">↶</button><button class="btn small ghost" id="sg-clear">Clear</button>${window.UnwipSymbols ? '<button class="btn small" id="sg-addsym" title="Add an animal, object or numeral">+ Symbol</button>' : ''}<button class="btn small" id="sg-rand" title="Roll a random sigil to start from (dice-style rules, not AI)">🎲 Random</button></div>
         <div class="sg-stage" id="sg-stage"></div>
-        <p class="br-hint">Draw anywhere: it repeats around the circle. The faint marks show where each copy will land. A dot goes down when you let go, so you can slide it into place first. In Rub out, tap a line to remove it.</p>
+        <p class="br-hint">Draw anywhere: it repeats around the circle. The faint marks show where each copy will land. A dot goes down when you let go, so you can slide it into place first. Move drags symbols. In Rub out, tap a line or symbol to remove it.</p>
       </section>
       <aside class="br-side">
         <h3>Symmetry</h3>
@@ -450,6 +459,7 @@
         <div class="field"><label>Colour</label><input type="color" id="sg-col" value="${sg.color}"></div>
         <div class="field"><label>Background</label><select id="sg-bg">${[['paper', 'Parchment'], ['white', 'White'], ['night', 'Night'], ['blood', 'Blood (black and red)'], ['witch', 'Witch (plum and candlelight)'], ['system', 'System (game interface)'], ['none', 'None (see-through)']].map(([v, l]) => `<option value="${v}" ${sg.bg === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="field"><label>Star</label><select id="sg-star">${[['', 'None'], ['5', 'Pentagram (5 points)'], ['6', 'Hexagram (6 points)'], ['7', 'Heptagram (7 points)'], ['8', 'Octagram (8 points)']].map(([v, l]) => `<option value="${v}" ${String(sg.star || '') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        ${window.UnwipSymbols ? `<h3>Symbols</h3><div class="ar-extras" id="sg-syms"></div>` : ''}
         <h3>Ring of runes</h3>
         <div class="field"><label>Words around the edge</label><input id="sg-text" value="${esc(sg.ring.text)}" placeholder="e.g. what is bound stays bound"></div>
         ${alphas.length ? `<div class="field"><label>Written in</label><select id="sg-alpha"><option value="">Plain letters</option>${alphas.map(a => `<option value="${a.id}" ${sg.ring.alpha === a.id ? 'selected' : ''}>${esc(a.title)} (runes)</option>`).join('')}</select></div>`
@@ -471,10 +481,33 @@
     $('#sg-text', box).oninput = e => { sg.ring.text = e.target.value; re(); };
     if ($('#sg-alpha', box)) $('#sg-alpha', box).onchange = e => { sg.ring.alpha = e.target.value; sgAlpha = alphas.find(a => a.id === sg.ring.alpha) || null; re(); };
     $$('#sg-tool .chip', box).forEach(b => b.onclick = () => { sgTool = b.dataset.v; $$('#sg-tool .chip', box).forEach(x => x.classList.toggle('on', x === b)); });
-    const keep = () => { sgUndo.push(JSON.stringify(sg.strokes)); if (sgUndo.length > 60) sgUndo.shift(); };
-    $('#sg-undo', box).onclick = () => { if (sgUndo.length) { sg.strokes = JSON.parse(sgUndo.pop()); re(); } };
+    const keep = () => { sgUndo.push(JSON.stringify({ strokes: sg.strokes, syms: sg.syms || [] })); if (sgUndo.length > 60) sgUndo.shift(); };
+    $('#sg-undo', box).onclick = () => { if (!sgUndo.length) return; const u = JSON.parse(sgUndo.pop()); if (Array.isArray(u)) sg.strokes = u; else { sg.strokes = u.strokes; sg.syms = u.syms; } re(); if (typeof symsList === 'function') symsList(); };
     $('#sg-clear', box).onclick = () => { keep(); sg.strokes = []; re(); };
     $('#sg-rand', box).onclick = () => { keep(); sg.strokes = randomSigil(sg); re(); };
+    // ---- symbols: a list in the side panel (size, repeat, remove); Move drags them on the circle
+    const SY = window.UnwipSymbols;
+    const symsList = () => {
+      const el = $('#sg-syms', box); if (!el) return;
+      el.innerHTML = (sg.syms || []).map((y, i) => SY.get(y.k) ? `<div class="ar-ex sg-sym" data-i="${i}"><span class="ar-ex-ic">${SY.icon(y.k)}</span><span class="ar-ex-n">${esc(SY.get(y.k).label)}</span>
+        <label class="bd-check sg-rep"><input type="checkbox" data-sy-rep ${y.rep ? 'checked' : ''}> Repeat around the circle</label>
+        <input type="range" data-sy-s min="10" max="120" step="5" value="${Math.round(y.s * 100)}" aria-label="Size"><button type="button" class="icon-btn small" data-sy-del title="Remove">×</button></div>` : '').join('')
+        + `<p class="bm-help">${(sg.syms || []).length ? 'Pick Move to drag a symbol on the circle.' : 'Add a crow, a skull, a numeral… with + Symbol at the top.'}</p>`;
+      $$('.sg-sym', el).forEach(row => {
+        const y = () => sg.syms[+row.dataset.i];
+        row.querySelector('[data-sy-rep]').onchange = e => { keep(); y().rep = e.target.checked; re(); };
+        row.querySelector('[data-sy-s]').oninput = e => { y().s = +e.target.value / 100; re(); };
+        row.querySelector('[data-sy-del]').onclick = () => { keep(); sg.syms.splice(+row.dataset.i, 1); re(); symsList(); };
+      });
+    };
+    const addSym = $('#sg-addsym', box);
+    if (addSym) addSym.onclick = async () => {
+      const k = await SY.pick({ title: 'Add a symbol to the sigil' }); if (!k) return;
+      keep(); sg.syms = [...(sg.syms || []), { k, x: 0, y: (sg.syms || []).length ? -40 : 0, s: (sg.syms || []).length ? .3 : .55, rep: false }];
+      sgTool = 'move'; $$('#sg-tool .chip', box).forEach(x => x.classList.toggle('on', x.dataset.v === 'move'));
+      re(); symsList();
+    };
+    symsList();
     drawSigil();
     const stage = $('#sg-stage', box);
     const pt = e => { const svg = $('svg', stage), p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const q = p.matrixTransform(svg.getScreenCTM().inverse()); return [Math.round(q.x * 10) / 10, Math.round(q.y * 10) / 10]; };
@@ -485,12 +518,24 @@
     stage.onpointerdown = e => {
       if (!$('svg', stage)) return; e.preventDefault();
       const raw = pt(e);
+      if (sgTool === 'move') {
+        // the nearest symbol (or one of its copies around the circle); dragging a copy moves the original to match
+        let best = null, bd = Infinity;
+        (sg.syms || []).forEach((y, i) => {
+          const tries = y.rep ? [...Array(sg.n)].flatMap((_, k) => (sg.mirror ? [1, -1] : [1]).map(m => ({ k, m }))) : [{ k: 0, m: 1 }];
+          for (const t of tries) { const a = 2 * Math.PI * t.k / sg.n, px = y.x * t.m, cx = px * Math.cos(a) - y.y * Math.sin(a), cy = px * Math.sin(a) + y.y * Math.cos(a), dd = Math.hypot(raw[0] - cx, raw[1] - cy); if (dd < Math.max(10, 44 * y.s) && dd < bd) { bd = dd; best = { i, ...t, ox: cx - raw[0], oy: cy - raw[1] }; } }
+        });
+        if (!best) return;
+        keep(); sgMove = best; stage.setPointerCapture(e.pointerId); return;
+      }
       if (sgTool === 'rub') {
         // the nearest line, measured in the slice it was drawn in (or any of its copies)
         let best = -1, bd = 8;
         const variants = [];
         for (let k = 0; k < sg.n; k++) for (const m of sg.mirror ? [1, -1] : [1]) { const a = -2 * Math.PI * k / sg.n, x = raw[0] * Math.cos(a) - raw[1] * Math.sin(a), y = raw[0] * Math.sin(a) + raw[1] * Math.cos(a); variants.push([x * m, y]); }
         sg.strokes.forEach((s, i) => { for (const v of variants) for (const q of s.t === 'circle' ? [s.pts[0]] : s.pts) { const d = Math.hypot(q[0] - v[0], q[1] - v[1]) - (s.t === 'circle' ? Math.hypot(s.pts[1][0] - s.pts[0][0], s.pts[1][1] - s.pts[0][1]) : 0); if (Math.abs(d) < bd) { bd = Math.abs(d); best = i; } } });
+        const hitSym = (sg.syms || []).findIndex(y => Math.hypot(raw[0] - y.x, raw[1] - y.y) < Math.max(10, 44 * y.s));
+        if (hitSym >= 0 && (best < 0 || bd > 3)) { keep(); sg.syms.splice(hitSym, 1); re(); if (typeof symsList === 'function') symsList(); return; }
         if (best >= 0) { keep(); sg.strokes.splice(best, 1); re(); }
         return;
       }
@@ -503,7 +548,13 @@
     stage.onpointermove = e => {
       if (!$('svg', stage)) return;
       const raw = pt(e);
-      if (!sgDraw) { if (e.pointerType === 'touch' || sgTool === 'rub') return; hover = sgTool === 'pen' ? raw : snapOn(raw); paint(); return; }
+      if (sgMove) {
+        // where the grabbed copy is now, turned back into the original's place
+        const M = sgMove, y = sg.syms[M.i]; if (!y) return;
+        const qx = raw[0] + M.ox, qy = raw[1] + M.oy, a = -2 * Math.PI * M.k / sg.n, bx = qx * Math.cos(a) - qy * Math.sin(a), by = qx * Math.sin(a) + qy * Math.cos(a);
+        y.x = Math.round(bx * M.m * 10) / 10; y.y = Math.round(by * 10) / 10; drawSigil(); return;
+      }
+      if (!sgDraw) { if (e.pointerType === 'touch' || sgTool === 'rub' || sgTool === 'move') return; hover = sgTool === 'pen' ? raw : snapOn(raw); paint(); return; }
       if (sgDraw.t === 'dot') { sgDraw.pts[0] = snapOn(raw); hover = sgDraw.pts[0]; paint(); return; }
       if (sgDraw.t === 'pen') {
         // the tip only moves once the pointer pulls the string tight
@@ -516,6 +567,7 @@
     };
     stage.onpointerleave = () => { if (!sgDraw && hover) { hover = null; paint(); } };
     const finish = () => {
+      if (sgMove) { sgMove = null; re(); return; }
       if (!sgDraw) return; const s = sgDraw; sgDraw = null; delete s.tip;
       if (s.t === 'dot') { sg.strokes.push(s); hover = null; re(); return; }
       if (s.t !== 'pen' && Math.hypot(s.pts[1][0] - s.pts[0][0], s.pts[1][1] - s.pts[0][1]) < 1) sg.strokes.pop();
@@ -531,7 +583,7 @@
     thumb: item => B.svgURL(sigilSVG(Object.assign(sigilBlank(), item.data || {}), sgAlpha && it === item ? sgAlpha.data : null, 200)),
     picture: async item => B.svgCanvas(sigilSVG(Object.assign(sigilBlank(), item.data || {}), await alphaFor(item), 1600), 1600, 1600),
     toBook: async item => { const c = await B.svgCanvas(sigilSVG(Object.assign(sigilBlank(), item.data || {}), await alphaFor(item), 900), 900, 900); return `<p><img src="${c.toDataURL('image/png')}" alt="${esc(item.title)}" width="360"></p>${item.data && item.data.ring && item.data.ring.text ? `<p><i>${esc(item.data.ring.text)}</i></p>` : ''}`; },
-    close: () => { it = null; box = null; sg = null; sgDraw = null; }
+    close: () => { it = null; box = null; sg = null; sgDraw = null; sgMove = null; }
   };
 
   // for coats of arms: draw any rune or sigil as a charge

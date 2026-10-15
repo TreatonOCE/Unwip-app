@@ -16,7 +16,7 @@ window.UnwipMaps = (function () {
     // a game's map screen: dark glass, glowing coastlines, a grid always on and plain typeface labels
     holo: { name: 'Holo map', paper: '#050a14', sea: '#07101e', seaLine: '#14385c', land: '#0d2238', coast: '#5fd0ff', ink: '#8fdcff', forest: '#2f8f8a', mountain: '#4f7ea8', river: '#5fd0ff', road: '#8fdcff', border: '#ff6b9a', label: '#d6f3ff', pin: '#ffd36b', mono: true }
   };
-  const FONT = (P, w, size) => P.mono ? `${w === 'italic' ? '' : w} ${size}px "JetBrains Mono", "Cascadia Mono", Consolas, Menlo, monospace` : `${w} ${size}px Georgia, serif`;
+  const FONT = (P, w, size) => P.mono ? `${w === 'italic' ? '' : w} ${size}px "IBM Plex Mono", Consolas, Menlo, monospace` : `${w} ${size}px Bookhaven, Georgia, serif`;
   const BORDER_ICON = '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 17 C8 5, 14 21, 21 7" fill="none" stroke="#b0413e" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="1 4.5"/></svg>';
   const FRAMES = { double: 'Double line', simple: 'Single line', thick: 'Thick line', ornate: 'Ornate corners', none: 'No frame' };
   const FRAME_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#3a3a3a"><rect x="3" y="5" width="18" height="14" stroke-width="2"/><rect x="6" y="8" width="12" height="8" stroke-width="1"/></svg>';
@@ -246,7 +246,7 @@ window.UnwipMaps = (function () {
     g.fill(); g.stroke(); g.shadowBlur = 0;
     g.fillStyle = col; g.strokeStyle = col; g.lineWidth = 2;
     if (k === 'waypoint') { g.beginPath(); g.arc(0, 0, 3.5, 0, 7); g.fill(); }
-    else if (k === 'quest') { g.font = 'bold 18px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('!', 0, 1); }
+    else if (k === 'quest') { g.font = 'bold 18px Bookhaven, Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('!', 0, 1); }
     else if (k === 'dungeon') { g.beginPath(); g.moveTo(-6, 7); g.lineTo(-6, -2); g.arc(0, -2, 6, Math.PI, 0); g.lineTo(6, 7); g.closePath(); g.fill(); }
     else if (k === 'safe') { g.beginPath(); g.moveTo(-5, 0); g.lineTo(-1, 5); g.lineTo(6, -5); g.stroke(); }
     else if (k === 'boss') { g.beginPath(); g.arc(0, -1, 5.5, 0, 7); g.fill(); g.fillRect(-3.5, 3, 7, 4); g.fillStyle = dark ? '#050a14' : '#fff'; g.beginPath(); g.arc(-2.2, -1.5, 1.6, 0, 7); g.arc(2.2, -1.5, 1.6, 0, 7); g.fill(); }
@@ -352,7 +352,7 @@ window.UnwipMaps = (function () {
     if (f === 'ornate') {
       // a scale bar along the bottom
       g.save(); g.strokeStyle = P.ink; g.lineWidth = 1.5; const x0 = 70, y0 = H - 54; for (let k = 0; k < 4; k++) { g.fillStyle = k % 2 ? P.paper : P.ink; g.fillRect(x0 + k * 40, y0, 40, 7); } g.strokeRect(x0, y0, 160, 7);
-      g.fillStyle = P.ink; g.font = '14px Georgia, serif'; g.textAlign = 'center'; g.fillText('0', x0, y0 - 6); g.fillText('100 leagues', x0 + 160, y0 - 6); g.restore();
+      g.fillStyle = P.ink; g.font = '14px Bookhaven, Georgia, serif'; g.textAlign = 'center'; g.fillText('0', x0, y0 - 6); g.fillText('100 leagues', x0 + 160, y0 - 6); g.restore();
     }
   }
   // skip: an item being dragged, drawn separately on top
@@ -364,7 +364,7 @@ window.UnwipMaps = (function () {
     st.labels.forEach((l, i) => { if (!(skip && skip.type === 'label' && skip.i === i)) drawLabel(g, l, P); });
     st.pins.forEach((p, i) => { if (!(skip && skip.type === 'pin' && skip.i === i)) drawPin(g, p, P); });
     drawFog(g, P);
-    if (st.compass) { g.save(); g.translate(W - 110, H - 120); g.strokeStyle = P.ink; g.fillStyle = P.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, 44, 0, 7); g.stroke(); for (let k = 0; k < 4; k++) { g.rotate(Math.PI / 2); g.beginPath(); g.moveTo(0, -58); g.lineTo(9, 0); g.lineTo(0, 9); g.lineTo(-9, 0); g.closePath(); k % 2 ? g.stroke() : g.fill(); } g.font = 'bold 18px Georgia, serif'; g.textAlign = 'center'; g.fillText('N', 0, -64); g.restore(); }
+    if (st.compass) { g.save(); g.translate(W - 110, H - 120); g.strokeStyle = P.ink; g.fillStyle = P.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, 44, 0, 7); g.stroke(); for (let k = 0; k < 4; k++) { g.rotate(Math.PI / 2); g.beginPath(); g.moveTo(0, -58); g.lineTo(9, 0); g.lineTo(0, 9); g.lineTo(-9, 0); g.closePath(); k % 2 ? g.stroke() : g.fill(); } g.font = 'bold 18px Bookhaven, Georgia, serif'; g.textAlign = 'center'; g.fillText('N', 0, -64); g.restore(); }
     drawFrame(g, P);
   }
   function drawOne(g, s, P) {
@@ -730,13 +730,15 @@ window.UnwipMaps = (function () {
   }
   async function open(id, h) {
     await close(true);
+    // labels are drawn with the bundled fonts: load them first, or the first drawing falls back to the computer's own
+    try { await Promise.all(['15px Bookhaven', '600 15px Bookhaven', 'italic 15px Bookhaven', '15px "IBM Plex Mono"', '600 15px "IBM Plex Mono"'].map(f => document.fonts.load(f))); } catch {}
     host = h || bookHost;
     nodeId = id; await load(id);
     view = document.createElement('div'); view.className = 'mp-view';
     view.innerHTML = `<div class="mp-top">
         <button class="icon-btn" id="mp-close" data-tip="Close the map">${I.back}</button><b class="mp-title">${esc(host.title(id) || 'Map')}</b><span class="mp-saved" id="mp-saved">Saved</span>
         <span class="mp-sp"></span>
-        ${host.inBook === false ? '<button class="st-proof rec-btn" type="button" title="Proof of writing: record your screen"></button>' : ''}
+        ${host.inBook === false ? '<button class="st-proof rec-btn" type="button" title="Record: a replay of your writing, or a screen video (proof of writing)"></button>' : ''}
         <button class="btn small" id="mp-gen" data-tip="Roll a random coastline, mountains, forests, rivers and towns, like rolling dice. Made by fixed rules and random numbers on this device, no AI. You can edit everything after">🎲 Random map…</button>
         <select id="mp-style" data-tip="Map style">${Object.entries(STYLES).map(([k, v]) => `<option value="${k}" ${st.style === k ? 'selected' : ''}>${v.name}</option>`).join('')}</select>
         <button class="btn small ghost" id="mp-grid" data-tip="The square grid on the floor">▦ Grid</button>
@@ -745,8 +747,9 @@ window.UnwipMaps = (function () {
         <select id="mp-frame" data-tip="The border around the edge of the map">${Object.entries(FRAMES).map(([k, v]) => `<option value="${k}" ${(st.frame || 'double') === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
         <button class="btn small ghost" id="mp-clear" data-tip="Start this map section again from empty sea">Clear</button>
         <button class="icon-btn small" id="mp-undo" data-tip="Undo (Ctrl+Z)">↶</button><button class="icon-btn small" id="mp-redo" data-tip="Redo (Ctrl+Y)">↷</button>
-        <button class="btn small" id="mp-copy" data-tip="Copy the map as a picture, ready to paste into a chapter">Copy picture</button>
-        <button class="btn small" id="mp-png" data-tip="Save as a PNG picture (high resolution)">Save PNG…</button>
+        <button class="btn small ghost" id="mp-copy" data-tip="Copy the map as a picture, ready to paste into a chapter">Copy picture</button>
+        <button class="btn small ghost" id="mp-png" data-tip="Save as a PNG picture (high resolution)">Save PNG…</button>
+        <button class="btn primary small mp-end" id="mp-done" data-tip="${host.inBook === false ? 'Save and go back to Build' : 'Save and go back to your chapter'}">Done</button>
       </div>
       <div class="mp-tabs" id="mp-tabs"></div>
       <div class="mp-body"><div class="mp-tools"><div class="mp-toollist"></div>
@@ -806,6 +809,7 @@ window.UnwipMaps = (function () {
     buildTools();
     $('#mp-size', view).oninput = e => { brush = +e.target.value; $('#mp-size-n', view).textContent = brush; redraw(); };
     $('#mp-close', view).onclick = () => close();
+    $('#mp-done', view).onclick = () => close();   // the same as ‹, where the other Build editors have Done
     $('#mp-style', view).onchange = e => { push(); st.style = e.target.value; landDirty = true; changed(); schedule(); };
     // the Grid button: a hex grid on world and town maps; on a dungeon floor, its square grid on or off
     $('#mp-grid', view).onclick = () => { push(); st.noGrid = !st.noGrid; syncGridBtn(); baseKey = ''; landDirty = true; changed(); schedule(); };
