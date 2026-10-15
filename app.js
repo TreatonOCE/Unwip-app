@@ -955,6 +955,7 @@
       <div class="cs-cols"><div class="form-grid">
         <div class="field full cs-name"><label>Section name</label><div class="cs-row"><button type="button" class="cs-icon" id="cs-icon" title="Choose an icon">${iconMarkup(icon) || '🗂️'}</button><input type="text" id="cs-title" value="${esc(f.title)}" placeholder="e.g. Factions"></div></div>
         <div class="field cs-single-f"><label>One entry is called a…</label><input type="text" id="cs-single" value="${esc(f.singular || '')}" placeholder="e.g. Faction"></div>
+        ${opts.presets ? `<div class="field full"><label>Start from</label><div class="chip-row cs-presets">${Object.keys(opts.presets).map(k => `<button type="button" class="chip" data-preset="${esc(k)}">${esc(k)}</button>`).join('')}</div></div>` : ''}
         <div class="field full"><label>Fields at the top of each sheet (comma separated). Keep “Name” and “Aliases” for name suggestions.</label><input type="text" id="cs-fields" value="${esc(f.fields.join(', '))}"></div>
         <div class="field full"><label>Headings below (comma separated)</label><input type="text" id="cs-sections" value="${esc(f.sections.join(', '))}"></div>
         ${(opts.offerSave || opts.forceSave) && !opts.sheetOnly ? `<label class="check full"><input type="checkbox" id="cs-save" ${!existing || isMine || opts.forceSave ? 'checked' : ''}> Save as one of my templates, so I can add it to other projects from + New</label>` : ''}
@@ -963,6 +964,7 @@
     const read = () => { const title = $('#cs-title', body).value.trim(); return { title, singular: $('#cs-single', body).value.trim() || title.replace(/s$/i, '') || 'Entry', fields: list('cs-fields'), sections: list('cs-sections'), icon }; };
     const redraw = () => { const r = read(); $('#cs-sheet', body).innerHTML = sheetPreviewHTML(icon || '🗂️', r.singular, r.fields, r.sections); };
     body.addEventListener('input', redraw); redraw();
+    $$('[data-preset]', body).forEach(b => b.onclick = () => { const pr = opts.presets[b.dataset.preset]; $('#cs-fields', body).value = pr[0].join(', '); $('#cs-sections', body).value = pr[1].join(', '); $$('[data-preset]', body).forEach(x => x.classList.toggle('on', x === b)); redraw(); });
     $('#cs-icon', body).onclick = async () => { const r = await pickIcon(icon, read().title || 'this section'); if (!r) return; icon = r.icon; $('#cs-icon', body).innerHTML = iconMarkup(icon) || '🗂️'; redraw(); };
     const ok = await modal({ title: opts.sheetOnly ? `The sheet for “${existing.title}”` : existing && existing.id ? `Edit “${existing.title}”` : existing ? `Set up “${existing.title}”` : 'New template section', body, wide: true,
       buttons: [{ label: 'Cancel', value: false, kind: 'ghost' }, ...(opts.resetTo ? [{ label: 'Back to the standard sheet', value: 'reset', kind: 'ghost' }] : []), { label: existing && existing.id ? 'Save' : 'Create section', value: true, kind: 'primary' }] });
@@ -998,14 +1000,35 @@
   // a button on every character, place and item sheet, so changing its fields is easy to find (not only by
   // right-clicking the folder)
   { const b = $('#btn-sheet');
-    const upd = () => { const r = S.project && S.docId && rootOf(S.docId); const on = !!(r && SHEETS[r.kind] && r.id !== S.docId); b.classList.toggle('hidden', !on); if (on) b.textContent = `Edit ${({ characters: 'character', places: 'place', items: 'item' })[r.kind] || 'sheet'} fields…`; };
+    const upd = () => { const r = S.project && S.docId && rootOf(S.docId); const on = !!(r && SHEETS[r.kind] && r.id !== S.docId); b.classList.toggle('hidden', !on); const nb = $('#btn-names'); if (nb) nb.classList.toggle('hidden', !(on && r.kind === 'characters')); if (on) b.textContent = `Edit ${({ characters: 'character', places: 'place', items: 'item' })[r.kind] || 'sheet'} fields…`; };
     b.onclick = () => { const r = S.docId && rootOf(S.docId); if (r) editSheet(r); };
     on('doc', () => setTimeout(upd, 0)); on('project', () => setTimeout(upd, 0)); }
+  // starting points for different kinds of story (the writer can change any of it)
+  const SHEET_PRESETS = {
+    characters: {
+      'Standard': [SHEETS.characters, SHEET_SECTIONS.characters],
+      'Fantasy': [['Full name', 'Aliases', 'Role', 'Age', 'Race or people', 'Homeland', 'Calling'], ['Appearance', 'Personality', 'Abilities', 'Backstory', 'Allegiances', 'Notes']],
+      'Sci-fi': [['Full name', 'Aliases', 'Role', 'Age', 'Species', 'Homeworld', 'Rank or job'], ['Appearance', 'Personality', 'Augments and tech', 'Backstory', 'Ship or crew', 'Notes']],
+      'LitRPG': [['Full name', 'Aliases', 'Player handle', 'Class', 'Level', 'Race'], ['Appearance', 'Stats', 'Skills', 'Equipment', 'Personality', 'Backstory', 'Notes']],
+      'Contemporary': [['Full name', 'Aliases', 'Role', 'Age', 'Job', 'Lives in'], ['Appearance', 'Personality', 'Family and friends', 'Backstory', 'What they want', 'Notes']]
+    },
+    places: {
+      'Standard': [SHEETS.places, SHEET_SECTIONS.places],
+      'Fantasy': [['Name', 'Aliases', 'Region', 'Type', 'Ruled by'], ['Description', 'People', 'History', 'Secrets', 'Notes']],
+      'Sci-fi': [['Name', 'Aliases', 'System or sector', 'Type', 'Controlled by'], ['Description', 'Environment', 'Population', 'History', 'Notes']],
+      'LitRPG': [['Name', 'Aliases', 'Zone', 'Level range', 'Type'], ['Description', 'Monsters', 'Loot', 'Quests here', 'Notes']]
+    },
+    items: {
+      'Standard': [SHEETS.items, SHEET_SECTIONS.items],
+      'LitRPG': [['Name', 'Aliases', 'Type', 'Rarity', 'Owner', 'Requirements'], ['Stats', 'Effects', 'How it was found', 'Notes']],
+      'Sci-fi': [['Name', 'Aliases', 'Type', 'Maker', 'Owner'], ['Description', 'What it does', 'Power and limits', 'Notes']]
+    }
+  };
   // Characters, Places and Items: change the fields and headings their new entries start with
   async function editSheet(n) {
     const was = sheetFor(n), std = { fields: SHEETS[n.kind], sections: SHEET_SECTIONS[n.kind] };
     const custom = !!(n.fields || n.sections);
-    const r = await sectionDialog({ title: n.title, singular: (NEW_TITLE[n.kind] || 'entry').replace(/^New /i, ''), fields: was.fields, sections: was.sections, icon: '', id: n.id }, { sheetOnly: true, resetTo: custom ? std : null });
+    const r = await sectionDialog({ title: n.title, singular: (NEW_TITLE[n.kind] || 'entry').replace(/^New /i, ''), fields: was.fields, sections: was.sections, icon: '', id: n.id }, { sheetOnly: true, resetTo: custom ? std : null, presets: SHEET_PRESETS[n.kind] });
     if (!r) return;
     const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
     if (r.reset || (same(r.fields, std.fields) && same(r.sections, std.sections))) { delete n.fields; delete n.sections; }
@@ -2658,7 +2681,7 @@
         if (!S.project.epubId) { S.project.epubId = 'urn:uuid:' + crypto.randomUUID(); scheduleMeta(); }
         const bk = S.project.book || {};
         const typeset = TS ? { t: TS.resolved(bookDesign()), d: bookDesign(), book: bk } : null;
-        const { bytes, chapters } = window.FolioEPUB.build({ blocks: PV.blocks, style: S.project.style, title: PV.scope === 'doc' ? name : (bk.title || name), author: bk.author || settings.author || '', lang, id: S.project.epubId, typeset: PV.scope === 'doc' ? null : typeset });
+        const { bytes, chapters } = window.FolioEPUB.build({ blocks: PV.blocks, style: S.project.style, title: PV.scope === 'doc' ? name : (bk.title || name), author: bk.author || settings.author || '', lang, id: S.project.epubId, typeset: PV.scope === 'doc' ? null : typeset, systemBoxes: !!(S.settings.litrpg && S.settings.litrpg.on && S.settings.litrpg.ebook) });
         const p = await api.exportBinary(bytes, name, 'epub', 'EPUB e-book');
         if (p) window.UnwipStart && window.UnwipStart.done('export');
         if (p) toast(`EPUB saved with ${chapters} chapter${chapters === 1 ? '' : 's'}.${settings.author ? '' : ' Tip: add your author name in Settings.'}`, '', 6000);
@@ -2846,6 +2869,8 @@
         <div class="field"><label>Custom dictionary</label><button class="btn" id="s-dict" type="button">Manage added words…</button></div>`}
         <label class="check full"><input type="checkbox" id="s-dash" ${smartDash() ? 'checked' : ''}> Turn two hyphens (--) into an em dash (—) as I type</label>
         <label class="check full"><input type="checkbox" id="s-spell" ${sp.enabled ? 'checked' : ''}> Underline spelling mistakes</label>
+        <div class="section-label">LitRPG and text shortcuts</div>
+        <div class="field full" id="s-litrpg"></div>
         <div class="section-label">Licence</div>
         <div class="field full" id="s-licence"></div>
         <div class="section-label">Help</div>
@@ -2868,6 +2893,7 @@
     if ($('#s-dict', body)) $('#s-dict', body).onclick = dictionaryDialog;
     if (window.UnwipSync) window.UnwipSync.settingsSection(body);
     if (window.UnwipLicence) window.UnwipLicence.settingsSection(body);
+    if (window.UnwipLitRPG) window.UnwipLitRPG.settingsSection(body);
     $('#g-intro', body).onclick = () => { body.closest('.modal-back').remove(); window.UnwipIntro && window.UnwipIntro.start(); };
     $('#g-tour', body).onclick = () => { body.closest('.modal-back').remove(); window.UnwipIntro && window.UnwipIntro.tour(); };
     $('#g-help', body).onclick = () => { body.closest('.modal-back').remove(); window.UnwipHelp && window.UnwipHelp.open(); };
