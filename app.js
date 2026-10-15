@@ -2062,9 +2062,11 @@
   editor.addEventListener('paste', async e => {
     e.preventDefault();
     const dt = e.clipboardData;
-    let html = dt.getData('application/x-unwip') || dt.getData('text/html');
-    let rtf = dt.getData('text/rtf');
-    const text = dt.getData('text/plain');
+    await pasteContent({ html: dt.getData('application/x-unwip') || dt.getData('text/html'), rtf: dt.getData('text/rtf'), text: dt.getData('text/plain') });
+  });
+  // the normal paste, from whatever the clipboard gave (images.js calls it too, once it has turned pasted pictures
+  // into ones stored in the chapter)
+  async function pasteContent({ html = '', rtf = '', text = '' }) {
     const plain = S.plainPaste;
     S.plainPaste = false;
     const st = S.project.style;
@@ -2093,7 +2095,7 @@
       }, 15000);
     }
     offerTitleFromPaste(text || '');
-  });
+  }
   api.onPastePlain(() => { S.plainPaste = true; restoreRange(); api.paste(); });
   api.onSplit(() => { restoreRange(); splitAtCursor(); });
 
@@ -4146,7 +4148,7 @@
             <span class="ol-no">${no}</span>
             <span class="ol-title" style="padding-left:${depth * 18}px">${n.icon ? iconHTML(n, '') : n.type === 'folder' ? I.folder : ''}<button class="ol-open" title="Open">${esc(n.title || 'Untitled')}</button>${n.label ? `<span class="lbl-chip" style="--lc:${esc(n.label.c)}" title="Label">${esc(n.label.n)}</span>` : ''}</span>
             <span><textarea class="ol-syn" rows="1" placeholder="${n.type === 'folder' ? 'What this part covers…' : 'What happens…'}">${esc(n.synopsis || '')}</textarea></span>
-            <span><input class="ol-pov" value="${esc(n.pov || '')}" placeholder="–" list="ol-pov-list"></span>
+            <span><input class="ol-pov" value="${esc(n.pov || '')}" placeholder="POV" title="POV (point of view): the character this chapter is told through" list="ol-pov-list"></span>
             <span>${n.type === 'doc' ? `<select class="ol-status" style="--st:${statusColor(n.status)}">${statusOptions().map(([v, l]) => `<option value="${v}" ${v === (n.status || '') ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>` : ''}</span>
             <span class="num">${fmt(folderWords(n))}</span>
           </div>`).join('')}
@@ -4958,7 +4960,7 @@
   // test hooks (used by the automated checks, harmless otherwise)
   window.__folio = { S, openProject, openDoc, copyDocForDocs, compileManuscript, flushSave, addNode, setWriter, insertCleanHTML };
   window.__unwip = {
-    get saveFailing() { return !!troubleRetry; },
+    get saveFailing() { return !!troubleRetry; }, pasteContent,
     S, api, I, $, $$, esc, fmt, makeRoom, countWords, today, editor, editorWrap, on, emit,
     modal, toast, toastAction, confirmBox, promptText, showMenu, quoteToast, placeField,
     findNode, walkTree, rootOf, isInside, currentBlock, scheduleSave, scheduleMeta, saveMetaNow, flushSave, refreshSnapCount,
