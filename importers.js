@@ -281,7 +281,7 @@ window.FolioImport = (function () {
     // Scrivener only writes <IncludeInCompile>Yes</IncludeInCompile> on what goes in the book, so in a project that uses
     // it, a manuscript item without it was unticked there and is left out of the book here too
     const usesInclude = [...xml.querySelectorAll('IncludeInCompile')].some(e => /^yes$/i.test(e.textContent.trim()));
-    const report = { documents: 0, folders: 0, skipped: [], empty: 0, withNotes: 0, missing: [], unreadable: [] };
+    const report = { documents: 0, folders: 0, skipped: [], empty: 0, withNotes: 0, missing: [], unreadable: [], trashMissing: [] };
     const docs = {};
     const noteDocs = [];
     const labels = {}, statuses = {};
@@ -295,7 +295,6 @@ window.FolioImport = (function () {
     // keep Scrivener's own status names (with colours from a matching palette), so nothing gets renamed
     const PALETTE = ['#9b968d', '#d39b2a', '#4a7fd0', '#7a5cc7', '#3f9a5a', '#c0392b', '#1f7a8c', '#b5651d'];
     const statusList = Object.entries(statuses).filter(([, n]) => n && !/^no status$/i.test(n)).map(([id, name], i) => ({ id: 's' + id, name, color: /done|final|complete/i.test(name) ? '#3f9a5a' : /to ?do/i.test(name) ? '#9b968d' : /first draft/i.test(name) ? '#d39b2a' : /revis/i.test(name) ? '#4a7fd0' : PALETTE[(i + 3) % PALETTE.length] }));
-    const STATUS_MAP = t => { t = (t || '').toLowerCase(); if (!t || t === 'no status') return ''; if (/to ?do/.test(t)) return 'todo'; if (/final|done|complete/.test(t)) return 'final'; if (/revis|second/.test(t)) return 'revised'; return 'draft'; };
 
     const roots = { manuscript: [], characters: [], places: [], items: [], notes: [], research: [], trash: [] };
     const rtfToHTML = rtf => rtf ? window.FolioRTF.toHTML(rtf) : '';
@@ -307,8 +306,18 @@ window.FolioImport = (function () {
     const clean2 = (html, docFont, docSize) => html ? window.FolioClip.cleanPaste(html, { docFont, docSize }) : '';
     const textOf = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent.trim(); };
 
+    // where each item was in Scrivener (sx on the node): its id, its parent's id and place, its type, title and icon
+    // exactly as they were, so "No hard feelings" can put the binder back the way it came (Unwip itself never uses it)
+    const idOf = el => el ? (el.getAttribute('UUID') || el.getAttribute('ID') || '') : '';
+    const origin = item => {
+      const parent = item.parentElement && item.parentElement.tagName === 'Children' ? item.parentElement.parentElement : null;
+      const sibs = item.parentElement ? [...item.parentElement.children].filter(c => c.tagName === 'BinderItem') : [];
+      const meta = item.querySelector(':scope > MetaData'), ic = meta && meta.querySelector('IconFileName');
+      return { u: idOf(item), p: idOf(parent), i: sibs.indexOf(item), t: item.getAttribute('Type') || 'Text', ti: (item.querySelector(':scope > Title') || {}).textContent || '', ...(ic && ic.textContent.trim() ? { ic: ic.textContent.trim() } : {}) };
+    };
     function convert(item) {
       const type = item.getAttribute('Type');
+      const sx = origin(item);
       // Scrivener 3 on Mac keeps text under the UUID, Scrivener on Windows (and older Mac versions) under the number ID
       const key = data.files[item.getAttribute('UUID')] ? item.getAttribute('UUID') : item.getAttribute('ID');
       const title = (item.querySelector(':scope > Title') || {}).textContent || 'Untitled';
@@ -324,13 +333,16 @@ window.FolioImport = (function () {
       if (type === 'Image' && f.image) {   // a picture in the binder becomes a document showing that picture
         const id = uid(); docs[id] = `<p style="text-align: center"><img class="doc-img" src="${f.image}" style="width: 100%" alt=""></p>`;
         report.documents++; report.images = (report.images || 0) + 1;
-        return { node: { id, type: 'doc', title, words: 0, icon: '🖼️', ...(synopsis ? { synopsis } : {}) }, type };
+        return { node: { id, type: 'doc', title, words: 0, icon: '🖼️', sx, ...(synopsis ? { synopsis } : {}) }, type };
       }
       if (['Image', 'PDF', 'WebArchive', 'Media'].includes(type)) { report.skipped.push(`${title} (${type === 'WebArchive' ? 'web page' : type.toLowerCase()})`); return null; }
       const bodyHTML = rtfToHTML(f.content);   // cleaned at the end, once the project's main font is known
       // a text document whose file is missing, or isn't readable RTF, is named in the report rather than quietly empty
       if (!/Folder/.test(type) && !['Image', 'PDF', 'WebArchive', 'Media'].includes(type)) {
-        if (f.content == null && !(item.querySelector(':scope > Children'))) report.missing.push(title);
+        // something in Scrivener's own Trash often has no text file left (Scrivener tidies deleted items): that's
+        // expected, so it's mentioned quietly and the document still goes to Unwip's Trash
+        const inTrash = !!(item.parentElement && item.parentElement.closest && item.parentElement.closest('BinderItem[Type="TrashFolder"]'));
+        if (f.content == null && !(item.querySelector(':scope > Children'))) (inTrash ? (report.trashMissing = report.trashMissing || []) : report.missing).push(title);
         else if (f.content && !/^\s*\{\\rtf/.test(f.content)) report.unreadable.push(title);
       }
       if (f.content) layoutOf(f.content);
@@ -348,18 +360,19 @@ window.FolioImport = (function () {
         if (!inc || !/^yes$/i.test(inc.textContent.trim())) { extra.noBook = true; report.leftOutOfBook = (report.leftOutOfBook || 0) + 1; }
       }
       const sv = look ? { sv: look } : {};
-      if (notesHTML && textOf(notesHTML)) { const nid = uid(); docs[nid] = notesHTML; noteDocs.push({ id: nid, type: 'doc', title: `${title} (notes)`, words: 0 }); report.withNotes++; }
+      if (notesHTML && textOf(notesHTML)) { const nid = uid(); docs[nid] = notesHTML; noteDocs.push({ id: nid, type: 'doc', title: `${title} (notes)`, words: 0, sx: { notesOf: sx.u } }); report.withNotes++; }
       if (isFolder) {
         report.folders++;
-        const node = { id: uid(), type: 'folder', title, open: false, children, ...extra };
-        if (hasText) { const id = uid(); docs[id] = bodyHTML; node.children.unshift({ node: { id, type: 'doc', title, words: 0, ...sv, ...(extra.noBook ? { noBook: true } : {}) }, type: 'Text' }); report.documents++; }
+        const node = { id: uid(), type: 'folder', title, open: false, children, ...extra, sx };
+        // a folder with text of its own: the text becomes the folder's first page here, and goes back into the folder there
+        if (hasText) { const id = uid(); docs[id] = bodyHTML; node.children.unshift({ node: { id, type: 'doc', title, words: 0, ...sv, ...(extra.noBook ? { noBook: true } : {}), sx: { own: sx.u } }, type: 'Text' }); report.documents++; }
         return { node, type };
       }
       const id = uid();
       docs[id] = bodyHTML || '<p><br></p>';
       if (!hasText) report.empty++;
       report.documents++;
-      return { node: { id, type: 'doc', title, words: 0, ...extra, ...sv, ...(opts.keepKeys ? { _key: key } : {}) }, type };
+      return { node: { id, type: 'doc', title, words: 0, ...extra, ...sv, sx, ...(opts.keepKeys ? { _key: key } : {}) }, type };
     }
     // unwrap {node, type} recursively
     const unwrap = r => { if (!r) return null; const n = r.node; if (n.children) n.children = n.children.map(unwrap).filter(Boolean); return n; };
@@ -383,6 +396,8 @@ window.FolioImport = (function () {
       else roots[target].push(node);
     }
     report.placed = placed;
+    // the top of Scrivener's binder, in order (Draft, Research, Trash and the folders beside them)
+    const tops = [...top.children].filter(c => c.tagName === 'BinderItem').map(origin);
     if (noteDocs.length) roots.notes.push({ id: uid(), type: 'folder', title: 'Document notes from Scrivener', open: false, children: noteDocs });
     // the font and size used most in the manuscript become the project's style, so they don't need repeating on every word
     const tally = {}, sizes = {};
@@ -399,7 +414,7 @@ window.FolioImport = (function () {
     const most = o => { const e = Object.entries(o).sort((a, b) => b[1] - a[1])[0]; return e ? +e[0] : null; };
     const sl = most(lsCount), fi = most(fiCount);
     const layout = { ...(docSize ? { size: docSize } : {}), ...(sl ? { lineHeight: Math.round(sl / 240 * 100) / 100 } : {}), ...(fi != null ? { indent: Math.round(fi / 1440 * 100) / 100 } : {}) };
-    return { roots, docs, report, labels, statuses, statusList, docFont, docSize, newSections, layout };
+    return { roots, docs, report, labels, statuses, statusList, docFont, docSize, newSections, layout, tops };
   }
 
   return { docxToHTML, splitChapters, scrivener, scrivenerScan, guessTarget, unzip, paraKey, rawLook };

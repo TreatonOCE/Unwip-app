@@ -7,10 +7,12 @@ window.UnwipCommand = (function () {
   const click = sel => () => { const b = $(sel); if (b) b.click(); };
   const needDoc = () => !!(S.project && S.docId);
   const inProject = () => !!S.project;
-  const detailed = fn => () => { if (S.mode !== 'detailed') U.setMode('detailed'); fn(); };
+  const detailed = fn => () => { if (U.level() < 1) U.setMode('detailed'); fn(); };
   const side = tab => () => window.UnwipSide && window.UnwipSide.open(tab);
   // on a phone some bigger tools stay on the iPad and computer (like Scrivener's iPhone app)
   const desk = avail => () => !document.documentElement.classList.contains('m-phone') && avail();
+  // Lore needs a bigger screen: phones go up to Detail (app.js level() caps there too)
+  const roomy = avail => () => !window.matchMedia('(max-width: 720px)').matches && avail();
 
   // [label, extra words people might type, shortcut, run, available?]
   const ACTIONS = () => [
@@ -47,8 +49,9 @@ window.UnwipCommand = (function () {
     ['Search the whole book', 'find replace everywhere', 'Ctrl+Shift+F', () => U.openSearch('search'), inProject],
     ['Find and replace', 'replace all rename', '', () => U.openSearch('replace'), inProject],
     ['LitRPG ledger: stats, skills and items', 'litrpg gamelit stats stat sheet level skills items quests titles system messages drift check', '', () => window.UnwipLedger && window.UnwipLedger.open(), inProject],
-    ['Interview my character', 'character interview questions voice spark stuck notes', '', () => window.UnwipStuck && window.UnwipStuck.interview(), inProject],
-    ['Character interview questions (change them)', 'interview questions customise customize edit my own character', '', () => window.UnwipStuck && window.UnwipStuck.editInterview(), () => true],
+    ['Interview a character', 'character interview questions voice spark stuck notes villain love interest backstory', '', () => window.UnwipStuck && window.UnwipStuck.open('interview'), inProject],
+    ['My interview questions (write your own)', 'interview questions customise customize edit my own character villain love interest', '', () => window.UnwipStuck && window.UnwipStuck.editInterview(), () => true],
+    ['Character sheet', 'character sheet gear equipment slots inventory stats skills lore litrpg rpg', '', () => { const U2 = window.__unwip; if (U2.level() < 2) U2.setMode('lore'); window.UnwipCharSheet && window.UnwipCharSheet.open(U2.S.docId); }, roomy(() => !!(S.project && S.docId && window.UnwipCharSheet && window.UnwipCharSheet.isChar(S.docId)))],
     ['Name ideas (name generator)', 'name generator names random character first middle last surname handle no ai', '', () => window.UnwipNames && window.UnwipNames.open(window.__unwip.S.docId ? { onUse: n => window.UnwipNames.useOnSheet(n), useLabel: 'Use on this sheet' } : {}), () => true],
     ['Continuity pass', 'continuity consistency scaling level stats changed rename retcon go through each check every place', '', () => window.UnwipContinuity && window.UnwipContinuity.open(), inProject],
     ['Split this chapter at the cursor', 'divide break', 'Ctrl+Shift+K', () => U.splitAtCursor(), needDoc],
@@ -59,8 +62,17 @@ window.UnwipCommand = (function () {
     ['New map', 'world map draw generate', '', click('#btn-add-map'), inProject],
     ['New template section', 'factions magic creatures monsters sheets', '', () => U.templateGallery(), inProject],
     ['Bring in chapters', 'import word docx google docs files', '', () => { const b = $('#btn-new'); if (b) b.click(); }, inProject],
-    ['Focused mode', 'simple calm less', '', () => U.setMode('focused'), inProject],
-    ['Detailed mode', 'more planning everything', '', () => U.setMode('detailed'), inProject],
+    ['Focus level', 'focused mode simple calm less just write', '', () => U.setMode('focused'), inProject],
+    ['Detail level', 'detailed mode more planning outline corkboard build', '', () => U.setMode('detailed'), inProject],
+    ['Character sheets (every character)', 'character sheets all characters gear lore list', '', () => { if (U.level() < 2) U.setMode('lore'); window.UnwipCharSheet && window.UnwipCharSheet.browse(); }, roomy(inProject)],
+    ['Open World: magic, runes, sigils and insignia', 'open world magic system rune runes sigil insignia emblem lore deep end', '', () => { if (U.level() < 2) U.setMode('lore'); window.UnwipBuild && window.UnwipBuild.fromBook('world'); }, roomy(inProject)],
+    ['Add the selected words to a character, place or thing page', 'add to character page place item notes quote selection', '', () => { if (U.level() < 1) U.setMode('detailed'); window.UnwipAddTo && window.UnwipAddTo.toPage(window.UnwipAddTo.picked()); }, roomy(inProject)],
+    ['Always correct this word…', 'autocorrect typo spelling replace always correct', '', () => window.UnwipAutocorrect && window.UnwipAutocorrect.always(), inProject],
+    ['Your corrections (autocorrect)…', 'autocorrect typo spelling list corrections never', '', () => window.UnwipAutocorrect && window.UnwipAutocorrect.manage(), () => true],
+    ['Link a map or picture to this page', 'map picture link place character page build coat of arms sigil', '', () => { if (U.level() < 1) U.setMode('detailed'); window.UnwipPageLinks && window.UnwipPageLinks.link(); }, inProject],
+    ['Make a timeline event from the selected words', 'timeline event add selection happened', '', () => { if (U.level() < 1) U.setMode('detailed'); window.UnwipAddTo && window.UnwipAddTo.toEvent(window.UnwipAddTo.picked()); }, roomy(inProject)],
+    ['Story Bible: add the selected words as a fact', 'story bible fact pin add note continuity series', '', () => { if (U.level() < 2) U.setMode('lore'); window.UnwipBible && window.UnwipBible.addFact(getSelection().toString()); }, roomy(inProject)],
+    ['Lore level', 'lore unhinged deep end character sheets niche everything', '', () => U.setMode('lore'), roomy(inProject)],
     ['Outline', 'plan synopsis list', '', detailed(() => U.setView('outline')), inProject],
     ['Corkboard', 'cards index plan', '', detailed(() => U.setView('cork')), desk(inProject)],
     ['Moodboard', 'images inspiration pictures', '', detailed(() => U.setView('mood')), desk(inProject)],

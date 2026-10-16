@@ -18,7 +18,10 @@ window.UnwipSelBar = (function () {
     btn('#btn-clear', 'Clear formatting', 'Clear formatting', true),
     '<span class="sb-sep"></span>',
     btn('#btn-comment', 'Comment (Ctrl+Alt+M)', I.comment + '<span>Comment</span>', true),
-    '<span class="sb-full sb-group">' + btn('#btn-footnote', 'Footnote (Ctrl+Alt+F)', 'Footnote', true) + '</span>'
+    '<span class="sb-full sb-group">' + btn('#btn-footnote', 'Footnote (Ctrl+Alt+F)', 'Footnote', true) + '</span>',
+    // Detail and Lore: one Add to… that lists where the words can go (a character or place page, a timeline event, and at
+    // Lore a sheet's gear or the Story Bible): addto.js
+    '<span class="sb-addto sb-group"><span class="sb-sep"></span>' + btn('#btn-add-to', 'Add these words to a character, place, event…', 'Add to…', true) + '</span>'
   ].join('');
   document.body.appendChild(bar);
   // clicking the bar must not lose the selection

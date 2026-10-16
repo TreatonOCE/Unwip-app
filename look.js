@@ -337,8 +337,18 @@ window.UnwipLook = (function () {
     g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
     o.connect(g); g.connect(master); o.start(t); o.stop(t + decay + 0.02);
   }
+  // the margin bell: a small steel dome struck by a hammer. A tick from the hammer, then a long ring whose partials are
+  // not whole multiples (a bell's aren't), each one doubled a few hertz apart so the ring shimmers as it fades, and the
+  // high ones dying first. (It used to be four plain sine tones, which sounded like a phone chime.)
+  function ring(t, f, gain, decay) {
+    const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t + 0.0015); g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + decay + 0.05);
+  }
   function bell(t) {
-    for (const [f, g, d] of [[2093, 0.22, 1.4], [4186, 0.07, 0.7], [5274, 0.04, 0.5], [2637, 0.05, 0.9]]) tone(t, { f, gain: g, decay: d });
+    const f = jit(2610, 0.01);
+    burst(t, { filters: [['highpass', 5000], ['bandpass', 8500, 1.2]], decay: 0.005, gain: 0.3 });   // the hammer
+    for (const [r, g, d] of [[1, 0.2, 2.4], [1.0028, 0.16, 2.1], [2.41, 0.06, 1.0], [2.416, 0.045, 0.9], [3.97, 0.03, 0.5], [5.42, 0.018, 0.3], [0.502, 0.02, 0.8]]) ring(t, f * r, g, d);
   }
   // pencil: grainy noise whose loudness flickers like graphite catching paper fibres
   function scratch(t, { dur = 0.09, gain = 0.35, lo = 2200, hi = 6500, sweep = 0, rub = false } = {}) {
@@ -480,7 +490,7 @@ window.UnwipLook = (function () {
         ['drop', 'Drop', 'Each letter falls in from above and lands with a small bounce.'],
         ['pop', 'Pop', 'Each letter starts big and shrinks into place.'],
         ['ink', 'Ink', 'Each letter starts blurry and sharpens, like ink soaking into paper.'],
-        ['strike', 'Typewriter strike', 'Each letter slams onto the page, dark and slightly crooked, like a typewriter key hitting the ribbon.'],
+        ['strike', 'Typewriter strike', 'Each letter lands on the page dark and slightly crooked, like a typewriter key striking the ribbon.'],
         ['glow', 'Glow', 'Each letter lights up warm and bright, then cools to the normal colour, like an ember.'],
         ['spin', 'Spin', 'Each letter spins in from small and settles into place.'],
         ['scatter', 'Scatter', 'Each letter flies in from a random direction and lands in its place.'],
@@ -579,7 +589,7 @@ window.UnwipLook = (function () {
   }
   return {
     setTheme(id) { look = { ...look, theme: id }; save('unwip-look', look); applyLook(); }, THEMES,
-    attach, openThemes, openTyping, applyLook, pageZoom, setMessyFade, updateFocus,
+    attach, openThemes, openTyping, applyLook, pageZoom, setMessyFade, updateFocus, playKey,
     typewriterActive, caretRect, typewriterPosition: () => typing.twPos || 0.45, smoothScroll: () => typing.twSmooth,
     get typing() { return typing; }, get look() { return look; },
     // settings that arrived from another device (prefsync.js): read them again and show them

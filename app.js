@@ -62,6 +62,14 @@
   const countWords = t => (String(t).match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length;
   const fmt = n => Number(n || 0).toLocaleString();
   const today = () => new Date().toLocaleDateString('en-CA'); // local YYYY-MM-DD
+  // when a book was last changed, with the time (people switch between books a lot): Today 3:05 pm, Yesterday 9:12 am, 14 Oct 2026, 8:40 pm
+  function lastChanged(t) {
+    const d = new Date(t), time = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }).replace(/\s?([AP])M$/i, (m, a) => ' ' + a.toLowerCase() + 'm');
+    const day = x => x.toLocaleDateString('en-CA'), y = new Date(); y.setDate(y.getDate() - 1);
+    if (day(d) === day(new Date())) return 'Today ' + time;
+    if (day(d) === day(y)) return 'Yesterday ' + time;
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + time;
+  }
 
   // ------------------------------------------------------------------ theme
   function applyTheme() {
@@ -186,7 +194,7 @@
   $('#sprint-bolt').innerHTML = I.bolt; $('#rp-refresh-ic').innerHTML = I.refresh;
   $('#btn-style').innerHTML = I.style;
   $('#btn-writer').innerHTML = I.writer;
-  $('#btn-cmdk').innerHTML = I.search; $('#btn-panel').innerHTML = I.panel; $('#btn-export-more').innerHTML = I.caretDown;
+  $('#btn-cmdk').innerHTML = I.goto + `<span class="cmdk-lbl">Go to or do</span><span class="cmdk-key">${/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘K' : 'Ctrl K'}</span>`; $('#btn-panel').innerHTML = I.panel; $('#ex-caret').innerHTML = I.caretDown; $('#ex-btn-ic').innerHTML = I.export || I.doc || '';
   $('#btn-cmdk').onclick = () => window.UnwipCommand && window.UnwipCommand.open();
   $$('[data-icon]').forEach(b => b.innerHTML = I[b.dataset.icon]);
   const writerExit = document.createElement('button');
@@ -225,7 +233,7 @@
       }
       const card = document.createElement('div');
       card.className = 'project-card';
-      const when = p.modified ? new Date(p.modified).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+      const when = p.modified ? lastChanged(p.modified) : '';
       const goal = (p.goals || {}).total || 0;
       const pace = paceText(p.goals || {}, p.words || 0);
       card.innerHTML = `<div class="pc-top"><div><div class="pc-spine"></div><h3>${esc(p.title)}</h3></div>
@@ -546,27 +554,54 @@
     toast(f.node.fav ? `★ Added “${esc(f.node.title)}” to Favourites (top of the binder).` : `Removed “${esc(f.node.title)}” from Favourites.`);
   }
   // ---- custom icons / emojis for binder items
-  const ICON_CHOICES = ['folder', 'doc', 'book', 'person', 'pin', 'gem', 'note', 'flask', 'scene', 'flame', 'bolt', 'tag', 'mood', 'image', 'sticky', 'palette', 'timeline', 'cork', 'outline', 'history', 'search', 'columns'];
+  const ICON_CHOICES = ['folder', 'doc', 'book', 'person', 'pin', 'gem', 'note', 'flask', 'scene', 'flame', 'bolt', 'tag', 'mood', 'image', 'sticky', 'palette', 'timeline', 'cork', 'outline', 'history', 'search', 'columns', 'trash'];
   const EMOJI_CHOICES = ('📖 📕 📗 📘 📙 📓 📝 ✏️ 🖋️ 📜 🗒️ 📌 📍 🔖 ⭐ 🌟 ✨ 💡 🔥 ⚡ ❤️ 💔 💀 👑 🗡️ ⚔️ 🛡️ 🏹 🔮 🧪 🗝️ 💎 💰 🪙 📦 🎁 ' +
     '🧙 🧝 🧛 🧟 🐉 🦄 🐺 🦅 🐈 🐍 👤 👥 👩 👨 🧒 👵 🤴 👸 🕵️ 🦹 ' +
     '🏰 🏯 🏠 🏚️ ⛪ 🏙️ 🌆 🌃 🌲 🌳 🏔️ 🌋 🏝️ 🌊 🏜️ 🌍 🗺️ 🧭 🚢 🚂 🚀 ' +
-    '☀️ 🌙 🌧️ ❄️ 🌪️ 🌸 🍂 🕯️ 🕰️ ⏳ 📅 🎭 🎬 🎵 🎨 🧩 ❓ ❗ ✅ ❌ 🚧 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪').split(' ');
+    '🗑️ ☀️ 🌙 🌧️ ❄️ 🌪️ 🌸 🍂 🕯️ 🕰️ ⏳ 📅 🎭 🎬 🎵 🎨 🧩 ❓ ❗ ✅ ❌ 🚧 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪').split(' ');
   function iconHTML(n, fallback) {
     if (!n.icon) return fallback;
     if (I[n.icon] && /^[a-zA-Z]+$/.test(n.icon)) return I[n.icon];
     return `<span class="tr-emoji">${esc(n.icon)}</span>`;
   }
   // the icon chooser: returns { icon } ('' = default) or null if cancelled
+  // every emoji with its name and search words (app/vendor/emoji/names.txt, made by tools/emoji/make.py), loaded the
+  // first time someone searches, so "trash" finds the wastebasket without the Windows emoji keyboard
+  let emojiNames = null;
+  const loadEmojiNames = () => emojiNames || (emojiNames = fetch('vendor/emoji/names.txt').then(r => r.ok ? r.text() : '').then(t => t.split('\n').filter(Boolean).map(l => { const [e, n, k] = l.split('\t'); return { e, n, k: (n + ' ' + (k || '')).toLowerCase() }; })).catch(() => []));
+  function findEmoji(list, q) {
+    const words = q.toLowerCase().split(/\s+/).filter(Boolean), out = [];
+    for (const it of list) {
+      const ws = it.k.split(' ');
+      if (!words.every(w => ws.some(x => x.startsWith(w)))) continue;
+      const nm = it.n.toLowerCase(), score = nm === q ? 0 : nm.startsWith(words[0]) ? 1 : nm.split(' ').some(x => x.startsWith(words[0])) ? 2 : 3;
+      out.push([score, it]);
+    }
+    return out.sort((a, b) => a[0] - b[0]).slice(0, 120).map(x => x[1]);
+  }
+  // the icon chooser: returns { icon } ('' = default) or null if cancelled
   async function pickIcon(current, title) {
     let chosen = current || '';
     const body = document.createElement('div');
-    body.innerHTML = `<div class="ip-label">Icons</div><div class="ip-grid icons">${ICON_CHOICES.map(k => `<button class="ip-btn" data-v="${k}" title="${k}">${I[k]}</button>`).join('')}</div>
-      <div class="ip-label">Emojis</div><div class="ip-grid emoji">${EMOJI_CHOICES.map(e => `<button class="ip-btn" data-v="${esc(e)}">${esc(e)}</button>`).join('')}</div>
-      <div class="ip-own"><label>Or type/paste any emoji (Windows: press Win + . to open the emoji keyboard)</label><input type="text" maxlength="8" value="${chosen && !I[chosen] ? esc(chosen) : ''}" placeholder="🙂"></div>`;
+    const btn = (v, t) => `<button class="ip-btn" type="button" data-v="${esc(v)}"${t ? ` title="${esc(t)}"` : ''}>${esc(v)}</button>`;
+    body.innerHTML = `<div class="ip-own"><label>Search emojis by name (trash, dragon, castle…), or type or paste any emoji</label><input type="text" maxlength="40" value="${chosen && !I[chosen] ? esc(chosen) : ''}" placeholder="Search, or 🙂" aria-label="Search emojis"></div>
+      <div class="ip-found hidden"><div class="ip-label">Found</div><div class="ip-grid emoji ip-found-grid"></div></div>
+      <div class="ip-label">Icons</div><div class="ip-grid icons">${ICON_CHOICES.map(k => `<button class="ip-btn" type="button" data-v="${k}" title="${k}">${I[k]}</button>`).join('')}</div>
+      <div class="ip-label">Emojis</div><div class="ip-grid emoji">${EMOJI_CHOICES.map(e => btn(e)).join('')}</div>`;
+    const input = $('.ip-own input', body), found = $('.ip-found', body), fgrid = $('.ip-found-grid', body);
     const mark = () => $$('.ip-btn', body).forEach(b => b.classList.toggle('on', b.dataset.v === chosen));
-    mark();
-    $$('.ip-btn', body).forEach(b => b.onclick = () => { chosen = b.dataset.v; $('.ip-own input', body).value = I[chosen] ? '' : chosen; mark(); });
-    $('.ip-own input', body).oninput = e => { chosen = e.target.value.trim(); mark(); };
+    const wire = root => $$('.ip-btn', root).forEach(b => b.onclick = () => { chosen = b.dataset.v; if (!input.value || !/\p{L}/u.test(input.value) || /\p{Extended_Pictographic}/u.test(input.value)) input.value = I[chosen] ? '' : chosen; mark(); });
+    mark(); wire(body);
+    let seq = 0;
+    input.oninput = async () => {
+      const v = input.value.trim(), my = ++seq;
+      if (v && /\p{L}/u.test(v) && !/\p{Extended_Pictographic}/u.test(v)) {   // words: search
+        const list = findEmoji(await loadEmojiNames(), v); if (my !== seq) return;
+        found.classList.remove('hidden');
+        fgrid.innerHTML = list.length ? list.map(it => btn(it.e, it.n)).join('') : `<p class="hint">No emoji called “${esc(v)}”. Try another word.</p>`;
+        wire(fgrid); mark();
+      } else { found.classList.add('hidden'); fgrid.innerHTML = ''; chosen = v; mark(); }
+    };
     const r = await modal({ title: `Icon for “${title || 'Untitled'}”`, body, wide: true, buttons: [{ label: 'Use default', value: 'reset', kind: 'ghost' }, { label: 'Cancel', value: false, kind: 'ghost' }, { label: 'Save', value: true, kind: 'primary' }] });
     if (!r) return null;
     if (r === 'reset' || !chosen) return { icon: '' };
@@ -617,7 +652,7 @@
     }
     let labelled = false;
     for (const r of S.project.binder) {
-      if (!r.root && !labelled) { labelled = true; const l = document.createElement('div'); l.className = 'tree-unsorted'; l.textContent = 'New — drag into place'; tree.appendChild(l); }
+      if (!r.root && !labelled) { labelled = true; const l = document.createElement('div'); l.className = 'tree-unsorted'; l.textContent = 'New: drag into place'; tree.appendChild(l); }
       build(r, 0);
     }
     emit('binder');
@@ -729,12 +764,13 @@
       if (n.type === 'doc') items.push({ label: 'Snapshots…', action: async () => { await openDoc(n.id); snapshotsDialog(); } });
       if (n.type === 'doc' && !n.map && window.UnwipSheets && root.kind !== 'manuscript' && root.kind !== 'trash') items.push({ label: 'Turn into separate sheets…', action: () => window.UnwipSheets.convert([n.id]) });
       if (n.type === 'doc' || n.type === 'folder') items.push({ label: 'Remove empty lines…', action: () => tidyBlankLines(n.id) });
+      if (window.UnwipPageLinks && window.UnwipPageLinks.isPage(n.id) && level() >= 1) items.push({ label: 'Maps and pictures…', action: () => window.UnwipPageLinks.link(n.id) });
       if (n.type === 'doc' && n.id !== S.docId) items.push({ label: 'Open in split view', action: () => { if (S.view !== 'write') setView('write'); openSplit(n.id); } });
       if (n.type === 'doc' && !n.map && api.popoutOpen) items.push({ label: S.popped && S.popped.has(n.id) ? 'Show its window' : 'Open in a new window', action: () => popOut(n.id) });
       { const fn = findNode(n.id); const nx = fn.list[fn.index + 1];
         if (n.type === 'doc' && nx && nx.type === 'doc' && !nx.root) items.push({ label: `Merge with next (“${nx.title.length > 24 ? nx.title.slice(0, 24) + '…' : nx.title}”)…`, action: () => mergeWithNext(n.id) });
         if (n.type === 'folder') items.push({ label: 'Merge folder into one document…', action: () => mergeFolder(n.id) }); }
-      if (n.type === 'doc' && S.mode === 'detailed') items.push({ label: 'Status', disabled: true }, ...statusOptions().map(([v, l]) => ({ label: (n.status || '') === v ? `✓ ${l}` : `    ${l}`, action: () => { n.status = v; scheduleMeta(); renderBinder(); refreshPlanView(); } })), { label: '    Edit status labels…', action: editStatuses });
+      if (n.type === 'doc' && level() >= 1) items.push({ label: 'Status', disabled: true }, ...statusOptions().map(([v, l]) => ({ label: (n.status || '') === v ? `✓ ${l}` : `    ${l}`, action: () => { n.status = v; scheduleMeta(); renderBinder(); refreshPlanView(); } })), { label: '    Edit status labels…', action: editStatuses });
       items.push({ sep: true });
       items.push({ label: 'Move to…', action: () => moveToDialog(n.id) });
       items.push({ label: 'Move up', hint: 'Alt+↑', disabled: f.index === 0, action: () => moveBy(n.id, -1) });
@@ -1044,15 +1080,6 @@
     }
     return r;
   }
-  async function newSection() {
-    const r = await sectionDialog(null, { offerSave: true }); if (!r) return;
-    const k = 'custom-' + uid();
-    const node = { id: 'root-' + k, type: 'folder', kind: k, root: true, custom: true, open: true, children: [], ...r };
-    const trashAt = S.project.binder.findIndex(x => x.kind === 'trash');
-    S.project.binder.splice(trashAt, 0, node);
-    scheduleMeta(); renderBinder(); scheduleNames();
-    toast(`Added “${esc(r.title)}”. Hover it and click + to add an entry.`);
-  }
   async function editSection(n, forceSave) {
     const was = sheetFor(n);
     const r = await sectionDialog(n, { offerSave: true, forceSave }); if (!r) return;
@@ -1163,24 +1190,6 @@
     renderBinder();
     const row = $(`.tree-row[data-id="${node.id}"]`);
     if (row) { row.scrollIntoView({ block: 'nearest' }); startRename(row, node); }
-  }
-  // (kept for the right-click menu)
-  function addMenu(type, btn) {
-    const what = type === 'doc' ? 'document' : 'folder';
-    const items = [];
-    const sel = S.selectedId && findNode(S.selectedId);
-    if (sel && !sel.node.root && rootOf(sel.node.id).kind !== 'trash') {
-      const rootName = rootOf(sel.node.id).title;
-      items.push({ label: `Below “${sel.node.title}”`, hint: rootName, action: () => addNode(type, sel.node.id, false) });
-      if (sel.node.type === 'folder') items.push({ label: `Inside “${sel.node.title}”`, hint: rootName, action: () => addNode(type, sel.node.id, true) });
-      items.push({ sep: true });
-    }
-    for (const r of S.project.binder) {
-      if (r.kind === 'trash') continue;
-      items.push({ label: `New ${what} in ${r.title}`, action: () => addNode(type, r.id, true) });
-    }
-    const rect = btn.getBoundingClientRect();
-    showMenu(rect.left, rect.top - 8 - (items.length * 34 + 12), items);
   }
   // + Document / + Folder: into the selected folder or section; with nothing (or a document) selected, at the bottom
   function addTarget() {
@@ -1418,8 +1427,10 @@
     await flushSave();
     const f = findNode(id); if (!f) return;
     if (f.node.map && window.UnwipMaps) { S.selectedId = id; renderBinder(); return window.UnwipMaps.open(id); }
-    if (S.view === 'outline') setView('write');
-    if (S.splitId === id) { await flushSplit(); $('#split-pane').classList.add('hidden'); $('#btn-split').classList.remove('on'); S.splitId = null; }
+    // opening a page always shows the writing view: from the Corkboard, Moodboard, Timeline or Insights charts it used
+    // to show the page but keep that view's state, which hid the toolbar until the level was switched
+    if (S.view !== 'write') setView('write');
+    if (S.splitId === id) { await flushSplit(); $('#split-pane').classList.add('hidden'); $('#btn-split').classList.remove('on'); S.splitId = null; if (S.project) S.project.splitId = null; }
     $$('.toast.with-action').forEach(t => t.remove()); // offers about the previous document
     S.docId = id; S.selectedId = id; S.touchedDoc = null;
     S.project.lastDoc = id; scheduleMeta();
@@ -1872,7 +1883,7 @@
     const order = new Map(items.map((el, i) => [el, i]));
     // first to be tucked away → last
     const PRIO = ['#btn-listen', '#btn-image', '#btn-footnote', '#btn-numbers', '#btn-bullets', '#btn-scene', '#btn-clear', '[data-cmd="strikeThrough"]', '[data-cmd="justifyFull"]', '[data-cmd="justifyRight"]',
-      '[data-cmd="justifyCenter"]', '[data-cmd="justifyLeft"]', '#sel-block', '[data-cmd="underline"]', '#sel-size', '#btn-comment', '#sel-font'];
+      '[data-cmd="justifyCenter"]', '[data-cmd="justifyLeft"]', '[data-cmd="underline"]', '#sel-size', '#btn-comment', '#sel-block', '#sel-font'];
     [more, pop].forEach(el => el.addEventListener('mousedown', e => { if (!e.target.closest('select')) e.preventDefault(); }));
     more.onclick = () => {
       if (!pop.classList.contains('hidden')) { pop.classList.add('hidden'); return; }
@@ -2426,8 +2437,29 @@
     if (g.dropBlank) blocks = blocks.filter(b => b.runs.some(r => !r.br && (r.text || '').trim()));
     if (g.smf) blocks = blocks.map(b => Clip.SCENE_BREAK.test(b.runs.map(r => r.text || '').join('')) && b.runs.some(r => (r.text || '').trim()) ? { ...b, runs: [{ ...b.runs.find(r => !r.br), text: '#' }] } : b);
     let html = Clip.exportFromBlocks(blocks, g.style, { pageBreaks: true }).html;
+    // Kindle / EPUB: [system messages] as boxes, as the EPUB will have them (Settings › LitRPG). The preview used to
+    // leave them as plain brackets whatever the setting said.
+    if (fmt === 'ebook') html = ebookSysBoxes(html);
     // in the preview, "new page" means "new column"
     return html.replace(/page-break-before: always; break-before: page/g, 'break-before: column');
+  }
+  function ebookSysBoxes(html) {
+    const L = S.settings.litrpg, Lit = window.UnwipLitRPG;
+    if (!L || !L.on || !L.ebook || !Lit) return html;
+    const box = document.createElement('div'); box.innerHTML = html;
+    const ps = [...box.querySelectorAll('p')].filter(p => (p.textContent || '').trim());
+    const mode = Lit.shortStyle();
+    // the same look as the EPUB's p.sys (epub.js)
+    const FULL = 'text-indent:0;text-align:left;margin:.7em 1.2em;padding:.35em .7em;border:1px solid #5d84c9;border-left:4px solid #5d84c9;background-color:#eef3fb;color:#1d2a44;font-family:monospace;font-size:.88em;break-inside:avoid;';
+    ps.forEach((p, i) => {
+      const t = p.textContent || ''; if (!Lit.isSys(t)) return;
+      const short = mode !== 'full' && Lit.isShort(t, ps[i - 1] ? ps[i - 1].textContent : '', ps[i + 1] ? ps[i + 1].textContent : '');
+      if (short && mode === 'plain') { p.style.cssText += ';text-indent:0;margin:.5em 1.2em;font-weight:bold;'; return; }
+      p.style.cssText += ';' + FULL + (short ? 'display:table;margin-right:auto;' : '');
+      p.querySelectorAll('[style]').forEach(x => { x.style.fontFamily = ''; x.style.fontSize = ''; });   // the box's own monospace, as in the EPUB
+      if (!short && ps[i - 1] && Lit.isSys(ps[i - 1].textContent)) p.style.cssText += 'margin-top:-.45em;border-top:0;';
+    });
+    return box.innerHTML;
   }
   // Flow the text into page-sized columns and count them
   function layoutInto(flow, fmt) {
@@ -2769,7 +2801,7 @@
         if (!S.project.epubId) { S.project.epubId = 'urn:uuid:' + crypto.randomUUID(); scheduleMeta(); }
         const bk = S.project.book || {};
         const typeset = TS ? { t: TS.resolved(bookDesign()), d: bookDesign(), book: bk } : null;
-        const { bytes, chapters } = window.FolioEPUB.build({ blocks: PV.blocks, style: S.project.style, title: PV.scope === 'doc' ? name : (bk.title || name), author: bk.author || settings.author || '', lang, id: S.project.epubId, typeset: PV.scope === 'doc' ? null : typeset, systemBoxes: !!(S.settings.litrpg && S.settings.litrpg.on && S.settings.litrpg.ebook) });
+        const { bytes, chapters } = window.FolioEPUB.build({ blocks: PV.blocks, style: S.project.style, title: PV.scope === 'doc' ? name : (bk.title || name), author: bk.author || settings.author || '', lang, id: S.project.epubId, typeset: PV.scope === 'doc' ? null : typeset, systemBoxes: !!(S.settings.litrpg && S.settings.litrpg.on && S.settings.litrpg.ebook), systemShort: window.UnwipLitRPG ? window.UnwipLitRPG.shortStyle() : 'full' });
         const p = await api.exportBinary(bytes, name, 'epub', 'EPUB e-book');
         if (p) window.UnwipStart && window.UnwipStart.done('export');
         if (p) toast(`EPUB saved with ${chapters} chapter${chapters === 1 ? '' : 's'}.${settings.author ? '' : ' Tip: add your author name in Settings.'}`, '', 6000);
@@ -2799,32 +2831,50 @@
     await loadScope();
   }
   $('#btn-export').onclick = () => openPreview();
-  // the arrow beside Copy for Docs: every other way to get the book out
+  // Export: every way to get the book out, grouped. One line each; the explanation shows at the bottom for the item
+  // you point at (or reach with the arrow keys), so the menu stays short.
   $('#btn-export-more').onclick = e => {
     e.stopPropagation();
     const open = document.querySelector('.export-pop'); if (open) { open.remove(); return; }
-    const items = [
-      ['copy', 'Copy for Docs', 'This chapter, ready to paste into Google Docs or Word', 'Ctrl+Shift+C', () => copyDocForDocs()],
-      ['copy', 'Copy for Royal Road…', 'This chapter, with [system messages] as boxes Royal Road keeps', '', () => window.UnwipRR && window.UnwipRR.open()],
-      ['preview', 'Preview & page counts', 'See it as a paperback, Kindle or Word page', '', () => openPreview()],
-      null,
-      ['doc', 'Print-ready PDF', 'Paperback interior with page numbers and chapter openers', '', () => openPreview('paperback')],
-      ['book', 'EPUB e-book', 'For Kindle (KDP), Apple Books and Kobo', '', () => openPreview('ebook')],
-      ['doc', 'Word document (.docx)', 'For an editor, agent or beta reader', '', () => openPreview('docs')],
-      ['folder', 'A folder of chapter files…', 'One Word or Markdown file per chapter, for Scrivener or any app', '', () => window.UnwipExportFolder && window.UnwipExportFolder.open()],
-      ['book', 'One Word file for Vellum or Atticus…', 'Each chapter a Heading 1, scene breaks as *** (not yet beta tested)', '', () => window.UnwipExportFolder && window.UnwipExportFolder.oneWord()],
-      ['heart', 'No hard feelings…', 'Take your book to Scrivener or anywhere else', '', () => window.UnwipNoHardFeelings && window.UnwipNoHardFeelings.open()],
-      null,
-      ['person', 'Send to a beta reader…', 'A Word file they mark up with Track Changes and comments', '', () => window.UnwipReader && window.UnwipReader.send()],
-      ['importic', 'Bring in a reader’s feedback…', 'Their changes and comments land in the right chapters', '', () => window.UnwipReader && window.UnwipReader.receive()]
+    const groups = [
+      ['Copy and paste', [
+        ['copy', 'Copy for Docs', 'This chapter, ready to paste into Google Docs or Word.', 'Ctrl+Shift+C', () => copyDocForDocs()],
+        ['boxes', 'Copy for Royal Road…', 'This chapter, with [system messages] as boxes Royal Road keeps.', '', () => window.UnwipRR && window.UnwipRR.open()]]],
+      ['Check it', [
+        ['preview', 'Preview & page counts', 'See it as a paperback, Kindle or Word page. Choose the whole book or this chapter there.', '', () => openPreview()]]],
+      ['Publish', [
+        ['doc', 'Print-ready PDF', 'Paperback interior with page numbers and chapter openers.', '', () => openPreview('paperback')],
+        ['book', 'EPUB e-book', 'For Kindle (KDP), Apple Books and Kobo.', '', () => openPreview('ebook')],
+        ['book', 'One Word file for Vellum or Atticus…', 'Each chapter a Heading 1, scene breaks as *** (not yet beta tested).', '', () => window.UnwipExportFolder && window.UnwipExportFolder.oneWord()]]],
+      ['Share', [
+        ['doc', 'Word document (.docx)', 'For an editor or agent.', '', () => openPreview('docs')],
+        ['person', 'Send to a beta reader…', 'A Word file they mark up with Track Changes and comments.', '', () => window.UnwipReader && window.UnwipReader.send()],
+        ['importic', 'Bring in a reader’s feedback…', 'Their changes and comments land in the right chapters.', '', () => window.UnwipReader && window.UnwipReader.receive()]]],
+      ['Take it elsewhere', [
+        ['folder', 'A folder of chapter files…', 'One Word or Markdown file per chapter, for Scrivener or any app.', '', () => window.UnwipExportFolder && window.UnwipExportFolder.open()],
+        ['heart', 'No hard feelings…', 'Take your book to Scrivener or anywhere else. Nothing in Unwip is changed.', '', () => window.UnwipNoHardFeelings && window.UnwipNoHardFeelings.open()]]]
     ];
-    const pop = document.createElement('div'); pop.className = 'export-pop'; pop.setAttribute('role', 'menu');
-    pop.innerHTML = items.map((x, i) => x ? `<button class="ex-item" role="menuitem" data-i="${i}"><span class="ex-ic">${I[x[0]] || ''}</span><span class="ex-t"><b>${esc(x[1])}</b><small>${esc(x[2])}</small></span>${x[3] ? `<kbd>${x[3]}</kbd>` : ''}</button>` : '<hr>').join('') + '<p class="ex-note">Whole book or this chapter? Choose in Preview.</p>';
+    const items = []; groups.forEach(g => g[1].forEach(x => items.push(x)));
+    const NOTE = 'Point at an item to see what it does.';
+    const pop = document.createElement('div'); pop.className = 'export-pop ex-grouped'; pop.setAttribute('role', 'menu');
+    let k = 0;
+    pop.innerHTML = groups.map(g => `<div class="ex-grp">${esc(g[0])}</div>` + g[1].map(x => `<button class="ex-item" role="menuitem" data-i="${k++}"><span class="ex-ic">${I[x[0]] || ''}</span><span class="ex-t"><b>${esc(x[1])}</b></span>${x[3] ? `<kbd>${x[3]}</kbd>` : ''}</button>`).join('')).join('') + `<p class="ex-note" id="ex-note">${NOTE}</p>`;
     document.body.appendChild(pop);
+    const note = $('#ex-note', pop);
     const r = $('#export-split').getBoundingClientRect();
     pop.style.top = (r.bottom + 6) + 'px'; pop.style.left = Math.max(8, Math.min(innerWidth - pop.offsetWidth - 8, r.right - pop.offsetWidth)) + 'px';
     pop.style.maxHeight = Math.max(200, innerHeight - r.bottom - 14) + 'px'; pop.style.overflowY = 'auto';   // a short window: it scrolls instead of running off the bottom
-    $$('.ex-item', pop).forEach(b => b.onclick = () => { pop.remove(); items[+b.dataset.i][4](); });
+    $$('.ex-item', pop).forEach(b => {
+      const show = () => { note.textContent = items[+b.dataset.i][2]; };
+      b.addEventListener('mouseenter', show); b.addEventListener('focus', show);
+      b.onclick = () => { pop.remove(); items[+b.dataset.i][4](); };
+    });
+    pop.addEventListener('mouseleave', () => { if (!pop.contains(document.activeElement)) note.textContent = NOTE; });
+    pop.addEventListener('keydown', ev => {
+      const bs = $$('.ex-item', pop), at = bs.indexOf(document.activeElement);
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); bs[(at + (ev.key === 'ArrowDown' ? 1 : bs.length - 1)) % bs.length].focus(); }
+      else if (ev.key === 'Escape') { pop.remove(); $('#btn-export-more').focus(); }
+    });
     setTimeout(() => document.addEventListener('mousedown', function off(ev) { if (!pop.contains(ev.target)) { pop.remove(); document.removeEventListener('mousedown', off); } }), 0);
   };
   function fontFaceCSS() { return ''; } // imported fonts embed in a later version
@@ -2959,6 +3009,8 @@
         <div class="field"><label>Custom dictionary</label><button class="btn" id="s-dict" type="button">Manage added words…</button></div>`}
         <label class="check full"><input type="checkbox" id="s-dash" ${smartDash() ? 'checked' : ''}> Turn two hyphens (--) into an em dash (—) as I type</label>
         <label class="check full"><input type="checkbox" id="s-spell" ${sp.enabled ? 'checked' : ''}> Underline spelling mistakes</label>
+        <div class="section-label">Autocorrect <span class="sl-now">· applies straight away</span></div>
+        <div class="field full" id="s-autocorrect">${window.UnwipAutocorrect ? window.UnwipAutocorrect.settingsHTML() : ''}</div>
         <div class="section-label">LitRPG and text shortcuts <span class="sl-now">· applies straight away</span></div>
         <div class="field full" id="s-litrpg"></div>
         <div class="section-label">Licence <span class="sl-now">· applies straight away</span></div>
@@ -2967,6 +3019,8 @@
         <div class="field"><label>New here, or showing someone?</label><button class="btn" id="g-intro" type="button">Welcome setup…</button></div>
         <div class="field"><label>A quick look around a book</label><button class="btn" id="g-tour" type="button">Take the tour</button></div>
         <div class="field"><label>What everything does, and keyboard shortcuts</label><button class="btn" id="g-help" type="button">Open Help (F1)</button></div>
+        <div class="section-label">What’s new</div>
+        <div class="field full" id="s-news"></div>
 <div class="pc-only">        <div class="section-label">Updates</div>
         <label class="check"><input type="checkbox" id="g-autoup" ${cfg.autoUpdate !== false ? 'checked' : ''}> Install updates automatically</label>
         <div class="field"><label id="g-version">Unwip</label><button class="btn" id="g-checkup" type="button">Check for updates now</button></div>
@@ -2987,13 +3041,15 @@
     $('#s-themes', body).onclick = () => window.UnwipLook && window.UnwipLook.openThemes();
     $('#s-typing', body).onclick = () => window.UnwipLook && window.UnwipLook.openTyping();
     if ($('#s-dict', body)) $('#s-dict', body).onclick = dictionaryDialog;
+    if (window.UnwipAutocorrect && $('#s-autocorrect', body)) window.UnwipAutocorrect.wireSettings($('#s-autocorrect', body));
     if (window.UnwipSync) window.UnwipSync.settingsSection(body);
     if (window.UnwipLicence) window.UnwipLicence.settingsSection(body);
     if (window.UnwipLitRPG) window.UnwipLitRPG.settingsSection(body);
     $('#g-intro', body).onclick = () => { body.closest('.modal-back').remove(); window.UnwipIntro && window.UnwipIntro.start(); };
     $('#g-tour', body).onclick = () => { body.closest('.modal-back').remove(); window.UnwipIntro && window.UnwipIntro.tour(); };
     $('#g-help', body).onclick = () => { body.closest('.modal-back').remove(); window.UnwipHelp && window.UnwipHelp.open(); };
-    api.updateState().then(st => { const l = $('#g-version', body); if (l) l.textContent = `You have Unwip ${st.current}`; }).catch(() => {});
+    const news = $('#s-news', body); if (news && window.UnwipUpdates) news.innerHTML = window.UnwipUpdates.newsHTML();
+    api.updateState().then(st => { const l = $('#g-version', body); if (l) { const u = window.UnwipUpdates && window.UnwipUpdates.status ? window.UnwipUpdates.status() : {}; const ago = u.lastCheck ? Math.round((Date.now() - u.lastCheck) / 60000) : null; l.textContent = `You have Unwip ${st.current}` + (st.status === 'ready' ? ` · ${st.version} is installed, restart to use it` : u.lastError ? ` · the last check failed: ${u.lastError}` : ago != null ? ` · checked ${ago < 1 ? 'just now' : ago + ' min ago'}` : ''); } if (news && window.UnwipUpdates && st.current) news.innerHTML = window.UnwipUpdates.newsHTML(st.current); }).catch(() => {});
     $('#g-checkup', body).onclick = () => { window.UnwipUpdates && window.UnwipUpdates.checkNow(); };
     const ok = await modal({ title: 'Settings', body, wide: true, buttons: [{ label: 'Cancel', value: false, kind: 'ghost' }, { label: 'Save', value: true, kind: 'primary' }] });
     if (!ok) return;
@@ -3067,22 +3123,45 @@
     if (sel && sel.length < 60) findInput.value = sel;
     findInput.focus(); findInput.select();
   }
-  function closeFind() { findbar.classList.add('hidden'); $('#find-count').textContent = ''; api.stopFind(); restoreRange(); }
-  function runFind(forward = true, next = true) {
-    const t = findInput.value; if (!t) { $('#find-count').textContent = ''; api.stopFind(); return; }
-    api.find(t, { forward, findNext: next });
+  // Find looks only in the chapter's text and highlights matches itself (all soft, the current one strong). The PC used to
+  // use the browser's find, which also matched the buttons and binder, and took the focus out of the box after every
+  // key, so Backspace stopped after each letter. Now you can type or backspace freely; Enter goes to the next match.
+  let findState = { text: '', idx: -1 }, findTimer = 0;
+  function findRanges(text) {
+    if (!text) return [];
+    const needle = text.toLowerCase(), out = [];
+    const tw = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+      const hay = n.data.toLowerCase(); let i = hay.indexOf(needle);
+      while (i >= 0) { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + text.length); out.push(r); i = hay.indexOf(needle, i + needle.length); }
+    }
+    return out;
   }
-  findInput.addEventListener('input', () => runFind(true, false));
+  function clearFindMarks() { try { CSS.highlights.delete('unwip-find'); CSS.highlights.delete('unwip-find-cur'); } catch {} findState = { text: '', idx: -1 }; }
+  function closeFind() { clearTimeout(findTimer); findbar.classList.add('hidden'); $('#find-count').textContent = ''; clearFindMarks(); restoreRange(); }
+  function runFind(forward = true, next = true) {
+    clearTimeout(findTimer);
+    const t = findInput.value, count = $('#find-count');
+    if (!t) { count.textContent = ''; clearFindMarks(); return; }
+    const rs = findRanges(t);
+    if (!rs.length) { clearFindMarks(); count.textContent = 'No matches'; return; }
+    let idx = findState.text === t && next ? findState.idx + (forward ? 1 : -1) : findState.text === t ? findState.idx : 0;
+    idx = (idx + rs.length) % rs.length;
+    findState = { text: t, idx };
+    try { if (window.Highlight && CSS.highlights) { CSS.highlights.set('unwip-find', new Highlight(...rs)); CSS.highlights.set('unwip-find-cur', new Highlight(rs[idx])); } } catch {}
+    const el = rs[idx].startContainer.parentElement;
+    if (el) el.scrollIntoView({ block: 'center', behavior: next ? 'smooth' : 'auto' });
+    count.textContent = `${idx + 1} of ${rs.length}`;
+  }
+  // typing in the box: wait for a short pause, so backspacing over a word doesn't search after every key
+  findInput.addEventListener('input', () => { clearTimeout(findTimer); if (!findInput.value) { $('#find-count').textContent = ''; clearFindMarks(); return; } findTimer = setTimeout(() => runFind(true, false), 250); });
   findInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); runFind(!e.shiftKey, true); }
+    if (e.key === 'Enter') { e.preventDefault(); runFind(!e.shiftKey, findState.text === findInput.value); }
     if (e.key === 'Escape') { e.preventDefault(); closeFind(); }
   });
   $('#find-next').onclick = () => runFind(true, true);
   $('#find-prev').onclick = () => runFind(false, true);
   $('#find-close').onclick = closeFind;
-  api.onFindResult(r => {
-    if (r.finalUpdate) $('#find-count').textContent = r.matches ? `${Math.max(0, r.activeMatchOrdinal - 0)} of ${r.matches}` : 'No matches';
-  });
 
 
   // ================================================================== REVISION MODE
@@ -3094,8 +3173,8 @@
     try { return JSON.parse(localStorage.getItem('folio-revise') || '{}'); } catch { return {}; }
   }
   function saveRevisePrefs(p) { try { localStorage.setItem('folio-revise', JSON.stringify(p)); } catch {} }
-  // Focused shows the five big things; Detailed shows every check. Follows the binder's Focused/Detailed until changed here.
-  function reviseLevel() { if (document.documentElement.classList.contains('m-phone')) return 'focused'; const p = revisePrefs(); return p.level || (S.mode === 'detailed' ? 'detailed' : 'focused'); }
+  // Main checks: the five big things; All checks: every check. Follows the book's level (Focus, or Detail and up) until changed here.
+  function reviseLevel() { if (document.documentElement.classList.contains('m-phone')) return 'focused'; const p = revisePrefs(); return p.level || (level() >= 1 ? 'detailed' : 'focused'); }
   function catShown(id) { if (id === 'more' && !window.UnwipHarper) return false; return reviseLevel() === 'detailed' || !!Rev.CATS.find(c => c.id === id).focused; }
   function catOn(id) { if (!catShown(id)) return false; const p = revisePrefs(); return p[id] !== undefined ? p[id] : Rev.CATS.find(c => c.id === id).on; }
   $$('#rp-level button').forEach(b => b.onclick = () => { const p = revisePrefs(); p.level = b.dataset.l; saveRevisePrefs(p); runRevise(); });
@@ -3489,7 +3568,7 @@
     if (custom > 0) minutes = Math.min(240, custom);
     const goal = Math.max(0, +$('#sp-goal', body).value || 0);
     S.sprintPlan = { rounds, brk, round: 1, minutes, goal, recs: [] };
-    beginSprint(minutes, goal, { writer: $('#sp-writer', body).checked, message: rounds > 1 ? `Sprint 1 of ${rounds}: ${minutes} minutes. Go!` : null });
+    beginSprint(minutes, goal, { writer: $('#sp-writer', body).checked, message: rounds > 1 ? `Sprint 1 of ${rounds} started: ${minutes} minutes.` : null });
   }
   // ---- breaks: between rounds, or a timer on its own
   function sprintChime() {
@@ -3532,11 +3611,11 @@
     S.sprint.timer = setInterval(() => {
       const sp = S.sprint; if (!sp) return;
       renderSprint();
-      if (sp.mini && sp.goal && !sp.cheered && S.sessionTyped - sp.startTyped >= sp.goal) { sp.cheered = true; quoteToast(`${fmt(sp.goal)} words. That was the hard part. Keep going if it's flowing — the timer's still running.`); }
+      if (sp.mini && sp.goal && !sp.cheered && S.sessionTyped - sp.startTyped >= sp.goal) { sp.cheered = true; quoteToast(`${fmt(sp.goal)} words, goal reached. You can keep going if you like: the timer's still running.`); }
       if (Date.now() >= sp.end) endSprint(true, false);
     }, 500);
     renderSprint();
-    if (opts.writer) setWriter(true); else quoteToast(opts.message || `Sprint started: ${minutes} minutes. Go!`);
+    if (opts.writer) setWriter(true); else quoteToast(opts.message || `Sprint started: ${minutes} minutes.`);
     editor.focus();
   }
   async function endSprint(showResult, early) {
@@ -3558,7 +3637,7 @@
       plan.round++;
       notify('Sprint done', `${fmt(words)} words. ${plan.brk}-minute break, then sprint ${plan.round} of ${plan.rounds}.`);
       quoteToast(`Sprint ${plan.round - 1} of ${plan.rounds} done: ${fmt(words)} words. ${plan.brk}-minute break. Stretch, drink some water.`);
-      startBreak(plan.brk, () => { if (S.slug) beginSprint(plan.minutes, plan.goal, { message: `Sprint ${plan.round} of ${plan.rounds}. Go!` }); else S.sprintPlan = null; });
+      startBreak(plan.brk, () => { if (S.slug) beginSprint(plan.minutes, plan.goal, { message: `Sprint ${plan.round} of ${plan.rounds} started.` }); else S.sprintPlan = null; });
       return;
     }
     S.sprintPlan = null;
@@ -3730,7 +3809,7 @@
         ${dial({ pct: daily ? week / (daily * 7) : 0, big: fmt(week), small: daily ? `of ${fmt(daily * 7)}` : 'words', label: 'This week', color: '#7a5cc7', size: 120 })}
         <div class="stat-stack">
           <div class="stat-card flame"><span class="ic">${I.flame}</span><b>${st.current}</b><span>${st.current ? `day streak<br><small>best ${st.best}</small>` : st.best ? `day streak<br><small>best ${st.best} · write today to start again</small>` : `day streak<br><small>write today to start one</small>`}</span></div>
-          <div class="stat-card"><span class="ic">${I.book}</span><b>${fmt(totalWords)}</b><span>words in your manuscripts<br><small>${totalWords ? `≈ ${fmt(Math.max(1, Math.round(totalWords / 280)))} paperback page${Math.max(1, Math.round(totalWords / 280)) === 1 ? '' : 's'}` : 'your first page is waiting'}</small></span></div>
+          <div class="stat-card"><span class="ic">${I.book}</span><b>${fmt(totalWords)}</b><span>words in your manuscripts<br><small>${totalWords ? `≈ ${fmt(Math.max(1, Math.round(totalWords / 280)))} paperback page${Math.max(1, Math.round(totalWords / 280)) === 1 ? '' : 's'}` : 'nothing written yet'}</small></span></div>
         </div>
         ${daily ? '' : `<button class="btn ghost small dash-setgoal" id="dash-setgoal">Set a daily goal</button>`}
       </div>
@@ -4144,18 +4223,35 @@
     walkTree(S.project.binder, n => { if (n.status && !ids.has(n.status)) delete n.status; });
     scheduleMeta(); renderBinder(); refreshPlanView();
   }
+  // Levels: Focus (0, stored as 'focused'), Detail (1, 'detailed'), Lore (2, 'lore'). Each level shows everything the one
+  // before it does, plus more; switching only hides and shows, it never changes the book. Code that asks "is Detail on?"
+  // uses level() >= 1, never S.mode === 'detailed' (that would be false in Lore).
+  const LEVELS = ['focused', 'detailed', 'lore'];
+  const phoneMQ = window.matchMedia('(max-width: 720px)');
+  // phones stop at Detail: Lore's tools need a bigger screen. A device that's switched to Lore keeps it saved, so it comes
+  // back when the window is wide again; on a phone it simply counts as Detail.
+  function level(m = S.mode) { const l = Math.max(0, LEVELS.indexOf(m)); return phoneMQ.matches ? Math.min(l, 1) : l; }
+  function applyLevelClasses(m) {
+    document.body.classList.toggle('detailed', level(m) >= 1);
+    document.body.classList.toggle('lore', level(m) >= 2);
+    const shown = LEVELS[level(m)];
+    $$('#mode-switch button, #lib-mode button').forEach(b => b.classList.toggle('on', b.dataset.m === shown));
+  }
   function setMode(m) {
+    if (!LEVELS.includes(m)) m = 'focused';
+    const before = S.mode;
     S.mode = m;
-    if (m === 'detailed' && S.project) window.UnwipStart && window.UnwipStart.done('detailed');
+    if (level(m) >= 1 && S.project) window.UnwipStart && window.UnwipStart.done('detailed');
     try { localStorage.setItem('folio-mode', m); } catch {}
-    document.body.classList.toggle('detailed', m === 'detailed');
-    $$('#mode-switch button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+    applyLevelClasses(m);
+    emit('level', m, before);
     if (!S.project) return;
-    if (S.revise && !revisePrefs().level) runRevise();      // Revise follows Focused/Detailed until set separately
-    if (m !== 'detailed' && S.view !== 'write') setView('write');
+    if (S.revise && !revisePrefs().level) runRevise();      // Revise follows the level until set separately
+    if (level(m) < 1 && S.view !== 'write') setView('write');
     renderBinder(); fitSynopsis();
   }
-  $$('#mode-switch button').forEach(b => b.onclick = () => setMode(b.dataset.m));
+  $$('#mode-switch button, #lib-mode button').forEach(b => b.onclick = () => setMode(b.dataset.m));
+  phoneMQ.addEventListener('change', () => { applyLevelClasses(S.mode); emit('level', S.mode, S.mode); });
   function setView(v) {
     S.view = v;
     setTimeout(() => emit('view', v), 0);
@@ -4217,7 +4313,7 @@
           </div>`).join('')}
       </div>
       <datalist id="ol-pov-list">${[...new Set(window.FolioNames.entries.filter(e => e.kind === 'Character' && !e.primary).map(e => e.text))].map(t => `<option value="${esc(t)}">`).join('')}</datalist>
-      <p class="ol-tip">Drag documents in the binder to reorder. Click a title to open it. Synopses also show under the title while you write in Detailed mode.</p>`;
+      <p class="ol-tip">Drag documents in the binder to reorder. Click a title to open it. Synopses also show under the title while you write at the Detail level.</p>`;
     $$('.ol-syn', ov).forEach(t => { const fit = () => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }; requestAnimationFrame(fit); t.oninput = () => { findNode(t.closest('.ol-row').dataset.id).node.synopsis = t.value; fit(); scheduleMeta(); }; });
     $$('.ol-pov', ov).forEach(t => t.oninput = () => { findNode(t.closest('.ol-row').dataset.id).node.pov = t.value; scheduleMeta(); });
     $$('.ol-status', ov).forEach(sel => sel.onchange = () => { findNode(sel.closest('.ol-row').dataset.id).node.status = sel.value; scheduleMeta(); renderBinder(); renderOutline(); });
@@ -4225,547 +4321,13 @@
     $$('.ol-open', ov).forEach(b => b.onclick = () => { const n = findNode(b.closest('.ol-row').dataset.id).node; if (n.type === 'doc') { setView('write'); openDoc(n.id); } else { n.open = true; S.selectedId = n.id; renderBinder(); } });
   }
 
-  // ================================================================== CORKBOARD
-  function corkContainer() {
-    S.corkPath = (S.corkPath && S.corkPath.length && S.corkPath.every(id => findNode(id))) ? S.corkPath : ['root-manuscript'];
-    return findNode(S.corkPath[S.corkPath.length - 1]).node;
-  }
-  function renderCork() {
-    const cv = $('#cork-view');
-    const box = corkContainer();
-    const size = (() => { try { return localStorage.getItem('folio-cork-size') || 'm'; } catch { return 'm'; } })();
-    const crumbs = S.corkPath.map((id, i) => { const n = findNode(id).node; return `<button class="ck-crumb" data-i="${i}" data-id="${id}">${esc(n.title)}</button>`; }).join('<span class="ck-sep">›</span>');
-    const roots = S.project.binder.filter(r => r.root && r.kind !== 'trash');
-    const kids = box.children || [];
-    cv.innerHTML = `
-      <div class="ck-head">
-        <div class="ck-crumbs"><select class="ck-root" title="Which section to show">${roots.map(r => `<option value="${r.id}" ${r.id === S.corkPath[0] ? 'selected' : ''}>${esc(r.title)}</option>`).join('')}</select>${S.corkPath.length > 1 ? '<span class="ck-sep">›</span>' + crumbs.split('<span class="ck-sep">›</span>').slice(1).join('<span class="ck-sep">›</span>') : ''}</div>
-        <div class="ck-tools">
-          <div class="seg" title="Card size">${['s', 'm', 'l'].map(k => `<button data-size="${k}" class="${k === size ? 'on' : ''}">${k.toUpperCase()}</button>`).join('')}</div>
-          <button class="btn small" id="ck-add-folder">+ Folder card</button>
-          <button class="btn small primary" id="ck-add">+ Card</button>
-        </div>
-      </div>
-      <div class="ck-grid size-${size}" id="ck-grid">
-        ${kids.map((n, i) => {
-          const words = folderWords(n);
-          const isF = n.type === 'folder';
-          const count = isF ? (n.children || []).length : 0;
-          return `<div class="ck-card ${isF ? 'folder' : ''}" style="--st:${isF ? 'var(--line)' : statusColor(n.status)}" draggable="true" data-id="${n.id}">
-            <i class="ck-pin"></i>
-            <div class="ck-top"><span class="ck-num">${i + 1}</span>${n.icon ? `<span class="ck-icon">${iconHTML(n, '')}</span>` : ''}<input class="ck-title" value="${esc(n.title || '')}" placeholder="Untitled" spellcheck="false">${n.label ? `<span class="lbl-chip" style="--lc:${esc(n.label.c)}" title="Label">${esc(n.label.n)}</span>` : ''}</div>
-            <textarea class="ck-syn" placeholder="${isF ? 'What this part covers…' : 'What happens…'}">${esc(n.synopsis || '')}</textarea>
-            <div class="ck-foot">
-              ${isF ? `<span class="ck-chip">${count} item${count === 1 ? '' : 's'}</span>` : `<button class="ck-chip ck-status" title="Click to change status (right-click to edit labels)">${esc(statusName(n.status))}</button>`}
-              ${n.pov ? `<span class="ck-chip pov">${esc(n.pov)}</span>` : ''}
-              <span class="ck-words">${fmt(words)}</span>
-              <button class="ck-open" title="${isF ? 'Open this folder' : 'Open in the editor'}">${isF ? 'Open ›' : 'Write ›'}</button>
-            </div>
-          </div>`;
-        }).join('')}
-        <button class="ck-new" id="ck-new" tabindex="-1">${I.plus}<span>New card</span></button>
-      </div>
-      <p class="ol-tip">Drag cards to reorder (the binder and outline follow). Double-click a card to open it. Cards edit the same synopsis and status you see in the outline.</p>`;
-    const sizeBtns = $$('.seg [data-size]', cv);
-    sizeBtns.forEach(b => b.onclick = () => { try { localStorage.setItem('folio-cork-size', b.dataset.size); } catch {} renderCork(); });
-    $('.ck-root', cv).onchange = e => { S.corkPath = [e.target.value]; renderCork(); };
-    $$('.ck-crumb', cv).forEach(b => b.onclick = () => { S.corkPath = S.corkPath.slice(0, +b.dataset.i + 1); renderCork(); });
-    const addCard = async type => {
-      const root = rootOf(box.id) || box;
-      const node = type === 'folder' ? { id: uid(), type: 'folder', title: root.kind === 'manuscript' ? 'New part' : 'New folder', open: true, children: [] } : { id: uid(), type: 'doc', title: root.kind === 'manuscript' ? (S.corkPath.length > 1 ? 'New scene' : 'New chapter') : newTitleFor(root), words: 0 };
-      box.children = box.children || []; box.children.push(node);
-      if (type === 'doc' && sheetFor(root)) await api.saveDoc(S.slug, node.id, sheetTemplate(root));
-      scheduleMeta(); renderBinder(); renderCork();
-      const t = $(`.ck-card[data-id="${node.id}"] .ck-title`, cv); if (t) { t.focus(); t.select(); }
-    };
-    $('#ck-add', cv).onclick = () => addCard('doc');
-    $('#ck-new', cv).onclick = () => addCard('doc');
-    $('#ck-add-folder', cv).onclick = () => addCard('folder');
-    const grid = $('#ck-grid', cv);
-    $$('.ck-card', cv).forEach(card => {
-      const n = findNode(card.dataset.id).node;
-      const title = $('.ck-title', card), syn = $('.ck-syn', card);
-      title.oninput = () => { n.title = title.value; scheduleMeta(); renderBinder(); };
-      title.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); syn.focus(); } };
-      syn.oninput = () => { n.synopsis = syn.value; scheduleMeta(); };
-      const open = () => { if (n.type === 'folder') { S.corkPath.push(n.id); renderCork(); } else { setView('write'); openDoc(n.id); } };
-      $('.ck-open', card).onclick = open;
-      card.ondblclick = e => { if (!e.target.closest('input, textarea')) open(); };
-      const st = $('.ck-status', card);
-      if (st) st.oncontextmenu = e => { e.preventDefault(); editStatuses(); };
-      if (st) st.onclick = () => {
-        const order = statusOptions().map(x => x[0]); n.status = order[(order.indexOf(n.status || '') + 1) % order.length];
-        scheduleMeta(); renderBinder(); renderCork();
-      };
-      // drag from anywhere on the card, including its title and synopsis; once you've clicked into one of those to
-      // type, dragging there selects text instead
-      card.addEventListener('mousedown', e => {
-        const field = e.target.closest('input, textarea');
-        card.draggable = !(field && document.activeElement === field);
-        if (!e.target.closest('input, textarea, button')) {
-          $$('.ck-card.sel', cv).forEach(c => c.classList.remove('sel')); card.classList.add('sel');
-          S.ckSelected = n.id; S.binderActive = false;
-          if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
-        }
-      });
-      card.addEventListener('dragstart', e => { S.ckDrag = n.id; card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/x-folio-card', n.id); });
-      card.addEventListener('dragend', () => { S.ckDrag = null; card.classList.remove('dragging'); $$('.ck-before, .ck-after', cv).forEach(c => c.classList.remove('ck-before', 'ck-after')); });
-    });
-    // Dropping works anywhere over the cards, gaps included: the nearest card decides the spot, and a line shows it.
-    let ckAt = null;
-    const ckSpot = e => {
-      let best = null, bd = 1e9;
-      for (const c of $$('.ck-card', grid)) {
-        if (c.dataset.id === S.ckDrag) continue;
-        const r = c.getBoundingClientRect();
-        const dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right), dy = Math.max(r.top - e.clientY, 0, e.clientY - r.bottom), d = dx * dx + dy * dy * 4;
-        if (d < bd) { bd = d; best = { card: c, after: e.clientX > r.left + r.width / 2 }; }
-      }
-      return best;
-    };
-    grid.addEventListener('dragover', e => {
-      if (!S.ckDrag) return;
-      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
-      const at = ckSpot(e);
-      if (ckAt && at && ckAt.card === at.card && ckAt.after === at.after) return;
-      $$('.ck-before, .ck-after', cv).forEach(c => c.classList.remove('ck-before', 'ck-after'));
-      ckAt = at; if (at) at.card.classList.add(at.after ? 'ck-after' : 'ck-before');
-    });
-    grid.addEventListener('dragleave', e => { if (!grid.contains(e.relatedTarget)) { $$('.ck-before, .ck-after', cv).forEach(c => c.classList.remove('ck-before', 'ck-after')); ckAt = null; } });
-    grid.addEventListener('drop', e => {
-      if (!S.ckDrag) return;
-      e.preventDefault();
-      const at = ckSpot(e); ckAt = null;
-      if (!at) return;
-      const src = findNode(S.ckDrag), id = at.card.dataset.id; if (!src || id === S.ckDrag) return;
-      if (isInside(id, src.node)) return;
-      src.list.splice(src.index, 1);
-      const tgt = findNode(id);
-      tgt.list.splice(tgt.index + (at.after ? 1 : 0), 0, src.node);
-      S.ckDrag = null; scheduleMeta(); renderBinder(); renderCork();
-    });
-    // drop on a breadcrumb: move the card up to that level
-    $$('.ck-crumb, .ck-root', cv).forEach(c => {
-      c.addEventListener('dragover', e => { if (S.ckDrag) { e.preventDefault(); c.classList.add('drop'); } });
-      c.addEventListener('dragleave', () => c.classList.remove('drop'));
-      c.addEventListener('drop', e => {
-        if (!S.ckDrag) return; e.preventDefault();
-        const target = c.dataset.id || c.value; const src = findNode(S.ckDrag);
-        if (!src || target === box.id) return;
-        src.list.splice(src.index, 1); findNode(target).node.children.push(src.node);
-        S.ckDrag = null; scheduleMeta(); renderBinder(); renderCork(); toast(`Moved to “${esc(findNode(target).node.title)}”.`);
-      });
-    });
-  }
+  // ================================================================== CORKBOARD (corkboard.js)
+  const renderCork = () => window.UnwipCork && window.UnwipCork.render();
 
-  // ================================================================== MOODBOARD
-  S.mediaCache = {};
-  function boards() {
-    S.project.boards = S.project.boards || [];
-    if (!S.project.boards.length) S.project.boards.push({ id: uid(), title: 'Inspiration', items: [] });
-    if (!S.moodBoard || !S.project.boards.find(b => b.id === S.moodBoard)) S.moodBoard = S.project.boards[0].id;
-    return S.project.boards;
-  }
-  const curBoard = () => boards().find(b => b.id === S.moodBoard);
-  async function mediaURL(file) {
-    if (!S.mediaCache[file]) S.mediaCache[file] = await api.mediaGet(S.slug, file);
-    return S.mediaCache[file];
-  }
-  const NOTE_COLOURS = ['#fff3a3', '#ffd6c9', '#d3ecff', '#d9f2d0', '#eadcff'];
-  function renderMood() {
-    const mv = $('#mood-view');
-    const list = boards(), b = curBoard();
-    const zoom = S.moodZoom || 1;
-    mv.innerHTML = `
-      <div class="mb-head">
-        <select id="mb-board" title="Board">${list.map(x => `<option value="${x.id}" ${x.id === b.id ? 'selected' : ''}>${esc(x.title)}</option>`).join('')}</select>
-        <button class="icon-btn small" id="mb-more" title="Board options">${I.dots}</button>
-        <span class="mb-sep"></span>
-        <button class="btn small" id="mb-img">${I.image}<span>Images</span></button>
-        <button class="btn small" id="mb-note">${I.sticky}<span>Note</span></button>
-        <button class="btn small" id="mb-colour">${I.palette}<span>Colour</span></button>
-        <span class="mb-hint">Drag images in from your folders, or paste them (Ctrl+V)</span>
-        <span class="mb-zoom"><input type="range" id="mb-zoom" min="0.3" max="1.5" step="0.05" value="${zoom}"><span>${Math.round(zoom * 100)}%</span></span>
-      </div>
-      <div class="mb-wrap" id="mb-wrap"><div class="mb-canvas" id="mb-canvas" style="transform:scale(${zoom})"></div>
-        ${b.items.length ? '' : '<div class="mb-empty"><b>Empty board</b><span>Add pictures of places, faces, clothes, weapons, colours, anything that sets the mood. Drag images straight in from File Explorer or a browser, or paste them.</span></div>'}
-      </div>`;
-    const canvas = $('#mb-canvas', mv), wrap = $('#mb-wrap', mv);
-    for (const it of b.items) canvas.appendChild(moodItem(it));
-    $('#mb-board', mv).onchange = e => { S.moodBoard = e.target.value; renderMood(); };
-    $('#mb-more', mv).onclick = e => showMenu(e.clientX, e.clientY, [
-      { label: 'New board…', action: async () => { const t = await promptText('New board', 'Board name (e.g. Mara, The Moor, Costumes)', ''); if (!t) return; const nb = { id: uid(), title: t, items: [] }; S.project.boards.push(nb); S.moodBoard = nb.id; scheduleMeta(); renderMood(); } },
-      { label: 'Rename board…', action: async () => { const t = await promptText('Rename board', 'Board name', b.title); if (!t) return; b.title = t; scheduleMeta(); renderMood(); } },
-      { sep: true },
-      { label: 'Delete board…', danger: true, disabled: list.length < 2, action: async () => { if (await confirmBox('Delete board?', `“${esc(b.title)}” and everything on it will be removed.`, 'Delete', true)) { S.project.boards.splice(S.project.boards.indexOf(b), 1); S.moodBoard = null; scheduleMeta(); renderMood(); } } }
-    ]);
-    // place new things in the middle of what you can see
-    const viewCentre = () => ({ x: (wrap.scrollLeft + wrap.clientWidth / 2) / zoom, y: (wrap.scrollTop + wrap.clientHeight / 2) / zoom });
-    const addItem = it => { b.items.push(it); scheduleMeta(); renderMood(); };
-    $('#mb-img', mv).onclick = async () => {
-      const files = await api.mediaPick(S.slug); const c = viewCentre();
-      files.forEach((f, i) => b.items.push({ id: uid(), type: 'image', file: f.file, x: c.x - 160 + i * 30, y: c.y - 120 + i * 30, w: 320, h: 240 }));
-      if (files.length) { scheduleMeta(); renderMood(); }
-    };
-    $('#mb-note', mv).onclick = () => { const c = viewCentre(); addItem({ id: uid(), type: 'note', text: '', color: NOTE_COLOURS[b.items.filter(i => i.type === 'note').length % NOTE_COLOURS.length], x: c.x - 110, y: c.y - 90, w: 220, h: 180, focus: true }); };
-    $('#mb-colour', mv).onclick = () => { const c = viewCentre(); addItem({ id: uid(), type: 'colour', color: '#6a4c93', label: '', x: c.x - 70, y: c.y - 80, w: 140, h: 160 }); };
-    $('#mb-zoom', mv).oninput = e => { S.moodZoom = +e.target.value; canvas.style.transform = `scale(${S.moodZoom})`; e.target.nextElementSibling.textContent = Math.round(S.moodZoom * 100) + '%'; };
-    $('#mb-zoom', mv).onchange = () => renderMood();
-    // drop image files from Explorer or a browser
-    wrap.addEventListener('dragover', e => { if ([...e.dataTransfer.types].includes('Files')) { e.preventDefault(); wrap.classList.add('drop'); } });
-    wrap.addEventListener('dragleave', () => wrap.classList.remove('drop'));
-    wrap.addEventListener('drop', async e => {
-      wrap.classList.remove('drop');
-      const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
-      if (!files.length) return;
-      e.preventDefault();
-      const r = wrap.getBoundingClientRect();
-      const x = (e.clientX - r.left + wrap.scrollLeft) / zoom, y = (e.clientY - r.top + wrap.scrollTop) / zoom;
-      await addImageFiles(files, x, y);
-    });
-  }
-  async function addImageFiles(files, x, y) {
-    const b = curBoard();
-    for (const [i, f] of files.entries()) {
-      const bytes = new Uint8Array(await f.arrayBuffer());
-      const ext = (f.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
-      const file = await api.mediaAdd(S.slug, bytes, ext);
-      // keep the picture's shape
-      let w = 320, h = 240;
-      try { const bmp = await createImageBitmap(f); const ratio = bmp.height / bmp.width; w = Math.min(380, bmp.width); h = Math.round(w * ratio); } catch {}
-      b.items.push({ id: uid(), type: 'image', file, x: x - w / 2 + i * 30, y: y - h / 2 + i * 30, w, h });
-    }
-    scheduleMeta(); renderMood();
-  }
-  document.addEventListener('paste', async e => {
-    if (S.view !== 'mood' || e.target.closest('.mb-note-text, input, textarea')) return;
-    const imgs = [...e.clipboardData.items].filter(i => i.type.startsWith('image/')).map(i => i.getAsFile()).filter(Boolean);
-    const wrap = $('#mb-wrap'); if (!wrap) return;
-    const z = S.moodZoom || 1, c = { x: (wrap.scrollLeft + wrap.clientWidth / 2) / z, y: (wrap.scrollTop + wrap.clientHeight / 2) / z };
-    if (imgs.length) { e.preventDefault(); await addImageFiles(imgs, c.x, c.y); return; }
-    const text = e.clipboardData.getData('text/plain');
-    if (text) { e.preventDefault(); curBoard().items.push({ id: uid(), type: 'note', text, color: NOTE_COLOURS[0], x: c.x - 110, y: c.y - 90, w: 240, h: 180 }); scheduleMeta(); renderMood(); }
-  });
-  function moodItem(it) {
-    const el = document.createElement('div');
-    el.className = 'mb-item mb-' + it.type;
-    el.style.cssText = `left:${it.x}px;top:${it.y}px;width:${it.w}px;height:${it.h}px;`;
-    if (it.type === 'image') {
-      el.innerHTML = '<div class="mb-img-loading"></div>';
-      mediaURL(it.file).then(url => { if (url) el.innerHTML = `<img src="${url}" draggable="false" alt="">`; else el.innerHTML = '<div class="mb-missing">Image missing</div>'; addHandles(); });
-    } else if (it.type === 'note') {
-      el.style.background = it.color;
-      el.innerHTML = `<div class="mb-note-text" contenteditable="true" spellcheck="true" data-placeholder="Write a note…"></div>`;
-      const t = el.firstChild; t.innerText = it.text || '';
-      t.oninput = () => { it.text = t.innerText; scheduleMeta(); };
-      if (it.focus) { delete it.focus; setTimeout(() => t.focus(), 30); }
-    } else if (it.type === 'colour') {
-      el.innerHTML = `<label class="mb-swatch" style="background:${esc(it.color)}"><input type="color" value="${esc(it.color)}"></label><input class="mb-colour-label" value="${esc(it.label || '')}" placeholder="${esc(it.color)}">`;
-      const ci = $('input[type=color]', el), sw = $('.mb-swatch', el), lab = $('.mb-colour-label', el);
-      ci.oninput = () => { it.color = ci.value; sw.style.background = ci.value; lab.placeholder = ci.value; scheduleMeta(); };
-      lab.oninput = () => { it.label = lab.value; scheduleMeta(); };
-    }
-    function addHandles() {
-      if ($('.mb-del', el)) return;
-      const del = document.createElement('button'); del.className = 'mb-del'; del.title = 'Remove'; del.innerHTML = I.x;
-      const rs = document.createElement('i'); rs.className = 'mb-resize'; rs.title = 'Drag to resize';
-      el.append(del, rs);
-      del.onclick = e => { e.stopPropagation(); const b = curBoard(); b.items.splice(b.items.indexOf(it), 1); scheduleMeta(); renderMood(); toastAction('Removed from the board.', 'Undo', () => { b.items.push(it); scheduleMeta(); renderMood(); }, 6000); };
-      rs.onmousedown = e => drag(e, 'resize');
-    }
-    if (it.type !== 'image') addHandles();
-    el.addEventListener('mousedown', e => {
-      if (e.button !== 0 || e.target.closest('.mb-del, .mb-resize, input, [contenteditable]:focus')) return;
-      if (e.target.closest('[contenteditable]') && e.detail > 1) return;   // double-click to edit a note
-      drag(e, 'move');
-    });
-    function drag(e, mode) {
-      e.preventDefault();
-      const b = curBoard();
-      b.items.push(...b.items.splice(b.items.indexOf(it), 1)); el.parentNode.appendChild(el);   // bring to front
-      const z = S.moodZoom || 1, sx = e.clientX, sy = e.clientY, ox = it.x, oy = it.y, ow = it.w, oh = it.h, ratio = oh / ow;
-      el.classList.add('active');
-      const mm = ev => {
-        const dx = (ev.clientX - sx) / z, dy = (ev.clientY - sy) / z;
-        if (mode === 'move') { it.x = Math.max(0, Math.round(ox + dx)); it.y = Math.max(0, Math.round(oy + dy)); el.style.left = it.x + 'px'; el.style.top = it.y + 'px'; }
-        else {
-          it.w = Math.max(80, Math.round(ow + dx));
-          it.h = it.type === 'image' && !ev.shiftKey ? Math.round(it.w * ratio) : Math.max(60, Math.round(oh + dy));
-          el.style.width = it.w + 'px'; el.style.height = it.h + 'px';
-        }
-      };
-      const mu = () => { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); el.classList.remove('active'); scheduleMeta(); };
-      document.addEventListener('mousemove', mm); document.addEventListener('mouseup', mu);
-    }
-    return el;
-  }
-
-  // ================================================================== TIMELINE
-  // Events sit on "story days" (Day 1, Day 2…) or real calendar dates. Each can be linked to a chapter and to characters.
-  const EV_COLOURS = ['#4a7fd0', '#c0392b', '#3f9a5a', '#d39b2a', '#7a5cc7', '#13a1a1', '#c2577a', '#6b6b6b'];
-  function tl() {
-    S.project.timeline = S.project.timeline || { mode: 'days', lanes: 'single', events: [], zoom: 70, filter: '' };
-    return S.project.timeline;
-  }
-  const dayNum = d => Math.round(new Date(d + 'T12:00:00').getTime() / 86400000);
-  const numDay = n => new Date(n * 86400000).toISOString().slice(0, 10);
-  function evStart(e, T) { return T.mode === 'dates' ? (e.date ? dayNum(e.date) : null) : (e.day ?? null); }
-  function evEnd(e, T) { return T.mode === 'dates' ? (e.endDate ? dayNum(e.endDate) : evStart(e, T)) : (e.endDay ?? evStart(e, T)); }
-  function characterNames() {
-    const set = new Set(window.FolioNames.entries.filter(e => e.kind === 'Character' && !e.primary).map(e => e.text));
-    for (const e of tl().events) (e.chars || []).forEach(c => set.add(c));
-    return [...set].sort((a, b) => a.localeCompare(b));
-  }
-  function chapterList() {
-    const out = []; walkTree(findNode('root-manuscript').node.children || [], n => { if (n.type === 'doc') out.push(n); }); return out;
-  }
-  // an event can cover several chapters (a ball over chapters 9–12). Older events kept one, in chapterId.
-  const evChapters = e => (e.chapterIds && e.chapterIds.length ? e.chapterIds : e.chapterId ? [e.chapterId] : []).filter(id => findNode(id));
-  const setEvChapters = (e, ids) => { e.chapterIds = ids; e.chapterId = ids[0] || null; };   // chapterId too, so older versions still see the first
-  // which characters the timeline follows: several at once shows the events they're in together (or any of them)
-  const tlFilters = T => (Array.isArray(T.filters) ? T.filters : T.filter ? [T.filter] : []);
-  // names as little chips: type and press Enter or comma (suggestions from the Characters sheets), × or Backspace removes
-  function chipInput(values, suggestions, placeholder) {
-    const el = document.createElement('div'); el.className = 'chipin'; el.dataset.ownEnter = '1';   // Enter adds a name here, it doesn't close the dialog
-    let vals = [...values];
-    const draw = () => {
-      el.innerHTML = vals.map((v, i) => `<span class="chipin-c">${esc(v)}<button type="button" data-i="${i}" aria-label="Remove ${esc(v)}">×</button></span>`).join('') +
-        `<span class="chipin-w"><input type="text" class="chipin-in" placeholder="${vals.length ? '' : esc(placeholder)}" autocomplete="off" spellcheck="false"><span class="chipin-s hidden"></span></span>`;
-      const inp = $('.chipin-in', el), sug = $('.chipin-s', el);
-      let pick = 0, list = [];
-      const showSug = () => {
-        const q = inp.value.trim().toLowerCase();
-        list = suggestions.filter(n => !vals.some(v => v.toLowerCase() === n.toLowerCase()) && (!q || n.toLowerCase().includes(q))).slice(0, 8);
-        if (!list.length || (!q && document.activeElement !== inp)) { sug.classList.add('hidden'); return; }
-        pick = Math.min(pick, list.length - 1);
-        sug.innerHTML = list.map((n, i) => `<button type="button" class="${i === pick ? 'on' : ''}" data-n="${esc(n)}">${esc(n)}</button>`).join('');
-        sug.classList.remove('hidden');
-        $$('button', sug).forEach(b => b.onmousedown = e => { e.preventDefault(); add(b.dataset.n); });
-      };
-      const add = v => { v = String(v || '').replace(/,/g, ' ').trim(); if (v && !vals.some(x => x.toLowerCase() === v.toLowerCase())) vals.push(v); draw(); $('.chipin-in', el).focus(); };
-      inp.addEventListener('input', () => { if (inp.value.includes(',')) { inp.value.split(',').slice(0, -1).forEach(x => { if (x.trim() && !vals.includes(x.trim())) vals.push(x.trim()); }); const rest = inp.value.split(',').pop(); draw(); const i2 = $('.chipin-in', el); i2.value = rest; i2.focus(); return; } pick = 0; showSug(); });
-      inp.addEventListener('focus', showSug);
-      inp.addEventListener('blur', () => setTimeout(() => { if (!inp.isConnected) return; if (inp.value.trim()) add(inp.value); else sug.classList.add('hidden'); }, 120));   // (a chip just added redraws the box: the old box's blur is ignored)
-      inp.addEventListener('keydown', e => {
-        if (e.key === 'ArrowDown' && list.length) { e.preventDefault(); pick = (pick + 1) % list.length; showSug(); }
-        else if (e.key === 'ArrowUp' && list.length) { e.preventDefault(); pick = (pick - 1 + list.length) % list.length; showSug(); }
-        else if (e.key === 'Enter' || e.key === 'Tab') {
-          const typed = inp.value.trim(), choice = !sug.classList.contains('hidden') && list[pick];
-          if (typed || (choice && e.key === 'Enter')) { e.preventDefault(); e.stopPropagation(); add(choice && (!typed || choice.toLowerCase().startsWith(typed.toLowerCase())) ? choice : typed); }
-        }
-        else if (e.key === 'Backspace' && !inp.value && vals.length) { vals.pop(); draw(); $('.chipin-in', el).focus(); }
-        else if (e.key === 'Escape' && !sug.classList.contains('hidden')) { e.stopPropagation(); sug.classList.add('hidden'); }
-      }, true);
-      $$('.chipin-c button', el).forEach(b => b.onclick = () => { vals.splice(+b.dataset.i, 1); draw(); });
-    };
-    el.addEventListener('mousedown', e => { if (e.target === el) { e.preventDefault(); $('.chipin-in', el).focus(); } });
-    draw();
-    return { el, get: () => { const t = $('.chipin-in', el); if (t && t.value.trim()) { const v = t.value.trim(); if (!vals.includes(v)) vals.push(v); } return [...vals]; } };
-  }
-
-  function renderTimeline() {
-    const T = tl();
-    const tv = $('#timeline-view');
-    const placed = T.events.filter(e => evStart(e, T) != null);
-    const unplaced = T.events.filter(e => evStart(e, T) == null);
-    const F = tlFilters(T), anyMode = T.filterAny;
-    const shown = placed.filter(e => !F.length || (anyMode ? F.some(n => (e.chars || []).includes(n)) : F.every(n => (e.chars || []).includes(n))));
-    const starts = placed.map(e => evStart(e, T)), ends = placed.map(e => evEnd(e, T));
-    let min = starts.length ? Math.min(...starts) : (T.mode === 'dates' ? dayNum(today()) : 1);
-    let max = ends.length ? Math.max(...ends) : min + 10;
-    if (T.mode === 'dates') min -= 1; else min = Math.min(min, 1);
-    max = Math.max(max + 3, min + 12);
-    const px = T.zoom || 70;
-    const width = (max - min + 1) * px;
-    // lanes
-    let lanes;
-    if (T.lanes === 'chars') {
-      const names = [...new Set(shown.flatMap(e => (e.chars && e.chars.length) ? e.chars : ['—']))].sort((a, b) => a === '—' ? 1 : b === '—' ? -1 : a.localeCompare(b));
-      lanes = names.map(n => ({ label: n === '—' ? 'No character' : n, events: shown.filter(e => n === '—' ? !(e.chars && e.chars.length) : e.chars.includes(n)) }));
-    } else lanes = [{ label: '', events: shown }];
-    // stack overlapping events into rows inside each lane
-    const C = T.mode === 'days' && window.UnwipCalendar && window.UnwipCalendar.on ? window.UnwipCalendar : null;
-    const ROW = C ? 78 : 64;
-    for (const ln of lanes) {
-      const rows = [];
-      ln.items = ln.events.slice().sort((a, b) => evStart(a, T) - evStart(b, T)).map(e => {
-        const s = evStart(e, T), en = evEnd(e, T);
-        const minW = Math.max(150, (en - s + 1) * px - 8);
-        const x = (s - min) * px + 4;
-        let r = rows.findIndex(endX => endX <= x);
-        if (r < 0) { r = rows.length; rows.push(0); }
-        rows[r] = x + minW + 8;
-        return { e, x, w: minW, row: r, span: en > s };
-      });
-      ln.height = Math.max(1, rows.length) * ROW + 16;
-    }
-    const tick = d => {
-      if (T.mode === 'dates') return new Date(numDay(d) + 'T12:00:00').toLocaleDateString(undefined, { day: 'numeric', month: 'short', ...(px < 40 ? {} : { year: '2-digit' }) });
-      if (!C) return `Day ${d}`;
-      const w = C.fromDay(d);
-      return `<i class="${w.d === 1 ? 'tl-m1' : ''}" title="Day ${d}: ${esc(C.describe(d))}">${w.d === 1 && w.m === 0 ? esc(String(w.y)) + ' · ' : ''}${esc(C.label(d, { short: true, tight: px < 60 }))}</i>`;
-    };
-    const step = C ? [1, 2, 3, 5, 7, 10, 15, 30, 60, 90].find(k => k * px >= 96) || 120 : px >= 60 ? 1 : px >= 30 ? 2 : px >= 15 ? 5 : 10;
-    const ticks = []; for (let d = min; d <= max; d++) if ((d - min) % step === 0) ticks.push(d);
-    // full and new moons of your own calendar, on the day they fall
-    const moonMarks = () => { if (!C || max - min > 4000) return ''; let out = ''; for (let d = min; d <= max; d++) for (const m of C.fromDay(d).moons) if (m.exact) out += `<b class="tl-moon" style="left:${(d - min) * px + px / 2}px" title="Day ${d}: ${esc(m.n)}, ${m.exact} moon">${m.exact === 'full' ? '🌕' : '🌑'}</b>`; return out; };
-    const names = characterNames();
-    tv.innerHTML = `
-      <div class="tl-head">
-        <div class="seg" title="How time is measured">${[['days', 'Story days'], ['dates', 'Calendar dates']].map(([k, l]) => `<button data-mode="${k}" class="${T.mode === k ? 'on' : ''}">${l}</button>`).join('')}</div>
-        <div class="seg" title="Layout">${[['single', 'One line'], ['chars', 'By character']].map(([k, l]) => `<button data-lanes="${k}" class="${T.lanes === k ? 'on' : ''}">${l}</button>`).join('')}</div>
-        <button class="btn small ghost tl-fbtn ${F.length ? 'on' : ''}" id="tl-filter" title="Follow one or more characters">${F.length ? esc(F.length <= 2 ? F.join(' + ') : F.length + ' characters') + (F.length > 1 ? (anyMode ? ' (any)' : ' (together)') : '') : 'All characters'} ▾</button>
-        ${T.mode === 'days' && window.UnwipCalendar ? `<button class="btn small ghost" id="tl-cal" title="Name the months, weeks, seasons and moons of your world">🌙 ${C ? esc(C.calendar.name || 'Calendar') : 'Your own calendar…'}</button>` : ''}
-        <span class="mb-zoom"><input type="range" id="tl-zoom" min="10" max="160" step="5" value="${px}"></span>
-        <span style="flex:1"></span>
-        ${chapterList().length ? '<button class="btn small" id="tl-fromch">Add events from chapters</button>' : ''}
-        <button class="btn small primary" id="tl-add">+ Event</button>
-      </div>
-      <div class="tl-scroll" id="tl-scroll">
-        <div class="tl-inner" style="width:${width + 160}px">
-          <div class="tl-axis ${C ? 'cal' : ''}" style="margin-left:${T.lanes === 'chars' ? 140 : 0}px;width:${width}px">${ticks.map(d => `<span style="left:${(d - min) * px}px">${tick(d)}</span>`).join('')}${moonMarks()}</div>
-          ${lanes.map(ln => `
-            <div class="tl-lane" style="height:${ln.height}px">
-              ${T.lanes === 'chars' ? `<div class="tl-lane-label">${esc(ln.label)}</div>` : ''}
-              <div class="tl-track" style="margin-left:${T.lanes === 'chars' ? 140 : 0}px;width:${width}px;background-size:${px * step}px 100%">
-                ${ln.items.map(it => {
-                  const chIds = evChapters(it.e), ch = chIds.length ? findNode(chIds[0]) : null, chMore = chIds.length > 1 ? ` +${chIds.length - 1}` : '';
-                  return `<div class="tl-ev ${it.span ? 'span' : ''}" data-id="${it.e.id}" style="left:${it.x}px;top:${it.row * ROW + 10}px;width:${it.w}px;--ev:${it.e.color || EV_COLOURS[0]}">
-                    <b>${esc(it.e.title || 'Untitled event')}</b>
-                    <span>${C && evStart(it.e, T) != null ? `<em class="tl-wd">${esc(C.label(evStart(it.e, T)))}</em>` : ''}${ch ? '§ ' + esc(ch.node.title) + chMore : ''}${(it.e.chars || []).length && T.lanes !== 'chars' ? (ch ? ' · ' : '') + esc(it.e.chars.join(', ')) : ''}</span>
-                  </div>`;
-                }).join('')}
-              </div>
-            </div>`).join('')}
-          ${!shown.length ? `<div class="tl-empty">${T.events.length ? (F.length > 1 && !anyMode ? 'These characters aren’t in any event together yet.' : 'No events for this character yet.') : '<b>No events yet</b>Add the key moments of your story: battles, births, journeys, betrayals. Link each to a chapter and the characters involved, then follow one character’s path with the filter above.'}</div>` : ''}
-        </div>
-      </div>
-      ${unplaced.length ? `<div class="tl-unplaced"><b>Not on the ${T.mode === 'dates' ? 'calendar' : 'timeline'} yet:</b> ${unplaced.map(e => `<button class="tl-chip" data-id="${e.id}">${esc(e.title || 'Untitled')}</button>`).join('')}<span class="hint">Click one to give it a ${T.mode === 'dates' ? 'date' : 'day'}.</span></div>` : ''}
-      <p class="ol-tip">Drag an event left or right to move it. Click to edit, link a chapter or add characters. Events that last longer stretch across days.</p>`;
-    $$('[data-mode]', tv).forEach(b => b.onclick = () => {
-      if (b.dataset.mode === 'dates' && !T.events.some(e => e.date) && T.events.length) toast('Give your events dates to see them on the calendar. Story days and dates are kept separately, so you can use both.', '', 7000);
-      T.mode = b.dataset.mode; scheduleMeta(); renderTimeline();
-    });
-    $$('[data-lanes]', tv).forEach(b => b.onclick = () => { T.lanes = b.dataset.lanes; scheduleMeta(); renderTimeline(); });
-    $('#tl-filter', tv).onclick = e => {
-      // tick several characters: "together" shows the events they share, "any" shows each one's events
-      const old = document.querySelector('.tl-fmenu'); if (old) { old.remove(); return; }
-      const r = e.currentTarget.getBoundingClientRect(), m = document.createElement('div'); m.className = 'tl-fmenu';
-      m.style.left = Math.min(r.left, innerWidth - 270) + 'px'; m.style.top = r.bottom + 4 + 'px';
-      const sel = new Set(tlFilters(T));
-      m.innerHTML = `<div class="seg tl-fmode">${[['', 'Together'], ['any', 'Any of them']].map(([k, l]) => `<button type="button" data-any="${k}" class="${!!T.filterAny === !!k ? 'on' : ''}">${l}</button>`).join('')}</div>
-        <div class="tl-flist">${names.length ? names.map(n => `<label class="check"><input type="checkbox" value="${esc(n)}" ${sel.has(n) ? 'checked' : ''}> ${esc(n)}</label>`).join('') : '<p class="hint">No characters yet. Add them to events, or make Characters sheets.</p>'}</div>
-        <div class="tl-ffoot"><button type="button" class="btn small ghost" data-clear>Show everyone</button></div>`;
-      document.body.appendChild(m);
-      const apply = () => { T.filters = [...m.querySelectorAll('.tl-flist input:checked')].map(i => i.value); T.filter = T.filters.length === 1 ? T.filters[0] : ''; scheduleMeta(); const keep = [m.style.left, m.style.top]; renderTimeline(); document.body.appendChild(m); [m.style.left, m.style.top] = keep; };
-      m.querySelectorAll('.tl-flist input').forEach(i => i.onchange = apply);
-      m.querySelectorAll('[data-any]').forEach(b => b.onclick = () => { T.filterAny = !!b.dataset.any; m.querySelectorAll('[data-any]').forEach(x => x.classList.toggle('on', x === b)); apply(); });
-      m.querySelector('[data-clear]').onclick = () => { m.querySelectorAll('.tl-flist input').forEach(i => { i.checked = false; }); apply(); };
-      setTimeout(() => { const off = ev => { if (!m.contains(ev.target) && !ev.target.closest('#tl-filter')) { m.remove(); document.removeEventListener('mousedown', off, true); } }; document.addEventListener('mousedown', off, true); }, 0);
-    };
-    $('#tl-zoom', tv).onchange = e => { T.zoom = +e.target.value; scheduleMeta(); renderTimeline(); };
-    $('#tl-add', tv).onclick = () => editEvent(null);
-    const calB = $('#tl-cal', tv); if (calB) calB.onclick = async () => { if (await window.UnwipCalendar.setup()) renderTimeline(); };
-    const fromCh = $('#tl-fromch', tv); if (fromCh) fromCh.onclick = addEventsFromChapters;
-    $$('.tl-chip', tv).forEach(c => c.onclick = () => editEvent(T.events.find(e => e.id === c.dataset.id)));
-    // drag to move along the line (snaps to whole days)
-    $$('.tl-ev', tv).forEach(el => {
-      const ev = T.events.find(e => e.id === el.dataset.id);
-      el.addEventListener('mousedown', down => {
-        if (down.button !== 0) return;
-        down.preventDefault();
-        const sx = down.clientX, ox = parseFloat(el.style.left); let moved = 0;
-        const mm = m => { const dx = m.clientX - sx; if (Math.abs(dx) > 3) moved = dx; el.style.left = ox + dx + 'px'; el.classList.add('dragging'); };
-        const mu = () => {
-          document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu);
-          if (!moved) { editEvent(ev); return; }
-          const shift = Math.round(moved / px);
-          if (shift) {
-            if (T.mode === 'dates') { ev.date = numDay(dayNum(ev.date) + shift); if (ev.endDate) ev.endDate = numDay(dayNum(ev.endDate) + shift); }
-            else { ev.day = ev.day + shift; if (ev.endDay != null) ev.endDay += shift; }
-            scheduleMeta();
-          }
-          renderTimeline();
-        };
-        document.addEventListener('mousemove', mm); document.addEventListener('mouseup', mu);
-      });
-    });
-  }
-
-  async function editEvent(ev) {
-    const T = tl();
-    const isNew = !ev;
-    const lastDay = T.events.reduce((a, e) => Math.max(a, e.endDay ?? e.day ?? 0), 0);
-    ev = ev || { id: uid(), title: '', day: lastDay + 1, chars: [], color: EV_COLOURS[T.events.length % EV_COLOURS.length] };
-    const chs = chapterList();
-    const body = document.createElement('div');
-    body.innerHTML = `
-      <div class="form-grid">
-        <div class="field full"><label>What happens</label><input type="text" id="ev-title" value="${esc(ev.title || '')}" placeholder="e.g. The siege of the Moor begins"></div>
-        <div class="field"><label>Story day</label><input type="number" id="ev-day" value="${ev.day ?? ''}" placeholder="e.g. 3"></div>
-        <div class="field"><label>Lasts until day (optional)</label><input type="number" id="ev-endday" value="${ev.endDay ?? ''}" placeholder="same day"></div>
-        ${window.UnwipCalendar && window.UnwipCalendar.on ? `<div class="field full ev-world"><label>In ${esc(window.UnwipCalendar.calendar.name || 'your calendar')}</label><div class="ev-wrow"><input type="number" id="ev-wd" min="1"><select id="ev-wm">${window.UnwipCalendar.calendar.months.map((m, i) => `<option value="${i}">${esc(m[0])}</option>`).join('')}</select><input type="number" id="ev-wy" title="Year"><span id="ev-wdesc" class="hint"></span></div></div>` : ''}
-        <div class="field"><label>Calendar date (optional)</label><input type="date" class="date-input" id="ev-date" value="${ev.date || ''}"></div>
-        <div class="field"><label>Until date (optional)</label><input type="date" class="date-input" id="ev-enddate" value="${ev.endDate || ''}"></div>
-        <div class="field full"><label>Characters involved</label><div id="ev-chars-box"></div><span class="hint">Type a name and press Enter. Names from your Characters sheets are suggested.</span></div>
-        <div class="field full"><label>Chapters</label><div id="ev-chs-box" class="ev-chs"></div>
-          <select id="ev-ch-add"><option value="">+ Link a chapter…</option>${chs.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div>
-        <div class="field"><label>Colour</label><div class="ev-colours">${EV_COLOURS.map(c => `<button type="button" class="ev-c ${c === ev.color ? 'on' : ''}" data-c="${c}" style="background:${c}"></button>`).join('')}</div></div>
-        <div class="field full"><label>Notes</label><textarea id="ev-note" rows="3" class="ev-note">${esc(ev.note || '')}</textarea></div>
-      </div>`;
-    let colour = ev.color;
-    const charsIn = chipInput(ev.chars || [], characterNames(), 'e.g. Mara'); $('#ev-chars-box', body).appendChild(charsIn.el);
-    // chapters: one or several (an event can span chapters 9–12)
-    let chIds = evChapters(ev);
-    const drawChs = () => {
-      const box = $('#ev-chs-box', body);
-      box.innerHTML = chIds.length ? chIds.map((id, i) => { const f = findNode(id); return `<span class="chipin-c">§ ${esc(f ? f.node.title : 'Chapter')}<button type="button" data-i="${i}" aria-label="Unlink">×</button></span>`; }).join('') : '<span class="hint">Not linked to a chapter.</span>';
-      $$('button', box).forEach(b => b.onclick = () => { chIds.splice(+b.dataset.i, 1); drawChs(); });
-      const order = chs.map(c => c.id); chIds.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-    };
-    $('#ev-ch-add', body).onchange = e => { const id = e.target.value; if (id && !chIds.includes(id)) chIds.push(id); e.target.value = ''; drawChs(); };
-    drawChs();
-    // your own calendar: the world date and the story day follow each other
-    if (window.UnwipCalendar && window.UnwipCalendar.on) {
-      const C = window.UnwipCalendar, dayIn = $('#ev-day', body), wd = $('#ev-wd', body), wm = $('#ev-wm', body), wy = $('#ev-wy', body), desc = $('#ev-wdesc', body);
-      const fromDayField = () => { if (dayIn.value === '') { desc.textContent = ''; return; } const w = C.fromDay(+dayIn.value); wd.value = w.d; wm.value = w.m; wy.value = w.y; desc.textContent = C.describe(+dayIn.value).split(' · ').slice(1).join(' · '); };
-      const fromWorld = () => { const m = +wm.value, max = +C.calendar.months[m][1]; if (+wd.value > max) wd.value = max; if (wd.value === '' || wy.value === '') return; dayIn.value = C.toDay(+wy.value, m, +wd.value); fromDayField(); };
-      dayIn.addEventListener('input', fromDayField); [wd, wm, wy].forEach(x => x.addEventListener('input', fromWorld)); fromDayField();
-    }
-    $$('.ev-c', body).forEach(b => b.onclick = () => { $$('.ev-c', body).forEach(x => x.classList.remove('on')); b.classList.add('on'); colour = b.dataset.c; });
-    const buttons = [{ label: 'Cancel', value: null, kind: 'ghost' }];
-    if (!isNew) buttons.unshift({ label: 'Delete', value: 'delete', kind: 'ghost danger-text' });
-    if (evChapters(ev).length) buttons.splice(buttons.length, 0, { label: evChapters(ev).length > 1 ? 'Open first chapter' : 'Open chapter', value: 'open' });
-    buttons.push({ label: isNew ? 'Add event' : 'Save', value: 'save', kind: 'primary' });
-    const res = await modal({ title: isNew ? 'New event' : 'Edit event', body, wide: true, buttons });
-    if (!res) return;
-    if (res === 'delete') { T.events.splice(T.events.indexOf(ev), 1); scheduleMeta(); renderTimeline(); toastAction('Event deleted.', 'Undo', () => { T.events.push(ev); scheduleMeta(); renderTimeline(); }, 6000); return; }
-    const v = id => $('#' + id, body).value;
-    ev.title = v('ev-title').trim() || 'Untitled event';
-    ev.day = v('ev-day') === '' ? null : +v('ev-day');
-    ev.endDay = v('ev-endday') === '' || +v('ev-endday') <= (ev.day ?? -1e9) ? null : +v('ev-endday');
-    ev.date = v('ev-date') || null;
-    ev.endDate = v('ev-enddate') && ev.date && v('ev-enddate') > ev.date ? v('ev-enddate') : null;
-    ev.chars = charsIn.get();
-    setEvChapters(ev, chIds);
-    ev.note = v('ev-note');
-    ev.color = colour;
-    if (isNew) T.events.push(ev);
-    scheduleMeta(); renderTimeline();
-    if (res === 'open' && evChapters(ev).length) { setView('write'); openDoc(evChapters(ev)[0]); }
-  }
-  async function addEventsFromChapters() {
-    const T = tl();
-    const linked = new Set(T.events.flatMap(e => evChapters(e)));
-    const chs = chapterList().filter(c => !linked.has(c.id));
-    if (!chs.length) { toast('Every chapter already has an event.'); return; }
-    if (!(await confirmBox('Add events from chapters?', `Adds an event for each of ${chs.length} chapter${chs.length === 1 ? '' : 's'} (using its synopsis and point-of-view character), one day apart. You can drag them to the right days afterwards.`, 'Add events'))) return;
-    let day = T.events.reduce((a, e) => Math.max(a, e.endDay ?? e.day ?? 0), 0);
-    const added = chs.map((c, i) => ({ id: uid(), title: c.synopsis ? (c.synopsis.length > 60 ? c.synopsis.slice(0, 57) + '…' : c.synopsis) : c.title, day: ++day, chars: c.pov ? [c.pov] : [], chapterId: c.id, chapterIds: [c.id], color: EV_COLOURS[(T.events.length + i) % EV_COLOURS.length] }));
-    T.events.push(...added);
-    scheduleMeta(); renderTimeline();
-    toastAction(`Added ${added.length} event${added.length === 1 ? '' : 's'}.`, 'Undo', () => { const gone = new Set(added.map(e => e.id)); const TT = tl(); TT.events = TT.events.filter(e => !gone.has(e.id)); scheduleMeta(); renderTimeline(); toast('Taken back out.'); }, 15000);
-  }
+  // ================================================================== MOODBOARD, TIMELINE (moodboard.js, timeline.js)
+  const renderMood = () => window.UnwipMood && window.UnwipMood.render();
+  const renderTimeline = () => window.UnwipTimeline && window.UnwipTimeline.render();
+  const editEvent = (ev, seed) => window.UnwipTimeline && window.UnwipTimeline.edit(ev, seed);
 
   // ================================================================== SPLIT VIEW
   const spEd = $('#sp-editor');
@@ -5003,7 +4565,8 @@
     }
     S.view = 'write';
     let m = 'focused'; try { m = localStorage.getItem('folio-mode') || 'focused'; } catch {}
-    S.mode = m; document.body.classList.toggle('detailed', m === 'detailed'); $$('#mode-switch button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+    if (!LEVELS.includes(m)) m = 'focused';
+    S.mode = m; applyLevelClasses(m);
     buildSizeSelect();
     try { await Fonts.loadImported(await api.importedFonts()); } catch {}
     buildFontSelect();
@@ -5023,14 +4586,43 @@
   // test hooks (used by the automated checks, harmless otherwise)
   window.__folio = { S, openProject, openDoc, copyDocForDocs, compileManuscript, flushSave, addNode, setWriter, insertCleanHTML };
   window.__unwip = {
+    editStatuses: () => editStatuses(), folderWords, iconHTML, newTitleFor, statusColor, statusName, statusOptions,   // for corkboard.js
+    newEventFrom: seed => editEvent(null, seed), showMenu: (x, y, items) => showMenu(x, y, items), deleteBook: p => deleteBook(p), pageTemplate: root => sheetFor(root) ? sheetTemplate(root) : '<p><br></p>',
     get saveFailing() { return !!troubleRetry; }, pasteContent,
     S, api, I, $, $$, esc, fmt, makeRoom, countWords, today, editor, editorWrap, on, emit,
-    modal, copyText, toast, toastAction, confirmBox, promptText, showMenu, quoteToast, placeField,
+    modal, copyText, toast, toastAction, confirmBox, promptText, showMenu, quoteToast, placeField, pickIcon,
     findNode, walkTree, rootOf, isInside, currentBlock, scheduleSave, scheduleMeta, saveMetaNow, flushSave, refreshSnapCount,
     renderBinder, refreshPlanView, updateStatus, updateCountsSoon, openDoc, addNode, setWriter, setRevise,
     beginSprint, typewriterScroll, applyTheme, insertCleanHTML, resyncWords, openSplit, takeSnapshot, uid,
     reloadProjectMeta, showLibrary, openProject, leaveProject: () => leaveProject(), importScrivener: () => importScrivener(), DEFAULT_STYLE, setMode, setView: v => setView(v), importWordProject: () => importWordProject(), newProjectTemplate: () => newProjectTemplate(), ROOTS,
     tidyBlankLines, sectionDialog, sheetFor, scheduleNames, fontOptionsHTML, applyStyle, markScenes, docBlocks, rejectChanges, acceptChanges, isTitlePage, compileManuscript, templateGallery, continueWriting, noteLastPlace, caretOffset,
-    openPreview, snapshotsDialog, openSettings, goalsDialog, writtenOn, dayKey, streaks, dial, manuscriptWords, openFind, openSearch, splitAtCursor, setMode, restoreRange, refreshToolbar, styleForm, applyStyleNow, refreshSnapCount
+    openPreview, snapshotsDialog, openSettings, goalsDialog, writtenOn, dayKey, streaks, dial, manuscriptWords, openFind, openSearch, splitAtCursor, setMode, level: m => level(m), restoreRange, refreshToolbar, styleForm, applyStyleNow, refreshSnapCount
   };
+})();
+
+// The main screen's header: one row when everything fits, otherwise the level switch and the tabs go to a second row.
+// It used to switch at a fixed 1320 px, but what's in the header changes (Lore adds Open World, Unwip Dev adds DEV,
+// Dropbox adds Sync now, Set up Unwip comes and goes), so on some screens Record and Settings were pushed off the right
+// edge after picking Lore. Now it measures: try one row, and if the last button ends past the edge, use two.
+(function () {
+  const head = document.querySelector('#library .lib-head') || document.querySelector('.lib-head'); if (!head) return;
+  let busy = false;
+  function fit() {
+    if (busy || !head.offsetParent || matchMedia('(max-width: 720px)').matches) { head.classList.remove('lh-two'); return; }
+    busy = true;
+    head.classList.remove('lh-two');
+    const right = head.querySelector('.lib-head-right'), edge = head.getBoundingClientRect().right - (parseFloat(getComputedStyle(head).paddingRight) || 0);
+    const last = right && [...right.children].filter(k => k.offsetParent).pop();
+    // always two rows on a computer or tablet: switching level used to snap the header between one row and two
+    // (Lore adds Open World), which jumped the page. The measuring is kept for the right-hand side wrapping.
+    void last; void edge;
+    head.classList.add('lh-two');
+    busy = false;
+  }
+  let t = null; const soon = () => { clearTimeout(t); t = setTimeout(fit, 30); };
+  new ResizeObserver(soon).observe(head);
+  new MutationObserver(soon).observe(head, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class', 'hidden', 'style'] });
+  addEventListener('resize', soon);
+  if (window.__unwip && window.__unwip.on) window.__unwip.on('level', soon);
+  setTimeout(fit, 0);
 })();
