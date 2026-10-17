@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.89",
-  "commit": "8c624bd903f4c89ff7e1889f79c759664531f8b3",
-  "name": "Unwip Dev 0.44.89",
-  "body": "- Website: the logo at the top now reads Unwip\u2026 Write to finish, the same as in the app, on phones too.\n\nsha256: e7d9c958af6d39c3a0c70ec81875081da99a0d78ba0d3ab43e11c3ac627eb260",
+  "tag_name": "v0.44.90",
+  "commit": "a9e7ff6870be5dd6ee908f621455724356929a93",
+  "name": "Unwip Dev 0.44.90",
+  "body": "- iPhone with a keyboard plugged in: the B I U, Body and Title row now sits above the iPhone's own ^ v \u2713 bar instead of underneath it.\n- iPhone: the ^ on that bar no longer moves you into a hidden line under the chapter title. You stay on the page.\n- The synopsis line under a chapter's title (Detail) shows all of it on a phone, instead of being squashed flat.\n- iPhone: tapping a map in your chapter list opens it, instead of showing only the \u2715.\n- iPhone: no more split view, which was too small to use there. Open beside opens the other page on its own, and \u2039 takes you back to your chapter.\n- Read aloud on a phone now shows the voice list. On an iPhone or iPad, More voices\u2026 tells you where to download better ones for free.\n- Settings \u203a Goal colours: pick your own colours for the Today, This week and Manuscript rings.\n\nsha256: edb129be153eb62e3156ad8d2c890b62e2f63cd4528250a30d57b4f7a78c67d0",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.89.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.89.zip"
+      "name": "unwip-dev-app-0.44.90.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.90.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.89.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.89.zip.sha256"
+      "name": "unwip-dev-app-0.44.90.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.90.zip.sha256"
     }
   ]
 }
