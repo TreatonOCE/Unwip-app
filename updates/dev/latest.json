@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.93",
-  "commit": "39bdf957ad98edd5f8e323936408e7356973652f",
-  "name": "Unwip Dev 0.44.93",
-  "body": "- New: the import room. \"Import a book\" now sits in the bottom right of the main screen and opens a room of its own. It takes it one step at a time: first your book comes in exactly as it is, then you go through your manuscript, your characters, then the places and notes, and a last check shows every word came across. Split a long chapter at its headings or keep it whole, set deleted scenes aside, turn a cast list into one page per person or keep it as one document, and make pages for names that come up a lot. Stop at any step: \"Sort the rest later\" keeps your place, and the button shows what's still to sort. You can turn the guide off in the room or in Settings.\n- New: fog of war, at Focus. The Fog button beside Focus / Detail / Lore hides the book except the chapter you're on and the next one. It asks where you're starting: your \"needs doing\" list (right-click a chapter \u203a Needs doing\u2026), where you left off, or story order. \"Done for now\" moves you on and ticks the chapter off, Look up finds a character or place without lifting the fog, and the fog lifts when your list is done.\n- Each book's \u22ef menu on the main screen has Export\u2026\n\nsha256: f6fd5c5826925ff79de7550db6a445b3304dd2236e894d4784f37f9f7f7ed8a7",
+  "tag_name": "v0.44.94",
+  "commit": "a0561affe2d3f2eb907ab42e86aaaade8c192733",
+  "name": "Unwip Dev 0.44.94",
+  "body": "- iPhone: a book's \u22ef menu now has Export\u2026 (PDF, EPUB, Word, Scrivener). It used to be only on the PC and iPad's top bar.\n\nsha256: 8a60a2c9eea9c6b207e238b72fc98d37c63ad861293642db50efaf5536368a06",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.93.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.93.zip"
+      "name": "unwip-dev-app-0.44.94.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.94.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.93.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.93.zip.sha256"
+      "name": "unwip-dev-app-0.44.94.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.94.zip.sha256"
     }
   ]
 }
