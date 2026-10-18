@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.94",
-  "commit": "a0561affe2d3f2eb907ab42e86aaaade8c192733",
-  "name": "Unwip Dev 0.44.94",
-  "body": "- iPhone: a book's \u22ef menu now has Export\u2026 (PDF, EPUB, Word, Scrivener). It used to be only on the PC and iPad's top bar.\n\nsha256: 8a60a2c9eea9c6b207e238b72fc98d37c63ad861293642db50efaf5536368a06",
+  "tag_name": "v0.44.95",
+  "commit": "b8c9c383efdcb2882d4a17b3c1c1e1c8220aeded",
+  "name": "Unwip Dev 0.44.95",
+  "body": "- New: Send a book out. The button in the bottom right of the main screen is now Import / Export. Send a book out takes it a step at a time: pick the book and where it's going (Scrivener, Word, Google Docs, Obsidian or a Markdown folder), then the shape it arrives in. For Scrivener that's as Unwip has it, as it came in (for books brought in from Scrivener), or chapters only. For Word it's one file, a file per chapter, or a file for Vellum or Atticus.\n- Before anything is saved, \"What changes on the way out\" lists what travels in a different form, each with a tick box: character sheet gear as a list on each character's page, the Story Bible as one document, maps as pictures, comments in Scrivener's notes (or a Comments file), and in Obsidian the first mention of each character or place becomes a [[link]].\n- The last step counts the words in your manuscript here and the words that went out, so you can see every one made it.\n- Inside a book, Export \u203a No hard feelings\u2026 opens the same steps with that book already picked. Your book in Unwip never changes.\n\nsha256: 6493946679c79e5e2bbceb111ac95f66d623ad36e0a4cfa8bdd4db5664c4b73a",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.94.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.94.zip"
+      "name": "unwip-dev-app-0.44.95.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.95.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.94.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.94.zip.sha256"
+      "name": "unwip-dev-app-0.44.95.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.95.zip.sha256"
     }
   ]
 }
