@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.92",
-  "commit": "d07507f30ece7b2e889f440a94be971c37d55310",
-  "name": "Unwip Dev 0.44.92",
-  "body": "- Deleting a book everywhere no longer waits for Dropbox to finish uploading it first. It stops the upload and deletes in a few seconds. Deleting on this device only still sends its latest changes first, and now tells you that's what it's waiting for.\n- Importing with auto sync on: syncing waits until the whole book is in, then sends it in one go, so the count only goes down.\n- The sync count shows only files that actually need sending or fetching, not every file it checks.\n- Recently updated no longer calls a change from another device \"this computer\". Each device now has its own hidden ID, and phones and iPads say \"this iPhone\" or \"this iPad\".\n\nsha256: 5892ffa4a6b9b9d0186ebfe3e44ec3dde16278419bf88a59b1be59b7c8f53b00",
+  "tag_name": "v0.44.93",
+  "commit": "39bdf957ad98edd5f8e323936408e7356973652f",
+  "name": "Unwip Dev 0.44.93",
+  "body": "- New: the import room. \"Import a book\" now sits in the bottom right of the main screen and opens a room of its own. It takes it one step at a time: first your book comes in exactly as it is, then you go through your manuscript, your characters, then the places and notes, and a last check shows every word came across. Split a long chapter at its headings or keep it whole, set deleted scenes aside, turn a cast list into one page per person or keep it as one document, and make pages for names that come up a lot. Stop at any step: \"Sort the rest later\" keeps your place, and the button shows what's still to sort. You can turn the guide off in the room or in Settings.\n- New: fog of war, at Focus. The Fog button beside Focus / Detail / Lore hides the book except the chapter you're on and the next one. It asks where you're starting: your \"needs doing\" list (right-click a chapter \u203a Needs doing\u2026), where you left off, or story order. \"Done for now\" moves you on and ticks the chapter off, Look up finds a character or place without lifting the fog, and the fog lifts when your list is done.\n- Each book's \u22ef menu on the main screen has Export\u2026\n\nsha256: f6fd5c5826925ff79de7550db6a445b3304dd2236e894d4784f37f9f7f7ed8a7",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.92.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.92.zip"
+      "name": "unwip-dev-app-0.44.93.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.93.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.92.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.92.zip.sha256"
+      "name": "unwip-dev-app-0.44.93.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.93.zip.sha256"
     }
   ]
 }
