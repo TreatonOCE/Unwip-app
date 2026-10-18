@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.91",
-  "commit": "48ee949fd5f9be64d78741016c7259bd9af459bc",
-  "name": "Unwip Dev 0.44.91",
-  "body": "- iPhone: on a map, Done stays put at the right end of the top bar while you swipe the buttons, instead of sliding over them.\n- Sync now saves anything you did a moment ago first, so a book no longer shows \"Not synced\" right after you sync.\n- Closing a map you only looked at no longer counts as a change, so it doesn't mark the book as not synced.\n\nsha256: 58766c56d888fb290d88b6d7de52f85a72609f979de05b4eb77327425a83f34f",
+  "tag_name": "v0.44.92",
+  "commit": "d07507f30ece7b2e889f440a94be971c37d55310",
+  "name": "Unwip Dev 0.44.92",
+  "body": "- Deleting a book everywhere no longer waits for Dropbox to finish uploading it first. It stops the upload and deletes in a few seconds. Deleting on this device only still sends its latest changes first, and now tells you that's what it's waiting for.\n- Importing with auto sync on: syncing waits until the whole book is in, then sends it in one go, so the count only goes down.\n- The sync count shows only files that actually need sending or fetching, not every file it checks.\n- Recently updated no longer calls a change from another device \"this computer\". Each device now has its own hidden ID, and phones and iPads say \"this iPhone\" or \"this iPad\".\n\nsha256: 5892ffa4a6b9b9d0186ebfe3e44ec3dde16278419bf88a59b1be59b7c8f53b00",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.91.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.91.zip"
+      "name": "unwip-dev-app-0.44.92.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.92.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.91.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.91.zip.sha256"
+      "name": "unwip-dev-app-0.44.92.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.92.zip.sha256"
     }
   ]
 }
