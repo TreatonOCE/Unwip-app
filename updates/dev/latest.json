@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.45.5",
-  "commit": "f97e5df92aef325ddcf1cba5a37d926bb77ab6a1",
-  "name": "Unwip Dev 0.45.5",
-  "body": "- Import room: a list's card now shows a small preview of each page it would make, laid out like that section's own sheet (Full name, Aliases and so on), with \u2039 \u203a to look through them and where they'll go. On an iPhone it folds away under the buttons and remembers whether you left it open.\n- Send a book out: the Structure step shows how a chapter will look in the app you chose: Scrivener's binder and page, a Word or Google Docs page, or an Obsidian or Markdown note. Use \u2039 \u203a to look at other chapters. What changes shows small samples too, like a character's gear list and the Story Bible.\n- Importing from Scrivener on an iPhone or iPad: if Dropbox is busy for a moment, Unwip quietly tries again a couple of times before telling you.\n\nsha256: 995c036d608d7696eda6af75b445b50ae04274e68108faaeae264a9850c56661",
+  "tag_name": "v0.45.6",
+  "commit": "45be21871cb45be46bbeaa0716faa852e4186c20",
+  "name": "Unwip Dev 0.45.6",
+  "body": "- Import / Export: the \"Guide me through imports\" switch is now right under Bring a book in, so you can turn the guide on or off where you start. Bring a book in says what it will do: sort it a section at a time with Unwip's guesses and previews, or bring it straight in as it is. It's the same setting as in Settings.\n\nsha256: 02e19cb782575faf681aafa062f6973265030e650513825615523e32e8b95d65",
   "assets": [
     {
-      "name": "unwip-dev-app-0.45.5.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.5.zip"
+      "name": "unwip-dev-app-0.45.6.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.6.zip"
     },
     {
-      "name": "unwip-dev-app-0.45.5.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.5.zip.sha256"
+      "name": "unwip-dev-app-0.45.6.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.6.zip.sha256"
     }
   ]
 }
