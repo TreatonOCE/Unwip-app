@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.96",
-  "commit": "f061ba7641f85a8ebbeeda706af759e1ee1f52c7",
-  "name": "Unwip Dev 0.44.96",
-  "body": "- Import / Export: clearer wording at the bottom. Export inside a book is where you preview every page and make a print-ready PDF or an EPUB to publish.\n\nsha256: 27237102e7b4bb36d11498a1ab9fab06bab6cc4c809377fee638e99a2b5671ad",
+  "tag_name": "v0.44.97",
+  "commit": "9b2b1b637f7ffed954906205d6f79b68535c6102",
+  "name": "Unwip Dev 0.44.97",
+  "body": "- Fixed: on an iPhone or iPad with a signal but no working connection, opening a book that another device had changed showed \"Couldn't check Dropbox\", and Open anyway did nothing. It now opens within a few seconds, so you can keep writing offline. Your changes sync when you're back online, and if both devices changed the same chapter you get both versions to choose from.\n\nsha256: ca33061a85e678a32a3d2c82f79787c6ddb7a33519391309b0378d62f710b160",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.96.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.96.zip"
+      "name": "unwip-dev-app-0.44.97.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.97.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.96.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.96.zip.sha256"
+      "name": "unwip-dev-app-0.44.97.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.97.zip.sha256"
     }
   ]
 }
