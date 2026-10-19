@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.45.3",
-  "name": "Unwip 0.45.3",
-  "body": "Everything since 0.44.98: the import room got a lot more help.\n\n**Sorting what you bring in**\n- Each document gets a first guess at where it belongs, worked out by plain rules on your device, no AI: what it's called, the folder it came from, what's inside (system [messages], a sheet with Age and Hair, place words like harbour and town, item words, prices), and whether its title is a name that keeps coming up in your chapters. The card shows the guess and why, with Put it there. Nothing moves until you tap.\n- Use Unwip's guesses for the rest sends every remaining document in the step where it was guessed, and ticks them off.\n- Apply to all in folder: once you've chosen where one document goes, send the rest of that folder's documents to the same place in one tap.\n- Unwip remembers where you sent each folder's documents. Bring in another book with a folder of the same name and its guess is where you put it last time.\n- \"+ New section\u2026\" under Where does it go? makes a section of your own (Factions, Magic, anything) and puts the document straight in it.\n- A list like \"Name - who they are\" is offered one page per person even when it's already in Characters, and lists of places or things are offered one page each too. A single character's sheet (Name, Age, Hair\u2026) isn't mistaken for a list.\n\n**Going through it**\n- Manuscript: moving a chapter with \u2191 or \u2193 keeps your place in the list instead of jumping back to the top. You can also drag a chapter by its \u2261 to anywhere in the list, with a finger or the mouse.\n- Choosing where a document goes no longer jumps straight to the next one. It shows the result (\"Now in Places\", with that section's list and this document marked), and Next document moves you on when you're ready.\n- Each step shows how far you are (\"Document 2 of 6 \u00b7 1 done\") with a small bar, and ticks the ones you've done.\n- Pressing Next: Places and the rest (or Check it over) while some documents haven't been looked at gives a gentle reminder first, with \"Look at the next one\" or \"Move on anyway\".\n\n**Dropbox**\n- Importing from Scrivener on an iPhone or iPad no longer asks you to sign in to Dropbox again just because Dropbox was busy for a moment. You keep your sign-in and are told to try again in a minute.\n\nsha256: 70f5f1f43a0fe8a583a8a6d80e16b6123e6fc1aa164beaa84885807bd48c5e4b",
+  "tag_name": "v0.45.4",
+  "name": "Unwip 0.45.4",
+  "body": "- Fixed: in the import room, a cast list (or a list of places or things) came in as one document unless you pressed \"One page per person\". Choosing a section, Next document, Use Unwip's guesses or Apply to all in folder skipped the split without saying. Now a list waits for your answer, \"One page per person\" or \"Keep it as one document\", and the question stays highlighted until you choose. Use Unwip's guesses and Apply to all in folder show every list they move in one \"Make the sheets\" window.\n- iPhone: BETA (and DEV) now sit small under the Unwip logo, so the Dropbox button has room to say what it's doing. While syncing it says \"Sending 12 of 86\u2026\" with a thin bar underneath.\n- Already imported a book whose lists came in whole? Press and hold Characters (right-click on a PC) \u203a Turn lists in here into sheets\u2026\n\nsha256: 01dede5978502bc2f2946ccb5ae8b6bf78fc91e7b0cffc88db4e56553aaa77de",
   "assets": [
     {
-      "name": "unwip-app-0.45.3.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.3.zip"
+      "name": "unwip-app-0.45.4.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.4.zip"
     },
     {
-      "name": "unwip-app-0.45.3.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.3.zip.sha256"
+      "name": "unwip-app-0.45.4.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.4.zip.sha256"
     }
   ]
 }
