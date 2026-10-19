@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.97",
-  "commit": "9b2b1b637f7ffed954906205d6f79b68535c6102",
-  "name": "Unwip Dev 0.44.97",
-  "body": "- Fixed: on an iPhone or iPad with a signal but no working connection, opening a book that another device had changed showed \"Couldn't check Dropbox\", and Open anyway did nothing. It now opens within a few seconds, so you can keep writing offline. Your changes sync when you're back online, and if both devices changed the same chapter you get both versions to choose from.\n\nsha256: ca33061a85e678a32a3d2c82f79787c6ddb7a33519391309b0378d62f710b160",
+  "tag_name": "v0.44.98",
+  "commit": "9c6be26eb3c645d60aae99a2f34cf24592df3ebc",
+  "name": "Unwip Dev 0.44.98",
+  "body": "- Conflicted copies (a chapter changed on two devices at once) now sit in their own section below the Trash, like Scrivener's, and each copy has a \u26a0\ufe0f in your chapter list. Drag one out to wherever you want it and it becomes an ordinary document, or delete it.\n- Unwip Dev on an iPhone or iPad: importing from Scrivener no longer tells you to pick the project from Dropbox, which Dev can't do yet. It asks for a zip.\n\nsha256: e012dba668cd264bf42de73262be0bf13ff3473e866575900633c61cb1dac668",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.97.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.97.zip"
+      "name": "unwip-dev-app-0.44.98.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.98.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.97.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.97.zip.sha256"
+      "name": "unwip-dev-app-0.44.98.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.98.zip.sha256"
     }
   ]
 }
