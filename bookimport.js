@@ -457,6 +457,7 @@ window.UnwipBookImport = (function () {
     return { nodes, docs };
   }
 
+  // Dropbox waits until the whole book is written (app.js holdSync)
   async function commit(chs, opts) {
     const { nodes, docs } = buildNodes(chs, opts);
     if (opts.dest === 'new') {
@@ -475,6 +476,7 @@ window.UnwipBookImport = (function () {
     }
     return { nodes, docs };
   }
+  { const raw = commit; commit = (...a) => (U.holdSync ? U.holdSync(() => raw(...a)) : raw(...a)); }
 
   // ================================================================== "YOUR BOOK CAME IN"
   // After an import: what arrived, what formatting came with it, and anything that was left out, said plainly.
@@ -575,7 +577,7 @@ window.UnwipBookImport = (function () {
       const pt = $('#bi-ptitle', ov); pt.oninput = () => { st.title = pt.value; }; pt.onfocus = () => { st.dest = 'new'; const r = $('[name="bi-dest"][value="new"]', ov); if (r) r.checked = true; };
       $('#bi-go', ov).onclick = async () => {
         const b = $('#bi-go', ov); b.disabled = true; b.textContent = 'Importing…';
-        try { const o = { ...st, parentId: ctx.parentId, from: ctx.from }; const r = await commit(p.chapters, o); close(); await summary(r.nodes, r.docs, { from: o.from, added: o.dest !== 'new', left: LEFT }); if (ctx.onDone) ctx.onDone(); }
+        try { const o = { ...st, parentId: ctx.parentId, from: ctx.from }; const r = await commit(p.chapters, o); close(); await summary(r.nodes, r.docs, { from: o.from, added: o.dest !== 'new', left: LEFT }); if (o.dest === 'new' && window.UnwipImportRoom) await window.UnwipImportRoom.afterImport({ from: o.from }); if (ctx.onDone) ctx.onDone(); }
         catch (e) { b.disabled = false; b.textContent = 'Try again'; U.toast(esc(e.message || 'Import failed.'), 'warn', 7000); }
       };
     }

@@ -49,7 +49,14 @@
     lastRange: null, sessionTyped: 0, lastDocWords: 0, programmatic: false,
     saveTimer: null, metaTimer: null, dirty: false, backupTimer: null, plainPaste: false,
     pendingSize: null
-  };
+  };  // which device this is: a hidden ID kept on this device. The device's name ("iPad", "Workhorse") is only for showing:
+  // two iPhones share a name, and an iPhone set to "Request Desktop Website" calls itself an iPad
+  S.deviceId = (() => { try { let id = localStorage.getItem('unwip-device-id'); if (!id) { id = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); localStorage.setItem('unwip-device-id', id); } return id; } catch { return ''; } })();
+  // was this changed on this device? By ID where it was recorded, by name only for changes saved before IDs existed
+  const isMine = (dev, devId) => devId && S.deviceId ? devId === S.deviceId : !!(dev && S.device && dev === S.device);
+  // "this iPad", "this iPhone", or "this computer"
+  const hereName = () => /^(iPad|iPhone|Android)$/.test(S.device || '') ? 'this ' + S.device : 'this computer';
+
   // small event bus so the add-on modules (notes.js, stuck.js, look.js) can follow along
   const HOOKS = {};
   function on(name, fn) { (HOOKS[name] = HOOKS[name] || []).push(fn); }
@@ -241,12 +248,13 @@
         ${pace ? `<div class="pc-pace">${esc(pace)}</div>` : ''}
         ${p.elsewhere ? `<div class="pc-elsewhere" title="Another device changed this book since this ${esc(window.folio.__device || 'device')} last synced. Opening it brings the changes in first.">⚠ Changed on another device</div>` : ''}
         ${p.unsynced ? `<div class="pc-unsynced" title="This book has changes on this ${esc(p.unsynced)} that aren’t in Dropbox yet. Press Sync to send them.">● Not synced yet</div>` : ''}
-        <div class="pc-meta">${fmt(p.words)}${goal ? ' / ' + fmt(goal) : ''} words · ${when}${p.dev && S.device && p.dev !== S.device ? ` · on ${esc(p.dev)}` : ''}</div><button class="icon-btn small pc-more" title="More">${I.dots}</button>`;
+        <div class="pc-meta">${fmt(p.words)}${goal ? ' / ' + fmt(goal) : ''} words · ${when}${p.dev && !isMine(p.dev, p.devId) ? ` · on ${esc(p.dev)}` : ''}</div><button class="icon-btn small pc-more" title="More">${I.dots}</button>`;
       card.onclick = e => { if (!e.target.closest('.pc-more')) openBook(p); };
       $('.pc-more', card).onclick = e => {
         e.stopPropagation();
         showMenu(e.clientX, e.clientY, [
           { label: 'Open', action: () => openBook(p) },
+          { label: 'Export…', action: async () => { const ok = await openBook(p); if (ok !== false && S.slug === p.slug) openPreview(); } },
           ...(api.web ? [] : [{ label: 'Show in folder', action: () => api.revealProject(p.slug) }]),
           { label: 'Backups…', action: () => window.UnwipSync && window.UnwipSync.backupsDialog(p.slug, p.title) },
           { label: 'Save a full backup file…', action: async () => { const f = await api.backupExport(p.slug); if (f) toast('Full backup saved, including images and snapshots.'); } },
@@ -622,8 +630,10 @@
     // a rename box is open: redrawing now would throw it away (the "flicker" on double-click), so wait for it
     if (S.renaming && tree.contains(S.renaming)) { S.binderPending = true; return; }
     tree.innerHTML = '';
+    settleConflicts();
     const ms = S.project.binder.find(r => r.kind === 'manuscript');
     const build = (n, depth) => {
+      if (n.root && n.kind === 'conflicts' && !(n.children || []).length) return;   // nothing waiting to be sorted
       const row = document.createElement('div');
       row.className = 'tree-row' + (n.root ? ' root' : '') + (n.id === S.selectedId ? ' selected' : '') + (n.noBook ? ' no-book' : '');
       if (n.noBook) row.title = 'Left out of the book (it isn’t in the preview or exports)';
@@ -634,7 +644,7 @@
       const icon = n.root ? rootIcon(n) : iconHTML(n, n.type === 'folder' ? (n.open ? I.folderOpen : I.folder) : I.doc);
       const showCount = n.id === ms.id || isInside(n.id, ms);
       const count = showCount ? folderWords(n) : 0;
-      row.innerHTML = `<span class="tr-chev ${n.open ? 'open' : ''} ${n.type === 'folder' && (hasKids || n.root) ? '' : 'none'}">${I.chevron}</span><span class="tr-icon">${icon}</span><span class="tr-title">${esc(n.title || 'Untitled')}</span>${S.popped && S.popped.has(n.id) ? '<span class="tr-pop" title="Open in its own window">⧉</span>' : ''}${n.series && S.project.series ? `<span class="tr-series" title="Shared with the series “${esc(S.project.series)}”">${I.series}</span>` : ''}${n.fav ? `<span class="tr-fav" title="Favourite">★</span>` : ''}${n.type === 'doc' && statusOf(n.status) && S.mode === 'detailed' ? `<span class="st-dot" style="--st:${statusColor(n.status)}" title="${esc(statusName(n.status))}"></span>` : ''}${showCount && count ? `<span class="tr-count">${fmt(count)}</span>` : ''}${n.root && n.kind !== 'trash' && n.kind !== 'conflicts' ? `<button class="tr-add" title="Add a new ${n.kind === 'manuscript' ? 'chapter' : newTitleFor(n).replace(/^New /, '')} to ${esc(n.title)}">+</button>` : ''}`;
+      row.innerHTML = `<span class="tr-chev ${n.open ? 'open' : ''} ${n.type === 'folder' && (hasKids || n.root) ? '' : 'none'}">${I.chevron}</span><span class="tr-icon">${icon}</span>${'conflictOf' in n ? `<span class="tr-cq" title="Conflicted copy from ${esc(n.conflictFrom || 'another device')}: changed in two places at once">⚠️</span>` : ''}<span class="tr-title">${esc(n.title || 'Untitled')}</span>${S.popped && S.popped.has(n.id) ? '<span class="tr-pop" title="Open in its own window">⧉</span>' : ''}${n.series && S.project.series ? `<span class="tr-series" title="Shared with the series “${esc(S.project.series)}”">${I.series}</span>` : ''}${n.fav ? `<span class="tr-fav" title="Favourite">★</span>` : ''}${n.type === 'doc' && statusOf(n.status) && S.mode === 'detailed' ? `<span class="st-dot" style="--st:${statusColor(n.status)}" title="${esc(statusName(n.status))}"></span>` : ''}${showCount && count ? `<span class="tr-count">${fmt(count)}</span>` : ''}${n.root && n.kind !== 'trash' && n.kind !== 'conflicts' ? `<button class="tr-add" title="Add a new ${n.kind === 'manuscript' ? 'chapter' : newTitleFor(n).replace(/^New /, '')} to ${esc(n.title)}">+</button>` : ''}`;
       row.draggable = !n.root;
       tree.appendChild(row);
       if (n.type === 'folder' && n.open) for (const c of n.children || []) build(c, depth + 1);
@@ -762,6 +772,7 @@
         else items.push({ label: 'Share with the series…', action: async () => { if (!S.project.series) return window.UnwipSeries.open(); await flushSave(); await window.UnwipSeries.share([n]); toast(`“${esc(n.title)}” is shared with the series “${esc(S.project.series)}”.`); } });
       }
       if (n.type === 'doc') items.push({ label: 'Snapshots…', action: async () => { await openDoc(n.id); snapshotsDialog(); } });
+      if (window.UnwipFog && root.kind === 'manuscript' && level() === 0) items.push(...window.UnwipFog.menuItems(n));
       if (n.type === 'doc' && !n.map && window.UnwipSheets && root.kind !== 'manuscript' && root.kind !== 'trash') items.push({ label: 'Turn into separate sheets…', action: () => window.UnwipSheets.convert([n.id]) });
       if (n.type === 'doc' || n.type === 'folder') items.push({ label: 'Remove empty lines…', action: () => tidyBlankLines(n.id) });
       if (window.UnwipPageLinks && window.UnwipPageLinks.isPage(n.id) && level() >= 1) items.push({ label: 'Maps and pictures…', action: () => window.UnwipPageLinks.link(n.id) });
@@ -1254,6 +1265,15 @@
     else toast(`“${esc(n.title)}” is a built-in section, so it can’t be deleted. You can collapse it or change its icon.`, '', 4500);
   }
   // ---- moving things around (menu + keyboard; drag and drop is below)
+  // Conflicted copies sit in their own section below the Trash, each with a ⚠️. Dragged out of it (anywhere but the
+  // Trash) a copy becomes an ordinary document. An empty section isn't shown; it's kept so Undo still has a place.
+  function settleConflicts() {
+    const B = S.project.binder, c = B.find(r => r.root && r.kind === 'conflicts'); let changed = false;
+    if (c) { const t = B.findIndex(r => r.root && r.kind === 'trash'); if (t > B.indexOf(c)) { B.splice(B.indexOf(c), 1); B.splice(t, 0, c); changed = true; } }
+    const walk = (list, keep) => { for (const n of list || []) { if ('conflictOf' in n && !keep) { delete n.conflictOf; delete n.conflictFrom; delete n.conflictAt; changed = true; } if (n.children) walk(n.children, keep); } };
+    for (const r of B) walk(r.children, r.kind === 'conflicts' || r.kind === 'trash');
+    if (changed) scheduleMeta();
+  }
   function moveNodeTo(id, parentId, index) {
     const src = findNode(id); if (!src || src.node.root) return;
     const parent = findNode(parentId).node;
@@ -1501,7 +1521,7 @@
     const id = S.docId;
     const html = editor.innerHTML;
     const f = findNode(id);
-    if (f) { f.node.words = countWords(editorText()); f.node.mod = Date.now(); f.node.dev = S.device || ''; }
+    if (f) { f.node.words = countWords(editorText()); f.node.mod = Date.now(); f.node.dev = S.device || ''; f.node.devId = S.deviceId || ''; }
     if (S.loadedHTML && S.loadedHTML !== html) autoSnapshotIfNeeded(id, S.loadedHTML).catch(() => {});
     const slug = S.slug, ukey = `${slug}:${id}`;
     try { await api.saveDoc(slug, id, html); delete S.unsaved[ukey]; if (pending.delete(`doc:${slug}:${id}`) && !pending.size) { troubleRetry = null; saveTrouble(null); } }
@@ -1530,7 +1550,7 @@
   function scheduleMeta() { clearTimeout(S.metaTimer); S.metaTimer = setTimeout(() => saveMetaNow().catch(() => {}), 600); }
   async function saveMetaNow() {
     clearTimeout(S.metaTimer); S.metaTimer = null; if (!S.slug) return;
-    S.project.totalWords = manuscriptWords(); S.project.lastDevice = S.device || S.project.lastDevice;
+    S.project.totalWords = manuscriptWords(); S.project.lastDevice = S.device || S.project.lastDevice; S.project.lastDeviceId = S.deviceId || S.project.lastDeviceId;
     try { await api.saveProjectMeta(S.slug, S.project); saveTrouble(null); }
     catch (e) {
       const msg = String(e && e.message || e);
@@ -2860,7 +2880,7 @@
         ['importic', 'Bring in a reader’s feedback…', 'Their changes and comments land in the right chapters.', '', () => window.UnwipReader && window.UnwipReader.receive()]]],
       ['Take it elsewhere', [
         ['folder', 'A folder of chapter files…', 'One Word or Markdown file per chapter, for Scrivener or any app.', '', () => window.UnwipExportFolder && window.UnwipExportFolder.open()],
-        ['heart', 'No hard feelings…', 'Take your book to Scrivener or anywhere else. Nothing in Unwip is changed.', '', () => window.UnwipNoHardFeelings && window.UnwipNoHardFeelings.open()]]]
+        ['heart', 'No hard feelings…', 'Take your book to Scrivener or anywhere else. Nothing in Unwip is changed.', '', () => window.UnwipSendOut ? window.UnwipSendOut.open({ slug: S.slug }) : window.UnwipNoHardFeelings && window.UnwipNoHardFeelings.open()]]]
     ];
     const items = []; groups.forEach(g => g[1].forEach(x => items.push(x)));
     const NOTE = 'Point at an item to see what it does.';
@@ -3004,6 +3024,7 @@
         <div class="field"><label>Author name (used on title pages and e-books)</label><input type="text" id="g-author" value="${esc(cfg.author || '')}" placeholder="e.g. Ima Novelist"></div>
         <div class="field"><label>Daily writing goal (all books)</label><input type="number" id="g-daily" min="0" step="50" value="${cfg.dailyGoal || ''}" placeholder="e.g. 1000"></div>
         <div class="field full"><label>Goal colours (the rings on the main screen and in Goals)</label><div class="gc-pick" id="g-colors"></div></div>
+        <label class="check full"><input type="checkbox" id="g-impguide" ${cfg.importGuide !== false ? 'checked' : ''}> Guide me through imports, one step at a time</label>
         <label class="check full"><input type="checkbox" id="g-quotes" ${cfg.quotes !== false ? 'checked' : ''}> Show quotes from writers (front page, writer mode, sprints, goals)</label>
         <div class="section-label">Appearance</div>
         <div class="field"><label>Theme and colours</label><button class="btn" id="s-themes" type="button">Themes &amp; colours…</button></div>
@@ -3078,7 +3099,7 @@
     const ok = await modal({ title: 'Settings', body, wide: true, buttons: [{ label: 'Cancel', value: false, kind: 'ghost' }, { label: 'Save', value: true, kind: 'primary' }] });
     if (!ok) return;
     const v = id => $('#' + id, body).value, c = id => $('#' + id, body).checked;
-    S.settings = await api.setSettings({ author: v('g-author').trim(), dailyGoal: Math.max(0, +v('g-daily') || 0), goalColors: gcDraft, quotes: c('g-quotes'), autoUpdate: c('g-autoup') });
+    S.settings = await api.setSettings({ author: v('g-author').trim(), dailyGoal: Math.max(0, +v('g-daily') || 0), goalColors: gcDraft, importGuide: c('g-impguide'), quotes: c('g-quotes'), autoUpdate: c('g-autoup') });
     try { localStorage.setItem('folio-ac', JSON.stringify({ on: c('s-ac'), min: +v('s-acmin') })); } catch {}
     try { localStorage.setItem('folio-dash', c('s-dash') ? 'on' : 'off'); } catch {}
     const langSel = $('#s-lang', body);
@@ -4191,14 +4212,23 @@
     toast(`Imported ${items.length} document${items.length === 1 ? '' : 's'} from ${esc(file.name)}.`);
   }
   // the three-step Scrivener import lives in scrivimport.js
+  // imports run with Dropbox syncing held back until the whole book is written (dropbox.js hold)
+  const holdSync = fn => window.UnwipDropbox && window.UnwipDropbox.hold ? window.UnwipDropbox.hold(fn) : fn();
+  { const raw = importWordProject; importWordProject = (...a) => holdSync(() => raw(...a)); }
+  { const raw = importDocxInto; importDocxInto = (...a) => holdSync(() => raw(...a)); }
   async function importScrivener() { if (window.UnwipScriv) return window.UnwipScriv.start(); }
-  $('#btn-import').onclick = e => {
-    const r = e.target.getBoundingClientRect();
-    showMenu(r.left, r.bottom + 4, [
+  // every way to bring a book in (the import room lists them; with its guide off, the Import button shows them as a menu)
+  function importSources() {
+    return [
       ...(window.UnwipBookImport ? window.UnwipBookImport.menuItems() : []), { sep: true },
       { label: 'Scrivener project (.scriv)…', action: importScrivener },
       { label: 'Restore from a backup file (.unwip)…', action: async () => { try { const slug = await api.backupImportFile(); if (slug) { try { await Fonts.loadImported(await api.importedFonts()); } catch {} toast('Backup restored as a new book.'); showLibrary(); } } catch (e) { toast(esc(String(e.message || e).replace(/^Error invoking remote method '[^']+': (Error: )?/, '')), 'warn', 7000); } } }
-    ]);
+    ];
+  }
+  $('#btn-import').onclick = e => {
+    if (window.UnwipImportRoom) return window.UnwipImportRoom.open();
+    const r = e.target.getBoundingClientRect();
+    showMenu(r.left, r.bottom + 4, importSources());
   };
   async function importWordProject() {
     const title = await promptText('New book from a Word file', 'Book title', '');
@@ -4638,7 +4668,7 @@
     beginSprint, typewriterScroll, applyTheme, insertCleanHTML, resyncWords, openSplit, takeSnapshot, uid,
     reloadProjectMeta, showLibrary, openProject, leaveProject: () => leaveProject(), importScrivener: () => importScrivener(), DEFAULT_STYLE, setMode, setView: v => setView(v), importWordProject: () => importWordProject(), newProjectTemplate: () => newProjectTemplate(), ROOTS,
     tidyBlankLines, sectionDialog, sheetFor, scheduleNames, fontOptionsHTML, applyStyle, markScenes, docBlocks, rejectChanges, acceptChanges, isTitlePage, compileManuscript, templateGallery, continueWriting, noteLastPlace, caretOffset,
-    openPreview, snapshotsDialog, openSettings, flushAll, goalsDialog, writtenOn, dayKey, streaks, dial, manuscriptWords, openFind, openSearch, splitAtCursor, setMode, level: m => level(m), restoreRange, refreshToolbar, styleForm, applyStyleNow, refreshSnapCount
+    openPreview, snapshotsDialog, openSettings, flushAll, holdSync, isMine, hereName, importSources, goalsDialog, writtenOn, dayKey, streaks, dial, manuscriptWords, openFind, openSearch, splitAtCursor, setMode, level: m => level(m), restoreRange, refreshToolbar, styleForm, applyStyleNow, refreshSnapCount
   };
 })();
 

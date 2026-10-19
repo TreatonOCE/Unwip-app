@@ -24,7 +24,8 @@ window.UnwipScriv = (function () {
     let how = opts.fromDropbox ? 'dropbox' : null;
     if (touch && !how) {
       how = await U.modal({ title: 'Import from Scrivener', body: `<p>${DI && DI.ready() ? 'Pick the Scrivener project straight from your Dropbox. Nothing there is changed.' : 'On an iPhone or iPad, Unwip reads a zip of your Scrivener project (Apple doesn’t let web apps open the .scriv folder itself).'}</p>
-        <p class="sim-small">A project kept only on this ${/iPad/.test(navigator.userAgent) ? 'iPad' : 'iPhone'} in Scrivener? Use Scrivener’s own Sync with Dropbox first, so it’s in Dropbox, then pick it here.</p>
+        ${DI && DI.ready() ? `<p class="sim-small">A project kept only on this ${/iPad/.test(navigator.userAgent) ? 'iPad' : 'iPhone'} in Scrivener? Use Scrivener’s own Sync with Dropbox first, so it’s in Dropbox, then pick it here.</p>`
+          : window.UNWIP_DEV ? '<p class="sim-small">Picking a project straight from Dropbox isn’t on in Unwip Dev yet. The normal Unwip (unwip.app) can.</p>' : ''}
         ${DI && DI.ready() ? '' : `<ol class="sim-steps"><li>In the <b>Files</b> app, press and hold the <b>.scriv</b> project and choose <b>Compress</b>.</li><li>Come back here, tap <b>Choose the zip</b> and pick it.</li></ol>`}`,
         buttons: [{ label: 'Cancel', value: false, kind: 'ghost' }, ...(DI && DI.ready() ? [{ label: 'Choose from Dropbox…', value: 'dropbox', kind: 'primary' }] : [{ label: 'Choose the zip…', value: 'zip', kind: 'primary' }])] });
       if (!how) return;
@@ -142,6 +143,7 @@ window.UnwipScriv = (function () {
   }
 
   // ---- 3. import into a new project
+  // Dropbox waits until the whole book is written (app.js holdSync)
   async function importNow(data, rows, v) {
     const map = {}; for (const r of rows) map[r.key] = r.on ? r.target : 'skip';
     if (v.mem) {
@@ -225,8 +227,11 @@ window.UnwipScriv = (function () {
           ${r.skipped.length ? `<li>Not imported (Unwip doesn’t hold these yet): ${esc(r.skipped.slice(0, 8).join(', '))}${r.skipped.length > 8 ? ` and ${r.skipped.length - 8} more` : ''}.</li>` : ''}
           <li>Not imported: compile settings, collections, keywords, custom metadata, snapshots, links and Scrivener-only styles.</li>
         </ul></div>`, buttons: [{ label: 'Start writing', value: true, kind: 'primary' }] });
+    // guided: sorting starts (its Characters step offers one page per person); otherwise the old offer
+    if (window.UnwipImportRoom && await window.UnwipImportRoom.afterImport({ from: 'Scrivener' })) return;
     if (window.UnwipSheets) await window.UnwipSheets.offerAfterImport().catch(() => {});
   }
+  { const raw = importNow; importNow = (...a) => (U.holdSync ? U.holdSync(() => raw(...a)) : raw(...a)); }
 
   return { start, TARGETS, _test: { importNow } };
 })();
