@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.44.98",
-  "commit": "9c6be26eb3c645d60aae99a2f34cf24592df3ebc",
-  "name": "Unwip Dev 0.44.98",
-  "body": "- Conflicted copies (a chapter changed on two devices at once) now sit in their own section below the Trash, like Scrivener's, and each copy has a \u26a0\ufe0f in your chapter list. Drag one out to wherever you want it and it becomes an ordinary document, or delete it.\n- Unwip Dev on an iPhone or iPad: importing from Scrivener no longer tells you to pick the project from Dropbox, which Dev can't do yet. It asks for a zip.\n\nsha256: e012dba668cd264bf42de73262be0bf13ff3473e866575900633c61cb1dac668",
+  "tag_name": "v0.44.99",
+  "commit": "8c388a93c838570cfbcd555b560b62faec6931dc",
+  "name": "Unwip Dev 0.44.99",
+  "body": "- Unwip Dev can now connect to Dropbox, in a folder of its own (Dropbox \u203a Apps \u203a Unwip Dev), so syncing between devices can be tried on Dev before it reaches everyone. Your real books in Apps \u203a Unwip can't be reached from Dev. Dev's Scrivener import on an iPhone or iPad can pick a project straight from Dropbox too.\n\nsha256: a8d2c287ae235f78a1ce92ba2703f4e754d69a178f231af378f09f259c3b5c27",
   "assets": [
     {
-      "name": "unwip-dev-app-0.44.98.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.98.zip"
+      "name": "unwip-dev-app-0.44.99.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.99.zip"
     },
     {
-      "name": "unwip-dev-app-0.44.98.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.98.zip.sha256"
+      "name": "unwip-dev-app-0.44.99.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.44.99.zip.sha256"
     }
   ]
 }
