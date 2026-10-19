@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.45.4",
-  "commit": "60c0f1f3c53d50124f464b58160e53f648abc261",
-  "name": "Unwip Dev 0.45.4",
-  "body": "- Fixed: in the import room, a cast list (or a list of places or things) came in as one document unless you pressed \"One page per person\". Choosing a section, Next document, Use Unwip's guesses or Apply to all in folder skipped the split without saying. Now a list waits for your answer, \"One page per person\" or \"Keep it as one document\", and the question stays highlighted until you choose. Use Unwip's guesses and Apply to all in folder show every list they move in one \"Make the sheets\" window.\n- iPhone: BETA (and DEV) now sit small under the Unwip logo, so the Dropbox button has room to say what it's doing. While syncing it says \"Sending 12 of 86\u2026\" with a thin bar underneath.\n- Already imported a book whose lists came in whole? Press and hold Characters (right-click on a PC) \u203a Turn lists in here into sheets\u2026\n\nsha256: 7e5748c67767adcb749d3686e7f2e3d8eab388711087aeaefbdf37df4d1c6b2f",
+  "tag_name": "v0.45.5",
+  "commit": "f97e5df92aef325ddcf1cba5a37d926bb77ab6a1",
+  "name": "Unwip Dev 0.45.5",
+  "body": "- Import room: a list's card now shows a small preview of each page it would make, laid out like that section's own sheet (Full name, Aliases and so on), with \u2039 \u203a to look through them and where they'll go. On an iPhone it folds away under the buttons and remembers whether you left it open.\n- Send a book out: the Structure step shows how a chapter will look in the app you chose: Scrivener's binder and page, a Word or Google Docs page, or an Obsidian or Markdown note. Use \u2039 \u203a to look at other chapters. What changes shows small samples too, like a character's gear list and the Story Bible.\n- Importing from Scrivener on an iPhone or iPad: if Dropbox is busy for a moment, Unwip quietly tries again a couple of times before telling you.\n\nsha256: 995c036d608d7696eda6af75b445b50ae04274e68108faaeae264a9850c56661",
   "assets": [
     {
-      "name": "unwip-dev-app-0.45.4.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.4.zip"
+      "name": "unwip-dev-app-0.45.5.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.5.zip"
     },
     {
-      "name": "unwip-dev-app-0.45.4.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.4.zip.sha256"
+      "name": "unwip-dev-app-0.45.5.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.5.zip.sha256"
     }
   ]
 }
