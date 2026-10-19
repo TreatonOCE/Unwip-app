@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.45.5",
-  "name": "Unwip 0.45.5",
-  "body": "- Import room: a list's card now shows a small preview of each page it would make, laid out like that section's own sheet (Full name, Aliases and so on), with \u2039 \u203a to look through them and where they'll go. On an iPhone it folds away under the buttons and remembers whether you left it open.\n- Send a book out: the Structure step shows how a chapter will look in the app you chose: Scrivener's binder and page, a Word or Google Docs page, or an Obsidian or Markdown note. Use \u2039 \u203a to look at other chapters. What changes shows small samples too, like a character's gear list and the Story Bible.\n- Importing from Scrivener on an iPhone or iPad: if Dropbox is busy for a moment, Unwip quietly tries again a couple of times before telling you.\n\nsha256: c143af9a1ccf5438eef13282862c0fd776a2a952797e11af8e5a09429b4f2198",
+  "tag_name": "v0.45.6",
+  "name": "Unwip 0.45.6",
+  "body": "- Import / Export: the \"Guide me through imports\" switch is now right under Bring a book in, so you can turn the guide on or off where you start. Bring a book in says what it will do: sort it a section at a time with Unwip's guesses and previews, or bring it straight in as it is. It's the same setting as in Settings.\n\nsha256: b91de9c52836ac4414af1fdc7b304ec46a0aa66013665a04466e3c316bd0e13f",
   "assets": [
     {
-      "name": "unwip-app-0.45.5.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.5.zip"
+      "name": "unwip-app-0.45.6.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.6.zip"
     },
     {
-      "name": "unwip-app-0.45.5.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.5.zip.sha256"
+      "name": "unwip-app-0.45.6.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.6.zip.sha256"
     }
   ]
 }
