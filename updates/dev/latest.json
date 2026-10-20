@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.45.8",
-  "commit": "b8b42d72c31798163d95472a957d2aca1f182c45",
-  "name": "Unwip Dev 0.45.8",
-  "body": "- Import room: \"Keep it as one document\" no longer jumps to the next document. It stays put and shows \u2713 Kept as one document, so you can see what you picked, and you can still choose one page per entry instead.\n- Import room: on the last document of a step, Next document goes on to the next step instead of being greyed out.\n- Import room: a list of people written on separate lines of one paragraph (common from Scrivener) is found as a list, with the one-page-per-person choice and its preview.\n- Import room: a notes page named after a game term (like \"Danger Rating\") is no longer guessed to be a person, and lines that are a whole [system message] aren't read as people's names.\n\nsha256: a9da04b364bb80e85acac9237c976744b3389793e267e34852fbf5f2ddc5c93f",
+  "tag_name": "v0.45.9",
+  "commit": "0bce216d56ce84a4c34f870f27b7f89d13bd4f31",
+  "name": "Unwip Dev 0.45.9",
+  "body": "- Import room: for a list, \"One page per person\" and \"Keep it as one document\" are now a switch. Picking one only picks it, and the preview below shows what you'll get: each page, or the document as one page. Switch as often as you like. The pages are made when you move on.\n- Import room: every page made from a list says which list it came from, with \"Change back to one document\" to undo it.\n\nsha256: 8d935566790e447ed4225979d0635ad68c7496e49633268f1a8c635b9d9d707a",
   "assets": [
     {
-      "name": "unwip-dev-app-0.45.8.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.8.zip"
+      "name": "unwip-dev-app-0.45.9.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.9.zip"
     },
     {
-      "name": "unwip-dev-app-0.45.8.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.8.zip.sha256"
+      "name": "unwip-dev-app-0.45.9.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.9.zip.sha256"
     }
   ]
 }
