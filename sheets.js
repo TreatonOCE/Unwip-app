@@ -97,6 +97,14 @@ window.UnwipSheets = (function () {
   }
   function parse(html) {
     const d = document.createElement('div'); d.innerHTML = html || '';
+    // lines kept apart by line breaks inside one paragraph (common from Scrivener, and Markdown with single line breaks)
+    // are lines of their own (beta, 20 Oct: "Debra - …<br>Stacey - …<br>Emilie - …" read as one entry, so no list)
+    for (const p of [...d.querySelectorAll('p')]) {
+      if (!p.querySelector('br') || p.querySelector('p, li')) continue;
+      const parts = p.innerHTML.split(/<br\s*\/?>/i);
+      if (parts.filter(h => h.replace(/<[^>]+>/g, '').replace(/&nbsp;|\u00a0/g, ' ').trim()).length < 2) continue;
+      p.replaceWith(...parts.map(h => { const q = document.createElement('p'); q.innerHTML = h; return q; }));
+    }
     const blocks = [...d.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li')].filter(b => !b.querySelector('p, li'));
     { const lines = blocks.map(b => b.textContent.trim()).filter(Boolean), br = lines.filter(t => BR.test(t)).length;
       if (br >= 3 && br >= lines.length * 0.5) return parseAbilities(blocks); }
@@ -104,6 +112,9 @@ window.UnwipSheets = (function () {
     for (const b of blocks) {
       const text = b.textContent.replace(/ /g, ' ').trim(); if (!text) continue;
       const lead = leadOf(b), lt = lead.trim();
+      // a whole line in [brackets] is a system message, not a name (beta, 20 Oct: "[Confirm Cost to Level 10]" was
+      // offered as a person's page)
+      if (/^\s*\[[^\]]*\]\s*$/.test(text)) { items.push({ k: 'more', html: b.outerHTML }); continue; }
       if (lt && lt.length <= 80 && lt.split(/\s+/).length <= 9) {
         const after = text.slice(text.indexOf(lt) + lt.length).trim();
         if (!after || /^[:：\-–—=|]*$/.test(after)) { items.push({ k: 'head', name: lt.replace(/[\s:：\-–—=|]+$/, ''), colon: /[:：]\s*$/.test(lt + after), heading: /^H/.test(b.tagName) }); continue; }
@@ -208,6 +219,7 @@ window.UnwipSheets = (function () {
     const toTrash = !body.dataset.keep;
     const undo = [];
     let made = 0;
+    convert.last = [];   // what was made, by plain ids, so the import room can change it back later (beta, 20 Oct)
     for (const L of lists) {
       const f = U.findNode(L.id); if (!f) continue;
       const folder = { id: U.uid(), type: 'folder', title: L.node.title, open: true, children: [] };
@@ -223,7 +235,7 @@ window.UnwipSheets = (function () {
           const html = sheetHTML(L.root, e);
           await U.api.saveDoc(S.slug, n.id, html);
           n.words = U.countWords(e.text || '');
-          into.push(n); made++;
+          into.push(n); made++; (L.pages = L.pages || []).push(n.id);
         }
       }
       // the new folder takes the list's place when it was already in that section, otherwise it goes at the end of the section
@@ -231,6 +243,7 @@ window.UnwipSheets = (function () {
       if (L.newRoot) { /* the entries are already in the new section */ } else if (sameRoot) f.list.splice(f.index + 1, 0, folder); else L.root.children.push(folder);
       L.root.open = true;
       undo.push({ folder, id: L.id, newRoot: L.newRoot });
+      { const o = U.findNode(L.id); convert.last.push({ id: L.id, folder: L.newRoot ? null : folder.id, newRoot: L.newRoot ? L.newRoot.id : null, pages: L.pages || [], parent: o && o.parent ? o.parent.id : null, index: o ? o.index : 0 }); }
       if (toTrash) { const t = U.findNode(L.id); undo[undo.length - 1].from = { list: t.list, index: t.index }; t.list.splice(t.index, 1); U.findNode('root-trash').node.children.push(t.node); if (L.id === S.docId) S.docId = null; }
     }
     U.scheduleMeta(); U.renderBinder(); if (U.scheduleNames) U.scheduleNames(0);
