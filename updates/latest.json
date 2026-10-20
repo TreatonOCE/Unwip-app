@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.45.9",
-  "name": "Unwip 0.45.9",
-  "body": "- Import room: for a list, \"One page per person\" and \"Keep it as one document\" are now a switch. Picking one only picks it, and the preview below shows what you'll get: each page, or the document as one page. Switch as often as you like. The pages are made when you move on.\n- Import room: every page made from a list says which list it came from, with \"Change back to one document\" to undo it.\n- Import room: on the last document of a step, Next document goes on to the next step instead of being greyed out.\n- Import room: a list of people written on separate lines of one paragraph (common from Scrivener) is found as a list, with the one-page-per-person choice and its preview.\n- Import room: a notes page named after a game term (like \"Danger Rating\") is no longer guessed to be a person, and lines that are a whole [system message] aren't read as people's names.\n\nsha256: f7f9afe3c64ceeb0271fa4dbb995e5cb39b3895ecadbd027428ce4358df9f752",
+  "tag_name": "v0.46.0",
+  "name": "Unwip 0.46.0",
+  "body": "- iPhone and iPad: \u270e Edit at the bottom of the binder. Drag rows by \u2261 into folders, between rows, or out of a folder by sliding left. Tick several to move them together, with Move to\u2026, Out of folder or Trash. Ticking a folder takes everything in it along.\n- In the Trash, holding something offers Put back, which returns it to where it was deleted from.\n- iPhone and iPad: holding a row or a menu no longer selects its text with Copy / Look Up / Translate.\n- Import room: every list now comes with Unwip's pick (one page each in Characters, Places and Items, one document elsewhere), so nothing comes back for a second pass. Switch any time. The pages are made when you move on to the next step, all in one review window.\n- Import room: every document shows a preview of how it will look, not just lists, and the guess line reads cleanly on a phone.\n- Import room: tapping the document you're already on no longer makes its pages, and Cancel in the review window no longer ticks the lists off.\n\nsha256: fcf502f46bf64092181a4793dc92444d86373ea8a8d9c60852dbc548fd7d6505",
   "assets": [
     {
-      "name": "unwip-app-0.45.9.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.9.zip"
+      "name": "unwip-app-0.46.0.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.0.zip"
     },
     {
-      "name": "unwip-app-0.45.9.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.45.9.zip.sha256"
+      "name": "unwip-app-0.46.0.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.0.zip.sha256"
     }
   ]
 }
