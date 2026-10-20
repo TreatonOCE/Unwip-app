@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.45.9",
-  "commit": "0bce216d56ce84a4c34f870f27b7f89d13bd4f31",
-  "name": "Unwip Dev 0.45.9",
-  "body": "- Import room: for a list, \"One page per person\" and \"Keep it as one document\" are now a switch. Picking one only picks it, and the preview below shows what you'll get: each page, or the document as one page. Switch as often as you like. The pages are made when you move on.\n- Import room: every page made from a list says which list it came from, with \"Change back to one document\" to undo it.\n\nsha256: 8d935566790e447ed4225979d0635ad68c7496e49633268f1a8c635b9d9d707a",
+  "tag_name": "v0.46.0",
+  "commit": "1621cfd6411aff514ef39f3940c8167a7368b40b",
+  "name": "Unwip Dev 0.46.0",
+  "body": "- iPhone and iPad: \u270e Edit at the bottom of the binder. Drag rows by \u2261 into folders, between rows, or out of a folder by sliding left. Tick several to move them together, with Move to\u2026, Out of folder or Trash. Ticking a folder takes everything in it along.\n- In the Trash, holding something offers Put back, which returns it to where it was deleted from.\n- iPhone and iPad: holding a row or a menu no longer selects its text with Copy / Look Up / Translate.\n- Import room: every list now comes with Unwip's pick (one page each in Characters, Places and Items, one document elsewhere), so nothing comes back for a second pass. Switch any time. The pages are made when you move on to the next step, all in one review window.\n- Import room: every document shows a preview of how it will look, not just lists, and the guess line reads cleanly on a phone.\n- Import room: tapping the document you're already on no longer makes its pages, and Cancel in the review window no longer ticks the lists off.\n\nsha256: 0f48a9ed013948bd6d2976656656cf1cd249717d0a1cf0d2fba158b0a7f4317a",
   "assets": [
     {
-      "name": "unwip-dev-app-0.45.9.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.9.zip"
+      "name": "unwip-dev-app-0.46.0.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.0.zip"
     },
     {
-      "name": "unwip-dev-app-0.45.9.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.45.9.zip.sha256"
+      "name": "unwip-dev-app-0.46.0.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.0.zip.sha256"
     }
   ]
 }
