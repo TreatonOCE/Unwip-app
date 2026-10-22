@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.46.1",
-  "commit": "aad24aed8968e33a52853f60dea0bbdd3b96dcef",
-  "name": "Unwip Dev 0.46.1",
-  "body": "- iPhone: the page now follows as you type. Before, the words could run on behind the keyboard while the page stayed put.\n- iPhone and iPad: the formatting row above the keyboard no longer hides under the iPhone's own ^ \u02c5 \u2713 bar, including after changing something earlier in a chapter, after Revise, and after switching out of the app and back.\n\nsha256: 7542d3ac1bd2c7a0ebbaf3e942dc246428a088fbb0e651259542048b6f9adadd",
+  "tag_name": "v0.46.2",
+  "commit": "faf0f9cab587a705cd0b6c159f302e5832141ff4",
+  "name": "Unwip Dev 0.46.2",
+  "body": "- iPhone: while you type, the formatting row now sits just under the top bar instead of above the keyboard, so the iPhone's own ^ \u02c5 \u2713 bar can never cover it or leave it floating. The chapter title is still right there below it, and the page keeps following your cursor.\n- iPhone: typing mode now switches on whenever the keyboard is up on the chapter, including after switching back from another app.\n- iPhone: \uff0b Page. Select a name while writing and tap \uff0b Page in the formatting row to make a character, place or item page called that, or add the words to a page you already have.\n\nsha256: e7bb2d1e930d67a6643fa073dbb0fc70ea07a50e40891ef4c2ec38175d6c9fd0",
   "assets": [
     {
-      "name": "unwip-dev-app-0.46.1.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.1.zip"
+      "name": "unwip-dev-app-0.46.2.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.2.zip"
     },
     {
-      "name": "unwip-dev-app-0.46.1.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.1.zip.sha256"
+      "name": "unwip-dev-app-0.46.2.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.2.zip.sha256"
     }
   ]
 }
