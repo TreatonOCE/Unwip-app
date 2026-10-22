@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.46.1",
-  "name": "Unwip 0.46.1",
-  "body": "- iPhone: the page now follows as you type. Before, the words could run on behind the keyboard while the page stayed put.\n- iPhone and iPad: the formatting row above the keyboard no longer hides under the iPhone's own ^ \u02c5 \u2713 bar, including after changing something earlier in a chapter, after Revise, and after switching out of the app and back.\n\nsha256: 20b9d8fdaff5ccc614d53132bb100ff26888ff0b6d1b606b4e662563c908d9ec",
+  "tag_name": "v0.46.2",
+  "name": "Unwip 0.46.2",
+  "body": "- iPhone: while you type, the formatting row now sits just under the top bar instead of above the keyboard, so the iPhone's own ^ \u02c5 \u2713 bar can never cover it or leave it floating. The chapter title is still right there below it, and the page keeps following your cursor.\n- iPhone: typing mode now switches on whenever the keyboard is up on the chapter, including after switching back from another app.\n- iPhone: \uff0b Page. Select a name while writing and tap \uff0b Page in the formatting row to make a character, place or item page called that, or add the words to a page you already have.\n\nsha256: f1bea895f38c9b095b06d16e7bca8458f314cc17bff282a031be950d74a043c2",
   "assets": [
     {
-      "name": "unwip-app-0.46.1.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.1.zip"
+      "name": "unwip-app-0.46.2.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.2.zip"
     },
     {
-      "name": "unwip-app-0.46.1.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.1.zip.sha256"
+      "name": "unwip-app-0.46.2.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.2.zip.sha256"
     }
   ]
 }
