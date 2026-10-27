@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.46.2",
-  "name": "Unwip 0.46.2",
-  "body": "- iPhone: while you type, the formatting row now sits just under the top bar instead of above the keyboard, so the iPhone's own ^ \u02c5 \u2713 bar can never cover it or leave it floating. The chapter title is still right there below it, and the page keeps following your cursor.\n- iPhone: typing mode now switches on whenever the keyboard is up on the chapter, including after switching back from another app.\n- iPhone: \uff0b Page. Select a name while writing and tap \uff0b Page in the formatting row to make a character, place or item page called that, or add the words to a page you already have.\n\nsha256: f1bea895f38c9b095b06d16e7bca8458f314cc17bff282a031be950d74a043c2",
+  "tag_name": "v0.46.6",
+  "name": "Unwip 0.46.6",
+  "body": "- iPhone and iPad: in \u270e Edit, tap a page or folder's name to rename it right there. The circle still ticks it.\n- iPhone and iPad: the hold menu no longer says Rename is a double-click, since a double tap opens the page.\n- Dropbox: \"Two versions found\" no longer comes up for the binder when nothing in it is different, such as after just opening the book on another device. A leftover one with nothing new in it is put away in the backups instead of asking every time the book opens.\n- iPhone: typewriter and other key sounds come back after you switch to another app and back.\n- Bold, italic, underline and strikethrough buttons now show what your next letters will be straight away. On iPhone, iPad and Safari, U used to stay lit after you turned underline off.\n- Deleting a selection and typing in its place carries on in the formatting the deleted words started with, as in Scrivener.\n- \"This week\" on the goal rings and in Play now counts from the start of this week (Monday in Australia), not the last 7 days.\n- Website: the three dots above the opening statement are back, filling in as the page opens.\n\nsha256: af0c010168943e0ae705ca409b5731a03c0610666a27a0e85ed8a3873d168842",
   "assets": [
     {
-      "name": "unwip-app-0.46.2.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.2.zip"
+      "name": "unwip-app-0.46.6.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.6.zip"
     },
     {
-      "name": "unwip-app-0.46.2.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.2.zip.sha256"
+      "name": "unwip-app-0.46.6.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.6.zip.sha256"
     }
   ]
 }

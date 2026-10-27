@@ -764,7 +764,7 @@
           toast(out ? `“${esc(n.title)}” is back in the book.` : `“${esc(n.title)}” stays here but is left out of the preview and exports. Right-click it again to put it back.`);
         } });
       }
-      items.push({ label: 'Rename', hint: 'Double-click', action: () => startRename($(`.tree-row[data-id="${n.id}"]`), n) });
+      items.push({ label: 'Rename', hint: matchMedia('(pointer: coarse)').matches ? '' : 'Double-click', action: () => startRename($(`.tree-row[data-id="${n.id}"]`), n) });
       if (n.type === 'doc') items.push({ label: 'Copy for Docs', action: () => copyDocForDocs(n.id) });
       if (n.type === 'doc' && window.UnwipRR) items.push({ label: 'Copy for Royal Road…', action: () => window.UnwipRR.open(n.id) });
       if (n.type === 'doc' && !n.map && window.UnwipSeries && ['characters', 'places', 'items'].concat(S.project.binder.filter(r => r.custom).map(r => r.kind)).includes(root.kind)) {
@@ -1990,7 +1990,7 @@
     $('#sel-block').disabled = false;
     for (const b of $$('.tb-btn[data-cmd]')) {
       let on = false;
-      try { on = document.queryCommandState(b.dataset.cmd); } catch {}
+      try { on = (FMT || []).includes(b.dataset.cmd) ? fmtShown(b.dataset.cmd) : document.queryCommandState(b.dataset.cmd); } catch {}
       b.classList.toggle('on', on && /bold|italic|underline|strike/i.test(b.dataset.cmd));
     }
     // when focus is elsewhere (e.g. the Style panel), read the place the cursor was last in the chapter
@@ -2071,9 +2071,79 @@
     }
     restoreRange();
     document.execCommand('styleWithCSS', false, false);
-    if (b.dataset.cmd === 'underline') toggleUnderline(); else document.execCommand(b.dataset.cmd);
+    if ((FMT || []).includes(b.dataset.cmd)) fmtToggle(b.dataset.cmd); else document.execCommand(b.dataset.cmd);
     cleanEmptySpans(); scheduleSave(); refreshToolbar();
   }));
+  // ---- what the next letters will look like (beta, 27 Oct). Unwip keeps track itself of bold, italic, underline and
+  // strikethrough for the spot the cursor is in, rather than asking the browser: Safari (iPhone, iPad, Mac) kept
+  // saying underline was on after it was turned off, until the next letter. Two things set it:
+  //  - turning one on or off with the cursor in one place: the next letters follow, and the button shows it at once
+  //  - deleting a selection: what's typed in its place carries on in the formatting the deleted words started with,
+  //    as in Scrivener and Word (Safari sometimes did, sometimes didn't, and the buttons didn't say which)
+  // The first letters typed there are given exactly that formatting; after that, typing follows on from them. Moving
+  // the cursor elsewhere goes back to the formatting of the words there.
+  var FMT = ['bold', 'italic', 'underline', 'strikeThrough'];   // var: the toolbar can be drawn before this part runs
+  var fmtPend = null;   // { node, off, f: { bold, italic, underline, strikeThrough } }
+  const caretNow = () => { const s = getSelection(); return s.rangeCount && s.isCollapsed && editor.contains(s.anchorNode) ? { node: s.anchorNode, off: s.anchorOffset } : null; };
+  const pendHere = () => { const c = caretNow(); return fmtPend && c && c.node === fmtPend.node && c.off === fmtPend.off && fmtPend.node.isConnected ? fmtPend : null; };
+  // the formatting the words at a point have, from the page itself (b/strong, i/em, u, s/strike, or the same as a style)
+  function fmtOf(node) {
+    const f = { bold: false, italic: false, underline: false, strikeThrough: false };
+    for (let e = node && node.nodeType === 3 ? node.parentElement : node; e && e !== editor && editor.contains(e); e = e.parentElement) {
+      const t = e.tagName, st = e.style || {}, dec = `${st.textDecoration || ''} ${st.textDecorationLine || ''}`;
+      if (t === 'B' || t === 'STRONG' || /^(bold|[6-9]00)$/.test(st.fontWeight || '')) f.bold = true;
+      if (t === 'I' || t === 'EM' || st.fontStyle === 'italic') f.italic = true;
+      if (t === 'U' || /underline/.test(dec)) f.underline = true;
+      if (t === 'S' || t === 'STRIKE' || /line-through/.test(dec)) f.strikeThrough = true;
+    }
+    return f;
+  }
+  const inHeading = node => { const b = node && currentBlock(node); return !!(b && /^H[1-6]$/.test(b.tagName)); };
+  // the button: what the next letter will be
+  function fmtShown(cmd) { const p = pendHere(); if (p) return !!p.f[cmd]; try { return document.queryCommandState(cmd); } catch { return false; } }
+  function fmtToggle(cmd) {
+    const c = caretNow(), base = c ? { ...(pendHere() ? fmtPend.f : fmtOf(c.node)) } : null;
+    if (cmd === 'underline') toggleUnderline(); else document.execCommand(cmd);
+    const after = caretNow();
+    if (base && after && !inHeading(after.node)) { base[cmd] = !base[cmd]; fmtPend = { node: after.node, off: after.off, f: base }; }
+    else fmtPend = null;
+  }
+  // deleting a selection: remember how the deleted words started
+  let delFmt = null, fmtNext = null, fmtBusy = false;
+  editor.addEventListener('beforeinput', e => {
+    if (fmtBusy) return;
+    const s = getSelection();
+    if (/^delete/.test(e.inputType || '') && s.rangeCount && !s.isCollapsed && editor.contains(s.anchorNode)) {
+      const r = s.getRangeAt(0); let n = r.startContainer;
+      if (n.nodeType !== 3 || r.startOffset >= n.length) { const w = document.createTreeWalker(r.commonAncestorContainer, NodeFilter.SHOW_TEXT); let t; while ((t = w.nextNode())) if (r.intersectsNode(t) && t.data.trim() && !(t === r.endContainer && r.endOffset === 0) && !(t === n && r.startOffset >= t.length)) { n = t; break; } }
+      delFmt = inHeading(n) ? null : fmtOf(n); fmtNext = null; return;
+    }
+    delFmt = null;
+    fmtNext = e.inputType === 'insertText' && e.data && pendHere() ? fmtPend.f : null;
+  }, true);
+  editor.addEventListener('input', e => {
+    if (fmtBusy) return;
+    if (delFmt && /^delete/.test(e.inputType || '')) { const c = caretNow(); fmtPend = c ? { node: c.node, off: c.off, f: delFmt } : null; delFmt = null; return; }
+    const want = fmtNext; fmtNext = null;
+    if (!want || e.inputType !== 'insertText' || !e.data) return;
+    fmtPend = null;
+    const s = getSelection(), n = s.anchorNode, o = s.anchorOffset, len = e.data.length;
+    if (!n || n.nodeType !== 3 || o < len) return;
+    const have = fmtOf(n), wrong = FMT.filter(c => !!have[c] !== !!want[c]);
+    if (!wrong.length) return;
+    // give the new letters exactly that formatting, then put the cursor back after them
+    fmtBusy = true;
+    try {
+      const r = document.createRange(); r.setStart(n, o - len); r.setEnd(n, o); s.removeAllRanges(); s.addRange(r);
+      document.execCommand('styleWithCSS', false, false);
+      for (const c of wrong) document.execCommand(c);
+      const r2 = s.getRangeAt(0); r2.collapse(false); s.removeAllRanges(); s.addRange(r2);
+      // the cursor stays inside the letters just typed, so the next ones follow on from them
+      let t = s.anchorNode; if (t && t.nodeType !== 3) { const kid = t.childNodes[s.anchorOffset - 1]; let last = kid; while (last && last.nodeType !== 3) last = last.lastChild; if (last) { const r3 = document.createRange(); r3.setStart(last, last.length); r3.collapse(true); s.removeAllRanges(); s.addRange(r3); } }
+      cleanEmptySpans();
+    } catch {} finally { fmtBusy = false; }
+    refreshToolbar();
+  });
   // Underline on an empty line (straight after Enter at the end of underlined words): on a Mac the browser keeps the
   // line's empty placeholder inside the underline, so Cmd+U couldn't turn it off until something was typed.
   // Here an empty line just loses the underline around its placeholder, and new typing is plain.
@@ -2094,8 +2164,9 @@
     document.execCommand('underline');
   }
   editor.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && (e.key || '').toLowerCase() === 'u') {
-      e.preventDefault(); document.execCommand('styleWithCSS', false, false); toggleUnderline(); cleanEmptySpans(); scheduleSave(); refreshToolbar();
+    const k = (e.key || '').toLowerCase(), c = { u: 'underline', b: 'bold', i: 'italic' }[k];
+    if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && c) {
+      e.preventDefault(); document.execCommand('styleWithCSS', false, false); fmtToggle(c); cleanEmptySpans(); scheduleSave(); refreshToolbar();
     }
   });
 
@@ -3845,6 +3916,14 @@
     return sets.reduce((a, d) => a + Math.max(0, d[day] || 0), 0);
   }
   function dayKey(offset) { const d = new Date(); d.setDate(d.getDate() - offset); return d.toLocaleDateString('en-CA'); }
+  // how many days of this week so far, today included: the week starts on the day this device's region starts it
+  // (Monday in Australia and the UK, Sunday in the US). "This week" used to be the last 7 days (beta, 27 Oct)
+  function weekSoFar(now = new Date()) {
+    let first = 1;   // Monday
+    try { const L = new Intl.Locale(navigator.language || 'en-AU'), w = (L.getWeekInfo && L.getWeekInfo()) || L.weekInfo; if (w && w.firstDay >= 1 && w.firstDay <= 7) first = w.firstDay; } catch {}
+    const today = now.getDay() || 7;   // 1 Monday … 7 Sunday
+    return ((today - first + 7) % 7) + 1;
+  }
   function streaks(allDays) {
     const wrote = k => writtenOn(k, allDays) > 0;
     let cur = 0, i = wrote(dayKey(0)) ? 0 : 1;            // today not written yet doesn't break the streak
@@ -3911,7 +3990,7 @@
     const daily = S.settings.dailyGoal || 0;
     const total = manuscriptWords();
     const todayW = writtenOn(today());
-    let week = 0; for (let i = 0; i < 7; i++) week += writtenOn(dayKey(i));
+    let week = 0; for (let i = 0; i < weekSoFar(); i++) week += writtenOn(dayKey(i));
     const st = streaks();
     const sprints = S.project.stats.sprints || [];
     const bestWpm = sprints.reduce((a, x) => Math.max(a, x.wpm || 0), 0);
@@ -3950,7 +4029,7 @@
     const allDays = list.map(p => p.days || {});
     const daily = (S.settings || {}).dailyGoal || 0;
     const todayW = writtenOn(today(), allDays);
-    let week = 0; for (let i = 0; i < 7; i++) week += writtenOn(dayKey(i), allDays);
+    let week = 0; for (let i = 0; i < weekSoFar(); i++) week += writtenOn(dayKey(i), allDays);
     const st = streaks(allDays);
     const totalWords = list.reduce((a, p) => a + (p.words || 0), 0);
     const dash = $('#dash');
@@ -4767,7 +4846,7 @@
 
   // test hooks (used by the automated checks, harmless otherwise)
   window.__folio = { S, openProject, openDoc, copyDocForDocs, compileManuscript, flushSave, addNode, setWriter, insertCleanHTML };
-  window.__unwip = { typewriterActive, moveNodeTo, moveToTrash, moveToDialog, moveOut, navGo, navState: () => ({ back: NAV.back.map(x => x.id), fwd: NAV.fwd.map(x => x.id), show: NAV.show }), goneCheck, setGoneGap: ms => { goneGap = ms; },
+  window.__unwip = { weekSoFar, fmtToggle, fmtShown, startRename, typewriterActive, moveNodeTo, moveToTrash, moveToDialog, moveOut, navGo, navState: () => ({ back: NAV.back.map(x => x.id), fwd: NAV.fwd.map(x => x.id), show: NAV.show }), goneCheck, setGoneGap: ms => { goneGap = ms; },
     editStatuses: () => editStatuses(), folderWords, iconHTML, newTitleFor, statusColor, statusName, statusOptions,   // for corkboard.js
     newEventFrom: seed => editEvent(null, seed), showMenu: (x, y, items) => showMenu(x, y, items), deleteBook: p => deleteBook(p), pageTemplate: root => sheetFor(root) ? sheetTemplate(root) : '<p><br></p>',
     get saveFailing() { return !!troubleRetry; }, pasteContent,
