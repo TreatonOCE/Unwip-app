@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.46.3",
-  "commit": "9bd9d91f78f9651a5aad421ccb67a22fcf8ec42d",
-  "name": "Unwip Dev 0.46.3",
-  "body": "- iPhone and iPad: in \u270e Edit, tap a page or folder's name to rename it right there. The circle still ticks it.\n- iPhone and iPad: the hold menu no longer says Rename is a double-click, since a double tap opens the page.\n\nsha256: bcf3ced6c62edef3d9f7665fa13cac196d28370f6cca1d4ac0f80ada54c78e25",
+  "tag_name": "v0.46.4",
+  "commit": "50243fd75d4f0a824d4aed115a09654385037d55",
+  "name": "Unwip Dev 0.46.4",
+  "body": "- Dropbox: \"Two versions found\" no longer comes up for the binder when nothing in it is different, such as after just opening the book on another device. A leftover one with nothing new in it is put away in the backups instead of asking every time the book opens.\n- iPhone: typewriter and other key sounds come back after you switch to another app and back.\n- Bold, italic, underline and strikethrough buttons now show what your next letters will be straight away. On iPhone, iPad and Safari, U used to stay lit after you turned underline off.\n- Deleting a selection and typing in its place carries on in the formatting the deleted words started with, as in Scrivener.\n\nsha256: e29ab8eaf3fd207dbf52384de58754ba9ebc3c2a98dedc74356519e79d83747a",
   "assets": [
     {
-      "name": "unwip-dev-app-0.46.3.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.3.zip"
+      "name": "unwip-dev-app-0.46.4.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.4.zip"
     },
     {
-      "name": "unwip-dev-app-0.46.3.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.3.zip.sha256"
+      "name": "unwip-dev-app-0.46.4.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.4.zip.sha256"
     }
   ]
 }
