@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.46.5",
-  "commit": "0a77c91d69a7932c0b7762a44eb261aa866cd77d",
-  "name": "Unwip Dev 0.46.5",
-  "body": "- \"This week\" on the goal rings and in Play now counts from the start of this week (Monday in Australia), not the last 7 days.\n\nsha256: 09ef12fa0baf62e17df6f4dfdadbaf67a64c44f85ae93f086ed6d1416b9b92e9",
+  "tag_name": "v0.46.6",
+  "commit": "dffcbe882639a9fdc0c2746dd41a4bc7fd8bc68d",
+  "name": "Unwip Dev 0.46.6",
+  "body": "- Website: the three dots above the opening statement are back, filling in as the page opens.\n\nsha256: b87ecdec656431b9411006b056c6c8112bcdf38dd19b52016b335912bd3d1ccd",
   "assets": [
     {
-      "name": "unwip-dev-app-0.46.5.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.5.zip"
+      "name": "unwip-dev-app-0.46.6.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.6.zip"
     },
     {
-      "name": "unwip-dev-app-0.46.5.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.5.zip.sha256"
+      "name": "unwip-dev-app-0.46.6.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.6.zip.sha256"
     }
   ]
 }
