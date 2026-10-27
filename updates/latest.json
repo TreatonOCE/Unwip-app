@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.46.6",
-  "name": "Unwip 0.46.6",
-  "body": "- iPhone and iPad: in \u270e Edit, tap a page or folder's name to rename it right there. The circle still ticks it.\n- iPhone and iPad: the hold menu no longer says Rename is a double-click, since a double tap opens the page.\n- Dropbox: \"Two versions found\" no longer comes up for the binder when nothing in it is different, such as after just opening the book on another device. A leftover one with nothing new in it is put away in the backups instead of asking every time the book opens.\n- iPhone: typewriter and other key sounds come back after you switch to another app and back.\n- Bold, italic, underline and strikethrough buttons now show what your next letters will be straight away. On iPhone, iPad and Safari, U used to stay lit after you turned underline off.\n- Deleting a selection and typing in its place carries on in the formatting the deleted words started with, as in Scrivener.\n- \"This week\" on the goal rings and in Play now counts from the start of this week (Monday in Australia), not the last 7 days.\n- Website: the three dots above the opening statement are back, filling in as the page opens.\n\nsha256: af0c010168943e0ae705ca409b5731a03c0610666a27a0e85ed8a3873d168842",
+  "tag_name": "v0.46.7",
+  "name": "Unwip 0.46.7",
+  "body": "- Safety net: if a chapter is about to become much shorter, whether you saved it that way or a shorter copy came in from Dropbox or another device, Unwip first keeps the longer version in Snapshots (the \u27f2 button on the chapter).\n- PC: if the Dropbox app puts back an older version of a chapter that Unwip saved a few minutes earlier, Unwip now notices and puts your newest words straight back. This is what emptied a chapter today.\n- Restarting for an update saves everything first. On iPhone and iPad with Dropbox, it also finishes syncing before it restarts, and tells you if Dropbox can't be reached.\n- While you type without stopping, your writing is now saved at least every 3 seconds. It used to wait for a pause.\n- iPhone and iPad: if a Dropbox sync is cut off part-way, or the app closes before it syncs, the chapters not sent yet go up with the next sync. Before, they could be skipped until you changed them again.\n\nsha256: 9686b6ba157e6cc760dd72852f12b9bd730a7a747465460e9426ac2804814692",
   "assets": [
     {
-      "name": "unwip-app-0.46.6.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.6.zip"
+      "name": "unwip-app-0.46.7.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.7.zip"
     },
     {
-      "name": "unwip-app-0.46.6.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.6.zip.sha256"
+      "name": "unwip-app-0.46.7.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.7.zip.sha256"
     }
   ]
 }
