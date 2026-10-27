@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.46.4",
-  "commit": "50243fd75d4f0a824d4aed115a09654385037d55",
-  "name": "Unwip Dev 0.46.4",
-  "body": "- Dropbox: \"Two versions found\" no longer comes up for the binder when nothing in it is different, such as after just opening the book on another device. A leftover one with nothing new in it is put away in the backups instead of asking every time the book opens.\n- iPhone: typewriter and other key sounds come back after you switch to another app and back.\n- Bold, italic, underline and strikethrough buttons now show what your next letters will be straight away. On iPhone, iPad and Safari, U used to stay lit after you turned underline off.\n- Deleting a selection and typing in its place carries on in the formatting the deleted words started with, as in Scrivener.\n\nsha256: e29ab8eaf3fd207dbf52384de58754ba9ebc3c2a98dedc74356519e79d83747a",
+  "tag_name": "v0.46.5",
+  "commit": "0a77c91d69a7932c0b7762a44eb261aa866cd77d",
+  "name": "Unwip Dev 0.46.5",
+  "body": "- \"This week\" on the goal rings and in Play now counts from the start of this week (Monday in Australia), not the last 7 days.\n\nsha256: 09ef12fa0baf62e17df6f4dfdadbaf67a64c44f85ae93f086ed6d1416b9b92e9",
   "assets": [
     {
-      "name": "unwip-dev-app-0.46.4.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.4.zip"
+      "name": "unwip-dev-app-0.46.5.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.5.zip"
     },
     {
-      "name": "unwip-dev-app-0.46.4.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.4.zip.sha256"
+      "name": "unwip-dev-app-0.46.5.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.5.zip.sha256"
     }
   ]
 }
