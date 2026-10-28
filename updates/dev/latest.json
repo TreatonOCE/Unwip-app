@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.47.1",
-  "commit": "c638445e85478dbd23615263eacb129de2555681",
-  "name": "Unwip Dev 0.47.1",
-  "body": "- iPhone: the top bar and the formatting row stay at the top of the screen while you select text or scroll with the keyboard open. iOS used to slide them off the top.\n\nsha256: bcf6ea72969ebe5d3ce49b7826ea7ff4ca44ce06bb0389c2ab7d8dffdcedcfbb",
+  "tag_name": "v0.47.2",
+  "commit": "e803fcfda17262e6b3cf6bda2233af30fd992257",
+  "name": "Unwip Dev 0.47.2",
+  "body": "- iPad and narrow windows: tools tucked into \"\u22ef\" come back onto the toolbar whenever there's room for them. \u2318K, the font size and the paragraph style no longer hide next to empty space.\n\nsha256: 9546fab303f7eb8cf91c32dcbd88ddc2649f2ae85086d09d25f3c1115c99bee9",
   "assets": [
     {
-      "name": "unwip-dev-app-0.47.1.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.1.zip"
+      "name": "unwip-dev-app-0.47.2.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.2.zip"
     },
     {
-      "name": "unwip-dev-app-0.47.1.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.1.zip.sha256"
+      "name": "unwip-dev-app-0.47.2.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.2.zip.sha256"
     }
   ]
 }
