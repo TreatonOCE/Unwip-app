@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.47.4",
-  "name": "Unwip 0.47.4",
-  "body": "- iPad with a keyboard attached: the page now keeps clear of the iPad's floating bar at the bottom on every iPad, so the zoom and the rest of the bottom row stay in reach while you type.\n- PC, Mac and iPad: a new button at the far left of the toolbar hides or brings back the left panel (Ctrl+Shift+[, or \u2318\u21e7[ on a Mac). Each book remembers it.\n- New in Settings \u203a Appearance: \"Hide the left panel while Revise or the side panel is open\". It's on by default on an iPad and off on a PC or Mac, and the left panel comes back when you close them.\n- Writer mode: one way out. \"Exit writer mode\" sits clear of the side panel, and the extra \u2715 on a tablet is gone.\n\nsha256: 215b1fe539b3aef2f645b678b460f01c33cffb622dbb06cada5bed2e84e3ca3d",
+  "tag_name": "v0.47.6",
+  "name": "Unwip 0.47.6",
+  "body": "- iPad with a keyboard attached: the page now ends just above the iPad's floating bar instead of leaving a gap, so you get more of the page while you type.\n- Revise: choose when the cards pop up. At the bottom of the Revise panel, Cards can be Show (as before), Tap twice (one tap puts the cursor in, a second tap opens the card) or Off. The highlights stay either way.\n- Revise: the \"e.g.\" examples on the cards are off unless you tick \"Include examples\".\n- Revise: every card has \"Stop showing these cards\" to turn them off in one tap.\n- iPad: a card opened by a tap no longer disappears a moment later.\n\nsha256: fa3d80e48d80a2984402cde6664def973d840339c6c09a4dbbbc917aad120914",
   "assets": [
     {
-      "name": "unwip-app-0.47.4.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.4.zip"
+      "name": "unwip-app-0.47.6.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.6.zip"
     },
     {
-      "name": "unwip-app-0.47.4.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.4.zip.sha256"
+      "name": "unwip-app-0.47.6.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.6.zip.sha256"
     }
   ]
 }
