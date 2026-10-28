@@ -1,5 +1,5 @@
-window.UNWIP_VERSION = "0.47.1";
-window.UNWIP_LATEST_NOTES = "- iPhone: the top bar and the formatting row stay at the top of the screen while you select text or scroll with the keyboard open. iOS used to slide them off the top.";
+window.UNWIP_VERSION = "0.47.2";
+window.UNWIP_LATEST_NOTES = "- iPad and narrow windows: tools tucked into \"\u22ef\" come back onto the toolbar whenever there's room for them. \u2318K, the font size and the paragraph style no longer hide next to empty space.";
 if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 (function () {
   if (location.protocol !== 'https:') return;
