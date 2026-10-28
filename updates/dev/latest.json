@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.47.0",
-  "commit": "a8e94bc6a96f5ead368f662c1a801a6522803508",
-  "name": "Unwip Dev 0.47.0",
-  "body": "- PC: typing no longer jitters every few seconds while Unwip saves. While you keep typing, only the chapter is saved, and the save no longer holds up the window. The rest of the book is saved when you pause.\n- Rename a book from the main screen: open its \u22ef menu and choose Rename\u2026\n- Scrivener import: statuses now take the colour of the label their chapters carry in Scrivener, so \"Amazon Ready\" comes in gold.\n- PC: the scene break button stays on the toolbar unless the window is very narrow.\n\nsha256: c5bb2eac96545cea8d82e0c305f901abca3bc172c2106eb1627bbe2dc5af163f",
+  "tag_name": "v0.47.1",
+  "commit": "c638445e85478dbd23615263eacb129de2555681",
+  "name": "Unwip Dev 0.47.1",
+  "body": "- iPhone: the top bar and the formatting row stay at the top of the screen while you select text or scroll with the keyboard open. iOS used to slide them off the top.\n\nsha256: bcf6ea72969ebe5d3ce49b7826ea7ff4ca44ce06bb0389c2ab7d8dffdcedcfbb",
   "assets": [
     {
-      "name": "unwip-dev-app-0.47.0.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.0.zip"
+      "name": "unwip-dev-app-0.47.1.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.1.zip"
     },
     {
-      "name": "unwip-dev-app-0.47.0.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.0.zip.sha256"
+      "name": "unwip-dev-app-0.47.1.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.1.zip.sha256"
     }
   ]
 }
