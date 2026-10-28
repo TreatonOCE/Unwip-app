@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.47.2",
-  "name": "Unwip 0.47.2",
-  "body": "- iPad and narrow windows: tools tucked into \"\u22ef\" come back onto the toolbar whenever there's room for them. \u2318K, the font size and the paragraph style no longer hide next to empty space.\n\nsha256: cad7f77916fb61c269b107c9a046be14f2896f9899ffc4e0a178eb1cf5199cc2",
+  "tag_name": "v0.47.4",
+  "name": "Unwip 0.47.4",
+  "body": "- iPad with a keyboard attached: the page now keeps clear of the iPad's floating bar at the bottom on every iPad, so the zoom and the rest of the bottom row stay in reach while you type.\n- PC, Mac and iPad: a new button at the far left of the toolbar hides or brings back the left panel (Ctrl+Shift+[, or \u2318\u21e7[ on a Mac). Each book remembers it.\n- New in Settings \u203a Appearance: \"Hide the left panel while Revise or the side panel is open\". It's on by default on an iPad and off on a PC or Mac, and the left panel comes back when you close them.\n- Writer mode: one way out. \"Exit writer mode\" sits clear of the side panel, and the extra \u2715 on a tablet is gone.\n\nsha256: 215b1fe539b3aef2f645b678b460f01c33cffb622dbb06cada5bed2e84e3ca3d",
   "assets": [
     {
-      "name": "unwip-app-0.47.2.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.2.zip"
+      "name": "unwip-app-0.47.4.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.4.zip"
     },
     {
-      "name": "unwip-app-0.47.2.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.2.zip.sha256"
+      "name": "unwip-app-0.47.4.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.4.zip.sha256"
     }
   ]
 }
