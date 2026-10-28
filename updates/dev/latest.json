@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.47.2",
-  "commit": "e803fcfda17262e6b3cf6bda2233af30fd992257",
-  "name": "Unwip Dev 0.47.2",
-  "body": "- iPad and narrow windows: tools tucked into \"\u22ef\" come back onto the toolbar whenever there's room for them. \u2318K, the font size and the paragraph style no longer hide next to empty space.\n\nsha256: 9546fab303f7eb8cf91c32dcbd88ddc2649f2ae85086d09d25f3c1115c99bee9",
+  "tag_name": "v0.47.3",
+  "commit": "15bb63d123fa6052e9b7dff722f1ad2b926ac27d",
+  "name": "Unwip Dev 0.47.3",
+  "body": "- iPad with a keyboard attached: the page now keeps clear of the iPad's floating bar at the bottom on every iPad, so the zoom and the rest of the bottom row stay in reach while you type.\n\nsha256: 724bef58ad90de10f670e1623b7f5cc29725680e319079217c9f219a8628c4a7",
   "assets": [
     {
-      "name": "unwip-dev-app-0.47.2.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.2.zip"
+      "name": "unwip-dev-app-0.47.3.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.3.zip"
     },
     {
-      "name": "unwip-dev-app-0.47.2.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.2.zip.sha256"
+      "name": "unwip-dev-app-0.47.3.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.3.zip.sha256"
     }
   ]
 }
