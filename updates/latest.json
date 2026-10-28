@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.47.6",
-  "name": "Unwip 0.47.6",
-  "body": "- iPad with a keyboard attached: the page now ends just above the iPad's floating bar instead of leaving a gap, so you get more of the page while you type.\n- Revise: choose when the cards pop up. At the bottom of the Revise panel, Cards can be Show (as before), Tap twice (one tap puts the cursor in, a second tap opens the card) or Off. The highlights stay either way.\n- Revise: the \"e.g.\" examples on the cards are off unless you tick \"Include examples\".\n- Revise: every card has \"Stop showing these cards\" to turn them off in one tap.\n- iPad: a card opened by a tap no longer disappears a moment later.\n\nsha256: fa3d80e48d80a2984402cde6664def973d840339c6c09a4dbbbc917aad120914",
+  "tag_name": "v0.47.7",
+  "name": "Unwip 0.47.7",
+  "body": "- iPad: tapping a check in Revise (Very hard sentences, Adverbs and the rest) goes through its highlights in the chapter again, one tap at a time.\n- Revise: after each jump, the short reason stays on screen for a moment instead of vanishing at once.\n\nsha256: d671e7783d2a22551a74a900f9a822581fc16e54ed891dc5d1e5357a86afd507",
   "assets": [
     {
-      "name": "unwip-app-0.47.6.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.6.zip"
+      "name": "unwip-app-0.47.7.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.7.zip"
     },
     {
-      "name": "unwip-app-0.47.6.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.6.zip.sha256"
+      "name": "unwip-app-0.47.7.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.7.zip.sha256"
     }
   ]
 }

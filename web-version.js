@@ -1,5 +1,5 @@
-window.UNWIP_VERSION = "0.47.6";
-window.UNWIP_LATEST_NOTES = "- iPad with a keyboard attached: the page now ends just above the iPad's floating bar instead of leaving a gap, so you get more of the page while you type.\n- Revise: choose when the cards pop up. At the bottom of the Revise panel, Cards can be Show (as before), Tap twice (one tap puts the cursor in, a second tap opens the card) or Off. The highlights stay either way.\n- Revise: the \"e.g.\" examples on the cards are off unless you tick \"Include examples\".\n- Revise: every card has \"Stop showing these cards\" to turn them off in one tap.\n- iPad: a card opened by a tap no longer disappears a moment later.";
+window.UNWIP_VERSION = "0.47.7";
+window.UNWIP_LATEST_NOTES = "- iPad: tapping a check in Revise (Very hard sentences, Adverbs and the rest) goes through its highlights in the chapter again, one tap at a time.\n- Revise: after each jump, the short reason stays on screen for a moment instead of vanishing at once.";
 if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 (function () {
   if (location.protocol !== 'https:') return;
