@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.47.4",
-  "commit": "a355cdc813f94daf14ce8f1223decb81b25c8be7",
-  "name": "Unwip Dev 0.47.4",
-  "body": "- PC, Mac and iPad: a new button at the far left of the toolbar hides or brings back the left panel (Ctrl+Shift+[, or \u2318\u21e7[ on a Mac). Each book remembers it.\n- New in Settings \u203a Appearance: \"Hide the left panel while Revise or the side panel is open\". It's on by default on an iPad and off on a PC or Mac, and the left panel comes back when you close them.\n- Writer mode: one way out. \"Exit writer mode\" sits clear of the side panel, and the extra \u2715 on a tablet is gone.\n\nsha256: 2c4efa28543f421cf15e0e93a6195205c9b36c684a1a88199e197bf06b228353",
+  "tag_name": "v0.47.5",
+  "commit": "b842d8213cfeb65cc7fc3e3656c8ceebe9068741",
+  "name": "Unwip Dev 0.47.5",
+  "body": "- iPad with a keyboard attached: the page now ends just above the iPad's floating bar instead of leaving a gap, so you get more of the page while you type.\n\nsha256: 65d5c647b18570e6eb613fa9862a96dc419c5f50c5117a4f118cfd04f37bfd89",
   "assets": [
     {
-      "name": "unwip-dev-app-0.47.4.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.4.zip"
+      "name": "unwip-dev-app-0.47.5.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.5.zip"
     },
     {
-      "name": "unwip-dev-app-0.47.4.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.4.zip.sha256"
+      "name": "unwip-dev-app-0.47.5.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.5.zip.sha256"
     }
   ]
 }
