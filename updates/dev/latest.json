@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.46.9",
-  "commit": "78c20d27f579154c6223ee9208ced8d464da3ea9",
-  "name": "Unwip Dev 0.46.9",
-  "body": "- Import: lists you don't choose for stay as one document. Only the lists where you pick \"One page per \u2026\" are turned into pages, however you move on.\n- Import: pages made from a list are no longer walked through one by one. Next goes past them, and the counter only counts the documents you brought in.\n- Deleting a book while Dropbox is busy with its folder: Unwip waits a few seconds and tries again. If it still can't, it says so plainly and leaves the book as it was, instead of a technical error.\n\nsha256: 725d26d0796c4d61a6072f1ab413d54cf2fad7776a04afe215e90f0e2e6a49c1",
+  "tag_name": "v0.47.0",
+  "commit": "a8e94bc6a96f5ead368f662c1a801a6522803508",
+  "name": "Unwip Dev 0.47.0",
+  "body": "- PC: typing no longer jitters every few seconds while Unwip saves. While you keep typing, only the chapter is saved, and the save no longer holds up the window. The rest of the book is saved when you pause.\n- Rename a book from the main screen: open its \u22ef menu and choose Rename\u2026\n- Scrivener import: statuses now take the colour of the label their chapters carry in Scrivener, so \"Amazon Ready\" comes in gold.\n- PC: the scene break button stays on the toolbar unless the window is very narrow.\n\nsha256: c5bb2eac96545cea8d82e0c305f901abca3bc172c2106eb1627bbe2dc5af163f",
   "assets": [
     {
-      "name": "unwip-dev-app-0.46.9.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.9.zip"
+      "name": "unwip-dev-app-0.47.0.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.0.zip"
     },
     {
-      "name": "unwip-dev-app-0.46.9.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.46.9.zip.sha256"
+      "name": "unwip-dev-app-0.47.0.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.0.zip.sha256"
     }
   ]
 }
