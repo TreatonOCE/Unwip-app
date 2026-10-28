@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.46.7",
-  "name": "Unwip 0.46.7",
-  "body": "- Safety net: if a chapter is about to become much shorter, whether you saved it that way or a shorter copy came in from Dropbox or another device, Unwip first keeps the longer version in Snapshots (the \u27f2 button on the chapter).\n- PC: if the Dropbox app puts back an older version of a chapter that Unwip saved a few minutes earlier, Unwip now notices and puts your newest words straight back. This is what emptied a chapter today.\n- Restarting for an update saves everything first. On iPhone and iPad with Dropbox, it also finishes syncing before it restarts, and tells you if Dropbox can't be reached.\n- While you type without stopping, your writing is now saved at least every 3 seconds. It used to wait for a pause.\n- iPhone and iPad: if a Dropbox sync is cut off part-way, or the app closes before it syncs, the chapters not sent yet go up with the next sync. Before, they could be skipped until you changed them again.\n\nsha256: 9686b6ba157e6cc760dd72852f12b9bd730a7a747465460e9426ac2804814692",
+  "tag_name": "v0.47.0",
+  "name": "Unwip 0.47.0",
+  "body": "- iPad: bold, italic and underline are always on the toolbar now. When space is short, the font box gets narrower instead, and the full font name still shows when you open it.\n- iPad with a keyboard attached: the iPad's own floating bar at the bottom no longer covers the word count, zoom and Record while you type.\n- Import: lists you don't choose for stay as one document. Only the lists where you pick \"One page per \u2026\" are turned into pages, however you move on.\n- Import: pages made from a list are no longer walked through one by one. Next goes past them, and the counter only counts the documents you brought in.\n- Deleting a book while Dropbox is busy with its folder: Unwip waits a few seconds and tries again. If it still can't, it says so plainly and leaves the book as it was, instead of a technical error.\n- PC: typing no longer jitters every few seconds while Unwip saves. While you keep typing, only the chapter is saved, and the save no longer holds up the window. The rest of the book is saved when you pause.\n- Rename a book from the main screen: open its \u22ef menu and choose Rename\u2026\n- Scrivener import: statuses now take the colour of the label their chapters carry in Scrivener, so \"Amazon Ready\" comes in gold.\n- PC: the scene break button stays on the toolbar unless the window is very narrow.\n\nsha256: 03e9ceba5cf6bb8f45908efebe6d0450402f6d4058c6e8d03ef3f137f18c3406",
   "assets": [
     {
-      "name": "unwip-app-0.46.7.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.7.zip"
+      "name": "unwip-app-0.47.0.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.0.zip"
     },
     {
-      "name": "unwip-app-0.46.7.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.46.7.zip.sha256"
+      "name": "unwip-app-0.47.0.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.0.zip.sha256"
     }
   ]
 }
