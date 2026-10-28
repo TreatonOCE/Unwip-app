@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.47.0",
-  "name": "Unwip 0.47.0",
-  "body": "- iPad: bold, italic and underline are always on the toolbar now. When space is short, the font box gets narrower instead, and the full font name still shows when you open it.\n- iPad with a keyboard attached: the iPad's own floating bar at the bottom no longer covers the word count, zoom and Record while you type.\n- Import: lists you don't choose for stay as one document. Only the lists where you pick \"One page per \u2026\" are turned into pages, however you move on.\n- Import: pages made from a list are no longer walked through one by one. Next goes past them, and the counter only counts the documents you brought in.\n- Deleting a book while Dropbox is busy with its folder: Unwip waits a few seconds and tries again. If it still can't, it says so plainly and leaves the book as it was, instead of a technical error.\n- PC: typing no longer jitters every few seconds while Unwip saves. While you keep typing, only the chapter is saved, and the save no longer holds up the window. The rest of the book is saved when you pause.\n- Rename a book from the main screen: open its \u22ef menu and choose Rename\u2026\n- Scrivener import: statuses now take the colour of the label their chapters carry in Scrivener, so \"Amazon Ready\" comes in gold.\n- PC: the scene break button stays on the toolbar unless the window is very narrow.\n\nsha256: 03e9ceba5cf6bb8f45908efebe6d0450402f6d4058c6e8d03ef3f137f18c3406",
+  "tag_name": "v0.47.1",
+  "name": "Unwip 0.47.1",
+  "body": "- iPhone: the top bar and the formatting row stay at the top of the screen while you select text or scroll with the keyboard open. iOS used to slide them off the top.\n\nsha256: b878daaf3fd8fad5cf0012e09e725475a892e8b1608c65a8ae91a1631bdddaab",
   "assets": [
     {
-      "name": "unwip-app-0.47.0.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.0.zip"
+      "name": "unwip-app-0.47.1.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.1.zip"
     },
     {
-      "name": "unwip-app-0.47.0.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.0.zip.sha256"
+      "name": "unwip-app-0.47.1.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.1.zip.sha256"
     }
   ]
 }
