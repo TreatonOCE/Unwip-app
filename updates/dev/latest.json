@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.47.9",
-  "commit": "5f9de354541f7438c6ad888ae09b9e833f18428a",
-  "name": "Unwip Dev 0.47.9",
-  "body": "- Words changed on another device now stand out in green on every theme and page colour, including dark ones.\n- Writer mode on a PC or Mac: one way out, the Exit in the strip that rises from the bottom.\n- iPad, iPhone and Safari on a Mac: shortcut hints say \u2318 where they used to say Ctrl.\n- Maps: \u2318\u21e7Z (Ctrl+Shift+Z) now redoes, as you'd expect.\n- Help is up to date: the missing shortcuts are listed (Read aloud, Track changes, Dialogue view, the left panel, page size, lists), and there are new topics for hiding the left panel, Revise cards and Build \u203a Character.\n- The tour brings the left panel back if it's hidden, and shows the left-panel and side-panel buttons.\n- Ctrl+K: \"Hide or show the left panel\".\n- Behind the scenes: old code that nothing used any more is gone, and there are new safety checks for Kindle chapter titles and for boxes that would make an iPhone zoom in.\n\nsha256: 6c42c0affc8d9c0e4fc052eeba56a82a07c6f93855ec32bad1e17b29f0398ead",
+  "tag_name": "v0.48.0",
+  "commit": "55b1c7a94af91e4bdecd13f2493bf9fa6c1b986a",
+  "name": "Unwip Dev 0.48.0",
+  "body": "- Writer quotes: every one was checked against its source. Six that were slightly misquoted now read as the writer wrote them, and five that weren't really the writer's own published words are gone.\n\nsha256: b1bc3496d201eb72f5857aa4baa3b2738f7105d4385e2445f8b3f4fcc5a9c135",
   "assets": [
     {
-      "name": "unwip-dev-app-0.47.9.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.9.zip"
+      "name": "unwip-dev-app-0.48.0.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.0.zip"
     },
     {
-      "name": "unwip-dev-app-0.47.9.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.9.zip.sha256"
+      "name": "unwip-dev-app-0.48.0.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.0.zip.sha256"
     }
   ]
 }
