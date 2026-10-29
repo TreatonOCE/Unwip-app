@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.47.7",
-  "commit": "291636aa8884785666a2065f9d91597e418d4f1d",
-  "name": "Unwip Dev 0.47.7",
-  "body": "- iPad: tapping a check in Revise (Very hard sentences, Adverbs and the rest) goes through its highlights in the chapter again, one tap at a time.\n- Revise: after each jump, the short reason stays on screen for a moment instead of vanishing at once.\n\nsha256: 4a6c4999b744280107594acfc49eefc59750981b936d62aa6f2033f0d3102584",
+  "tag_name": "v0.47.8",
+  "commit": "ec1cad4ea171564992b91f026adff942122c6f71",
+  "name": "Unwip Dev 0.47.8",
+  "body": "- iPad and iPhone: when a chapter was changed on another device, opening it now shows what changed. A green bar says where and when, and the new or changed words are in green. Before, only the dot in the chapter list showed.\n\nsha256: 56fa535ab3311e8835917db3dbf337758e7223cc33fac0cee996f2377c9786ed",
   "assets": [
     {
-      "name": "unwip-dev-app-0.47.7.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.7.zip"
+      "name": "unwip-dev-app-0.47.8.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.8.zip"
     },
     {
-      "name": "unwip-dev-app-0.47.7.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.7.zip.sha256"
+      "name": "unwip-dev-app-0.47.8.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.47.8.zip.sha256"
     }
   ]
 }
