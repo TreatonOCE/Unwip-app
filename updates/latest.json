@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.47.7",
-  "name": "Unwip 0.47.7",
-  "body": "- iPad: tapping a check in Revise (Very hard sentences, Adverbs and the rest) goes through its highlights in the chapter again, one tap at a time.\n- Revise: after each jump, the short reason stays on screen for a moment instead of vanishing at once.\n\nsha256: d671e7783d2a22551a74a900f9a822581fc16e54ed891dc5d1e5357a86afd507",
+  "tag_name": "v0.47.9",
+  "name": "Unwip 0.47.9",
+  "body": "- iPad and iPhone: when a chapter was changed on another device, opening it now shows what changed. A green bar says where and when, and the new or changed words are in green. Before, only the dot in the chapter list showed.\n- Words changed on another device now stand out in green on every theme and page colour, including dark ones.\n- Writer mode on a PC or Mac: one way out, the Exit in the strip that rises from the bottom.\n- iPad, iPhone and Safari on a Mac: shortcut hints say \u2318 where they used to say Ctrl.\n- Maps: \u2318\u21e7Z (Ctrl+Shift+Z) now redoes, as you'd expect.\n- Help is up to date: the missing shortcuts are listed (Read aloud, Track changes, Dialogue view, the left panel, page size, lists), and there are new topics for hiding the left panel, Revise cards and Build \u203a Character.\n- The tour brings the left panel back if it's hidden, and shows the left-panel and side-panel buttons.\n- Ctrl+K: \"Hide or show the left panel\".\n- Behind the scenes: old code that nothing used any more is gone, and there are new safety checks for Kindle chapter titles and for boxes that would make an iPhone zoom in.\n\nsha256: bc9f233b51866d2c151cbaf9352550d2cb77fbc96635a07ac4ec533c4f0f45ca",
   "assets": [
     {
-      "name": "unwip-app-0.47.7.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.7.zip"
+      "name": "unwip-app-0.47.9.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.9.zip"
     },
     {
-      "name": "unwip-app-0.47.7.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.7.zip.sha256"
+      "name": "unwip-app-0.47.9.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.47.9.zip.sha256"
     }
   ]
 }
