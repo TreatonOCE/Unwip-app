@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.48.1",
-  "name": "Unwip 0.48.1",
-  "body": "- PC and Mac: \u270e Edit at the bottom of the binder, as on the iPad, made for a mouse. Click rows to tick them, Shift-click to tick a run, then drag them by \u2261 or use Move to\u2026, Out of folder or Trash. Double-click a name to rename it, Ctrl+A ticks the rows beside the last one you clicked, Delete sends the ticked rows to the Trash (with Undo), and Esc finishes.\n- Outside Edit the binder works as before: drag a row, right-click, Alt+arrows.\n\nsha256: 005585bafe4dbf1cb170482295f6689b6fbd4634d4ccd25bbcb28592b467fe01",
+  "tag_name": "v0.48.2",
+  "name": "Unwip 0.48.2",
+  "body": "- Record: \u2039 Recordings in the player and the video window takes you back to the list of recordings, so finding the right one doesn't mean starting over. Esc does the same.\n- Record: replay videos are made much faster than they play on PC and Mac (and wherever the device can), and still play at the speed you pick. An 11-second test replay took about 2 seconds to make.\n- Record on PC and Mac: choose where videos and reports are saved, at the bottom of the recordings list. They go straight there (Videos\\Unwip to start with), or untick \"Save there without asking\" to pick each time.\n\nsha256: d8c232bbd890ccc4d543b792b340efc2cd44666fb2e5e160c17782f180aa2ae8",
   "assets": [
     {
-      "name": "unwip-app-0.48.1.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.1.zip"
+      "name": "unwip-app-0.48.2.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.2.zip"
     },
     {
-      "name": "unwip-app-0.48.1.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.1.zip.sha256"
+      "name": "unwip-app-0.48.2.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.2.zip.sha256"
     }
   ]
 }
