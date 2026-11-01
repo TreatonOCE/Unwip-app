@@ -1,15 +1,15 @@
 {
-  "tag_name": "v0.48.0",
-  "name": "Unwip 0.48.0",
-  "body": "- Writer quotes: every one was checked against its source. Six that were slightly misquoted now read as the writer wrote them, and five that weren't really the writer's own published words are gone.\n\nsha256: de826806bdc343678f8657705799a4dcc5e3c79f02f7499349bd647abb815c3a",
+  "tag_name": "v0.48.1",
+  "name": "Unwip 0.48.1",
+  "body": "- PC and Mac: \u270e Edit at the bottom of the binder, as on the iPad, made for a mouse. Click rows to tick them, Shift-click to tick a run, then drag them by \u2261 or use Move to\u2026, Out of folder or Trash. Double-click a name to rename it, Ctrl+A ticks the rows beside the last one you clicked, Delete sends the ticked rows to the Trash (with Undo), and Esc finishes.\n- Outside Edit the binder works as before: drag a row, right-click, Alt+arrows.\n\nsha256: 005585bafe4dbf1cb170482295f6689b6fbd4634d4ccd25bbcb28592b467fe01",
   "assets": [
     {
-      "name": "unwip-app-0.48.0.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.0.zip"
+      "name": "unwip-app-0.48.1.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.1.zip"
     },
     {
-      "name": "unwip-app-0.48.0.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.0.zip.sha256"
+      "name": "unwip-app-0.48.1.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/packages/unwip-app-0.48.1.zip.sha256"
     }
   ]
 }
