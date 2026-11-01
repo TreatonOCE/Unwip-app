@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.48.0",
-  "commit": "55b1c7a94af91e4bdecd13f2493bf9fa6c1b986a",
-  "name": "Unwip Dev 0.48.0",
-  "body": "- Writer quotes: every one was checked against its source. Six that were slightly misquoted now read as the writer wrote them, and five that weren't really the writer's own published words are gone.\n\nsha256: b1bc3496d201eb72f5857aa4baa3b2738f7105d4385e2445f8b3f4fcc5a9c135",
+  "tag_name": "v0.48.1",
+  "commit": "c0f712e947bb2396a2f16dd9a3e43c85df89819a",
+  "name": "Unwip Dev 0.48.1",
+  "body": "- PC and Mac: \u270e Edit at the bottom of the binder, as on the iPad, made for a mouse. Click rows to tick them, Shift-click to tick a run, then drag them by \u2261 or use Move to\u2026, Out of folder or Trash. Double-click a name to rename it, Ctrl+A ticks the rows beside the last one you clicked, Delete sends the ticked rows to the Trash (with Undo), and Esc finishes.\n- Outside Edit the binder works as before: drag a row, right-click, Alt+arrows.\n\nsha256: df401e171b1327560bc33c3f85fcd547d0f167d5379190e25e42afc2e1fa901d",
   "assets": [
     {
-      "name": "unwip-dev-app-0.48.0.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.0.zip"
+      "name": "unwip-dev-app-0.48.1.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.1.zip"
     },
     {
-      "name": "unwip-dev-app-0.48.0.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.0.zip.sha256"
+      "name": "unwip-dev-app-0.48.1.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.1.zip.sha256"
     }
   ]
 }
