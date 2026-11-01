@@ -1,16 +1,16 @@
 {
-  "tag_name": "v0.48.1",
-  "commit": "c0f712e947bb2396a2f16dd9a3e43c85df89819a",
-  "name": "Unwip Dev 0.48.1",
-  "body": "- PC and Mac: \u270e Edit at the bottom of the binder, as on the iPad, made for a mouse. Click rows to tick them, Shift-click to tick a run, then drag them by \u2261 or use Move to\u2026, Out of folder or Trash. Double-click a name to rename it, Ctrl+A ticks the rows beside the last one you clicked, Delete sends the ticked rows to the Trash (with Undo), and Esc finishes.\n- Outside Edit the binder works as before: drag a row, right-click, Alt+arrows.\n\nsha256: df401e171b1327560bc33c3f85fcd547d0f167d5379190e25e42afc2e1fa901d",
+  "tag_name": "v0.48.2",
+  "commit": "6da8dcadac0fc072fd29fc204c2b52d4f6e5745b",
+  "name": "Unwip Dev 0.48.2",
+  "body": "- Record: \u2039 Recordings in the player and the video window takes you back to the list of recordings, so finding the right one doesn't mean starting over. Esc does the same.\n- Record: replay videos are made much faster than they play on PC and Mac (and wherever the device can), and still play at the speed you pick. An 11-second test replay took about 2 seconds to make.\n- Record on PC and Mac: choose where videos and reports are saved, at the bottom of the recordings list. They go straight there (Videos\\Unwip to start with), or untick \"Save there without asking\" to pick each time.\n\nsha256: e47a33f254362696889b54cf95abe8a9fa3beabe8167cec9931cff82fb67c9f4",
   "assets": [
     {
-      "name": "unwip-dev-app-0.48.1.zip",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.1.zip"
+      "name": "unwip-dev-app-0.48.2.zip",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.2.zip"
     },
     {
-      "name": "unwip-dev-app-0.48.1.zip.sha256",
-      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.1.zip.sha256"
+      "name": "unwip-dev-app-0.48.2.zip.sha256",
+      "browser_download_url": "https://raw.githubusercontent.com/UnwipOfficial/unwip-releases/main/dev/packages/unwip-dev-app-0.48.2.zip.sha256"
     }
   ]
 }
